@@ -318,8 +318,25 @@ function coinBadge(sym, size) {
 }
 const EXTRA_DEFAULTS = { strategy_tf: '1h', max_account_risk_pct: 100, corr_min_trades: 3, corr_win_rate: 60 };
 
+// Dinamik API Base URL (Doğrudan tünelden açılırsa bağıl kalır; GitHub Pages'den açılırsa tünel adresine bağlanır)
+function getApiBase() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const qApi = urlParams.get("api");
+  if (qApi && qApi.startsWith("https://")) {
+    localStorage.setItem("elena_api_base", qApi);
+    return qApi;
+  }
+  const cached = localStorage.getItem("elena_api_base");
+  if (cached && location.hostname.includes("github.io")) {
+    return cached;
+  }
+  return "";
+}
+
 async function api(path, body = {}) {
-  const r = await fetch(path, {
+  const baseUrl = getApiBase();
+  const fullUrl = (baseUrl && path.startsWith("/")) ? (baseUrl.replace(/\/$/, "") + path) : path;
+  const r = await fetch(fullUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ initData, ...body })
@@ -1039,7 +1056,8 @@ async function main() {
   }
 
   try {
-    CFG = await (await fetch("/api/config")).json();
+    const cfgUrl = getApiBase() ? (getApiBase().replace(/\/$/, "") + "/api/config") : "/api/config";
+    CFG = await (await fetch(cfgUrl)).json();
     if (document.getElementById("webhook-url-box") && CFG.webhook_url) {
       document.getElementById("webhook-url-box").textContent = CFG.webhook_url;
       document.getElementById("btn-copy-webhook").onclick = () => {

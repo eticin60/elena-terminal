@@ -5,8 +5,24 @@ tg?.ready();
 tg?.expand();
 const initData = tg?.initData || "";
 
+function getApiBase() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const qApi = urlParams.get("api");
+  if (qApi && qApi.startsWith("https://")) {
+    localStorage.setItem("elena_api_base", qApi);
+    return qApi;
+  }
+  const cached = localStorage.getItem("elena_api_base");
+  if (cached && location.hostname.includes("github.io")) {
+    return cached;
+  }
+  return "";
+}
+
 async function api(path, body = {}) {
-  const r = await fetch(path, {
+  const baseUrl = getApiBase();
+  const fullUrl = (baseUrl && path.startsWith("/")) ? (baseUrl.replace(/\/$/, "") + path) : path;
+  const r = await fetch(fullUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ initData, ...body })

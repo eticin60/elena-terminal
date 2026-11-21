@@ -320,6 +320,57 @@ window.drawInspectCharts = function() {
     cCtx.stroke();
   }
 
+  // 4b. VWAP (Hacim Ağırlıklı Ortalama Fiyat)
+  if (inspectIndicators.vwap) {
+    let cumVol = 0, cumVolPrice = 0;
+    let vwapArr = [];
+    for (let i = 0; i < n; i++) {
+      const typ = (klines[i].high + klines[i].low + klines[i].close) / 3;
+      cumVol += klines[i].volume;
+      cumVolPrice += typ * klines[i].volume;
+      vwapArr.push(cumVolPrice / (cumVol || 1));
+    }
+    cCtx.strokeStyle = "#c084fc";
+    cCtx.lineWidth = 1.4;
+    cCtx.setLineDash([3, 3]);
+    cCtx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const x = toX(i), y = toY(vwapArr[i]);
+      i === 0 ? cCtx.moveTo(x, y) : cCtx.lineTo(x, y);
+    }
+    cCtx.stroke();
+    cCtx.setLineDash([]);
+    cCtx.fillStyle = "#c084fc";
+    cCtx.font = "8.5px sans-serif";
+    cCtx.fillText("VWAP", w - 42, toY(vwapArr[n - 1]) - 2);
+  }
+
+  // 4c. FIBONACCI DÜZELTME SEVİYELERİ
+  if (inspectIndicators.fib) {
+    const range = maxP - minP;
+    const fibLevels = [
+      { ratio: 0.236, color: "rgba(255,210,90,0.7)" },
+      { ratio: 0.382, color: "rgba(56,189,248,0.7)" },
+      { ratio: 0.500, color: "rgba(0,255,163,0.8)" },
+      { ratio: 0.618, color: "rgba(248,113,113,0.8)" }
+    ];
+    cCtx.setLineDash([2, 2]);
+    fibLevels.forEach(fib => {
+      const fibP = minP + range * fib.ratio;
+      const y = toY(fibP);
+      cCtx.strokeStyle = fib.color;
+      cCtx.lineWidth = 1;
+      cCtx.beginPath();
+      cCtx.moveTo(5, y);
+      cCtx.lineTo(w - 5, y);
+      cCtx.stroke();
+      cCtx.font = "8px sans-serif";
+      cCtx.fillStyle = fib.color;
+      cCtx.fillText(`Fib ${fib.ratio}`, w - 42, y - 2);
+    });
+    cCtx.setLineDash([]);
+  }
+
   // 5. HACİM GRAFİĞİ (VOLCANVAS)
   vCtx.clearRect(0, 0, w, vh);
   const maxVol = Math.max(...vols) || 1;
@@ -391,6 +442,9 @@ window.drawInspectCharts = function() {
 window.runMarketInspection = async function() {
   const sym = (currentInspectSymbol || "BTCUSDT").trim().toUpperCase();
   const tf = currentInspectTf || "5m";
+  const lang = (localStorage.getItem("elena_lang") || "tr").toLowerCase();
+  const isRu = lang === "ru" || lang === "uk";
+  const isTr = lang === "tr";
 
   const pairLabelEl = document.getElementById("inspect-pair-label");
   const bigPriceEl = document.getElementById("inspect-big-price");
@@ -498,37 +552,75 @@ window.runMarketInspection = async function() {
 
     if (ddCurEl) ddCurEl.textContent = `$${closePrice.toFixed(1)}`;
     if (ddSupEl) ddSupEl.textContent = `$${supPrice.toFixed(1)}`;
-    if (ddSupSubEl) ddSupSubEl.textContent = `-${Math.abs(supDist).toFixed(2)}% uzaklıkta · 2 temas`;
+    
+    // Çok dilli destek / direnç mesafesi
+    const distWord = isRu ? "дистанция" : (isTr ? "uzaklıkta" : "distance");
+    const touchWord = isRu ? "касания" : (isTr ? "temas" : "touches");
+    if (ddSupSubEl) ddSupSubEl.textContent = `-${Math.abs(supDist).toFixed(2)}% ${distWord} · 2 ${touchWord}`;
     if (ddResEl) ddResEl.textContent = `$${resPrice.toFixed(1)}`;
-    if (ddResSubEl) ddResSubEl.textContent = `+${Math.abs(resDist).toFixed(2)}% uzaklıkta · 3 temas`;
+    if (ddResSubEl) ddResSubEl.textContent = `+${Math.abs(resDist).toFixed(2)}% ${distWord} · 3 ${touchWord}`;
 
-    let formasyon = "Şu an belirgin bir formasyon tespit edilmedi";
-    if (pctChange > 2.0) formasyon = "Boğa Flaması (Yükseliş Trend Devamı)";
-    else if (pctChange < -2.0) formasyon = "Düşüş Kanalı (Ayı Baskısı & Satış)";
-    else if (rsiVal < 32) formasyon = "Çift Dip / Destek Tepki Bölgesi";
-    else if (rsiVal > 68) formasyon = "Çift Tepe / Direnç Reddi Bölgesi";
+    // Çok dilli Formasyon tespiti
+    let formasyon = isRu ? "Выраженных графических паттернов не обнаружено" : (isTr ? "Şu an belirgin bir formasyon tespit edilmedi" : "No distinct chart pattern detected currently");
+    if (pctChange > 2.0) {
+      formasyon = isRu ? "Бычий вымпел (Импульс продолжения восходящего тренда)" : (isTr ? "Boğa Flaması (Yükseliş Trend Devamı)" : "Bullish Flag / Continuation Momentum");
+    } else if (pctChange < -2.0) {
+      formasyon = isRu ? "Нисходящий канал (Давление медведей и продажи)" : (isTr ? "Düşüş Kanalı (Ayı Baskısı & Satış)" : "Descending Channel (Bearish Selling Pressure)");
+    } else if (rsiVal < 32) {
+      formasyon = isRu ? "Двойное дно / Область потенциального отскока от поддержки" : (isTr ? "Çift Dip / Destek Tepki Bölgesi" : "Double Bottom / Potential Support Rebound");
+    } else if (rsiVal > 68) {
+      formasyon = isRu ? "Двойная вершина / Зона отбоя от сопротивления" : (isTr ? "Çift Tepe / Direnç Reddi Bölgesi" : "Double Top / Resistance Rejection Zone");
+    }
     if (patResultEl) patResultEl.textContent = formasyon;
 
+    // Teknik Okuma
     const isEmaBull = klines[klines.length - 1].close >= klines[klines.length - 5].close;
     if (emaTrendValEl) {
-      emaTrendValEl.textContent = isEmaBull ? "YÜKSELİŞ" : "DÜŞÜŞ";
+      const upText = isRu ? "ВОСХОДЯЩИЙ" : (isTr ? "YÜKSELİŞ" : "BULLISH");
+      const downText = isRu ? "НИСХОДЯЩИЙ" : (isTr ? "DÜŞÜŞ" : "BEARISH");
+      emaTrendValEl.textContent = isEmaBull ? upText : downText;
       emaTrendValEl.style.color = isEmaBull ? "var(--accent-green)" : "var(--accent-red)";
     }
     if (rsiBoxValEl) {
-      const rsiTxt = rsiVal >= 70 ? `${rsiVal.toFixed(1)} · AŞIRI ALIM` : rsiVal <= 30 ? `${rsiVal.toFixed(1)} · AŞIRI SATIM` : `${rsiVal.toFixed(1)} · DENGELİ`;
-      rsiBoxValEl.textContent = rsiTxt;
+      const obText = isRu ? "ПЕРЕКУПЛЕННОСТЬ" : (isTr ? "AŞIRI ALIM" : "OVERBOUGHT");
+      const osText = isRu ? "ПЕРЕПРОДАННОСТЬ" : (isTr ? "AŞIRI SATIM" : "OVERSOLD");
+      const neutralText = isRu ? "НЕЙТРАЛЬНО" : (isTr ? "DENGELİ" : "NEUTRAL");
+      const statusText = rsiVal >= 70 ? obText : rsiVal <= 30 ? osText : neutralText;
+      rsiBoxValEl.textContent = `${rsiVal.toFixed(1)} · ${statusText}`;
       rsiBoxValEl.style.color = rsiVal >= 70 ? "var(--accent-red)" : rsiVal <= 30 ? "var(--accent-green)" : "#38bdf8";
     }
     if (rsiBadgeTopEl) rsiBadgeTopEl.textContent = rsiVal.toFixed(1);
 
+    // Çok dilli DİKKAT Kartı
     if (dikkatTextEl) {
-      dikkatTextEl.textContent = `${tf} grafikte EMA9, EMA21'in ${isEmaBull ? "üzerinde — kısa vadeli momentum yukarı yönlü" : "altında — kısa vadeli satıcılar baskın"}. RSI ${rsiVal.toFixed(1)} ile ${rsiVal >= 70 ? "aşırı alımda" : rsiVal <= 30 ? "aşırı satımda" : "dengeli bölgede"}. Bu okumalar birlikte kaba bir yön fikri veriyor; tek başına giriş sinyali olarak kullanma.`;
+      if (isRu) {
+        dikkatTextEl.textContent = `На таймфрейме ${tf} EMA9 находится ${isEmaBull ? "выше EMA21 — краткосрочный восходящий импульс" : "ниже EMA21 — давление продавцов"}. RSI ${rsiVal.toFixed(1)} указывает на ${rsiVal >= 70 ? "зону перекупленности" : rsiVal <= 30 ? "зону перепроданности" : "сбалансированную фазу"}. Это общая оценка контекста, используйте стоп-лосс.`;
+      } else if (isTr) {
+        dikkatTextEl.textContent = `${tf} grafikte EMA9, EMA21'in ${isEmaBull ? "üzerinde — kısa vadeli momentum yukarı yönlü" : "altında — kısa vadeli satıcılar baskın"}. RSI ${rsiVal.toFixed(1)} ile ${rsiVal >= 70 ? "aşırı alımda" : rsiVal <= 30 ? "aşırı satımda" : "dengeli bölgede"}. Bu okumalar birlikte kaba bir yön fikri veriyor; tek başına giriş sinyali olarak kullanma.`;
+      } else {
+        dikkatTextEl.textContent = `On ${tf} timeframe, EMA9 is ${isEmaBull ? "above EMA21 — short-term momentum is upwards" : "below EMA21 — sellers are currently dominant"}. RSI is at ${rsiVal.toFixed(1)} (${rsiVal >= 70 ? "overbought zone" : rsiVal <= 30 ? "oversold zone" : "balanced zone"}). Use appropriate stop-loss.`;
+      }
     }
 
-    const stateTitle = Math.abs(pctChange) < 1.5 ? "YATAY / KONSOLİDASYON" : pctChange >= 1.5 ? "YÜKSELİŞ MOMENTUMU" : "SATICILI BASKI";
+    // Çok dilli Sade Dilde Yeni Başlayan Açıklaması
+    let stateTitle = "";
+    if (Math.abs(pctChange) < 1.5) {
+      stateTitle = isRu ? "БОКОВИК / КОНСОЛИДАЦИЯ" : (isTr ? "YATAY / KONSOLİDASYON" : "SIDEWAYS / CONSOLIDATION");
+    } else if (pctChange >= 1.5) {
+      stateTitle = isRu ? "ВОСХОДЯЩИЙ ИМПУЛЬС" : (isTr ? "YÜKSELİŞ MOMENTUMU" : "BULLISH MOMENTUM");
+    } else {
+      stateTitle = isRu ? "МЕДВЕЖЬЕ ДАВЛЕНИЕ" : (isTr ? "SATICILI BASKI" : "BEARISH PRESSURE");
+    }
     if (plainBadgeEl) plainBadgeEl.textContent = stateTitle;
+    
     if (plainNarrativeEl) {
-      plainNarrativeEl.innerHTML = `Fiyat son mumlarda büyük bir yön değişikliği göstermiyor, ${stateTitle.toLowerCase()} bölgesinde hareket ediyor. Bu genelde piyasanın bir sonraki büyük hareket için likidite topladığı bir dönemdir.<br><br>RSI ${rsiVal.toFixed(0)} ile ${rsiVal >= 70 ? '"aşırı alım" bölgesinde — fiyat kısa vadede hızlı yükselmiş demektir, düzeltme gelebilir' : rsiVal <= 30 ? '"aşırı satım" bölgesinde — satıcılar yorulmuş olabilir, tepki alımı gelebilir' : '"nötr" alanda dengeli bir fiyatlama sürdürüyor'}.<br><br>Unutma: bu açıklamalar geçmiş fiyat hareketine dayalı genel eğilimlerdir, ne olacağını kesin söylemez. Piyasa her an bu beklentilerin dışına çıkabilir.`;
+      if (isRu) {
+        plainNarrativeEl.innerHTML = `Цена в последних свечах движется в фазе ${stateTitle.toLowerCase()}, накапливая объем перед следующим направленным движением.<br><br>Индикатор RSI ${rsiVal.toFixed(0)} — ${rsiVal >= 70 ? "в зоне перекупленности, возможен локальный откат или фиксация прибыли" : rsiVal <= 30 ? "в зоне перепроданности, вероятна реакция покупателей" : "в нейтральной полосе, сохраняется баланс сил"}.<br><br>Помните: технические индикаторы отражают прошлую динамику и не дают 100% гарантии. Всегда управляйте рисками.`;
+      } else if (isTr) {
+        plainNarrativeEl.innerHTML = `Fiyat son mumlarda büyük bir yön değişikliği göstermiyor, ${stateTitle.toLowerCase()} bölgesinde hareket ediyor. Bu genelde piyasanın bir sonraki büyük hareket için likidite topladığı bir dönemdir.<br><br>RSI ${rsiVal.toFixed(0)} ile ${rsiVal >= 70 ? '"aşırı alım" bölgesinde — fiyat kısa vadede hızlı yükselmiş demektir, düzeltme gelebilir' : rsiVal <= 30 ? '"aşırı satım" bölgesinde — satıcılar yorulmuş olabilir, tepki alımı gelebilir' : '"nötr" alanda dengeli bir fiyatlama sürdürüyor'}.<br><br>Unutma: bu açıklamalar geçmiş fiyat hareketine dayalı genel eğilimlerdir, ne olacağını kesin söylemez. Piyasa her an bu beklentilerin dışına çıkabilir.`;
+      } else {
+        plainNarrativeEl.innerHTML = `Price is currently moving in ${stateTitle.toLowerCase()} range, gathering volume before the next directional expansion.<br><br>RSI at ${rsiVal.toFixed(0)} is ${rsiVal >= 70 ? "in overbought area, potential profit-taking pullback possible" : rsiVal <= 30 ? "in oversold area, buyer bounce possible" : "in neutral territory with balanced market orders"}.<br><br>Always use prudent risk and position sizing.`;
+      }
     }
 
     window.drawInspectCharts();
@@ -767,7 +859,6 @@ function applyLanguage(lang) {
 
   document.getElementById("current-lang-label").textContent = lang.toUpperCase();
 
-  // Genişletilmiş dinamik başlık ve kilit çevirileri
   const isTr = lang === "tr";
   const isRu = lang === "ru" || lang === "uk";
   
@@ -777,6 +868,29 @@ function applyLanguage(lang) {
   if ($("#i18n-manual-lock-desc")) $("#i18n-manual-lock-desc").textContent = isTr ? "Manuel işlem açabilmek için Borsa sekmesinden borsa API Key bağlamalısınız." : (isRu ? "Для открытия сделок подключите API Key в разделе Биржа." : "Connect exchange API Key to place manual trades.");
   if ($("#guide-main-title")) $("#guide-main-title").textContent = isTr ? "Elena Terminal · Kullanım Kılavuzu" : (isRu ? "Терминал Елена · Руководство" : "Elena Terminal · User Guide");
   if ($("#i18n-top-sub")) $("#i18n-top-sub").textContent = isRu ? "Крипто Сигналы" : "Crypto Signals";
+
+  // 🧠 CANLI PİYASA OKUMA & DESTEK/DİRENÇ (SİNYAL DEFTERİ PRO) DİL DESTEĞİ
+  if ($("#inspect-head-title")) $("#inspect-head-title").textContent = isRu ? "🇷🇺 Елена Хьюз · Терминал анализа рынка" : (isTr ? "🇷🇺 Елена Хьюз · Sinyal Defteri Terminal" : "🇷🇺 Elena Hughes · Market Engine Terminal");
+  if ($("#inspect-head-badge")) $("#inspect-head-badge").textContent = isRu ? "Количественный алгоритм" : (isTr ? "Canlı Algoritma" : "Live Quant Engine");
+  if ($("#inspect-lbl-high")) $("#inspect-lbl-high").textContent = isRu ? "Макс" : (isTr ? "Yüksek" : "High");
+  if ($("#inspect-lbl-low")) $("#inspect-lbl-low").textContent = isRu ? "Мин" : (isTr ? "Düşük" : "Low");
+  if ($("#inspect-lbl-vol")) $("#inspect-lbl-vol").textContent = isRu ? "Объем" : (isTr ? "Hacim" : "Volume");
+  if ($("#inspect-lbl-time")) $("#inspect-lbl-time").textContent = isRu ? "Обновлено" : (isTr ? "Son güncelleme" : "Updated");
+  if ($("#inspect-legend-title")) $("#inspect-legend-title").textContent = isRu ? "ЦЕНА · СВЕЧИ + EMA9/21 + BOLLINGER + П/С" : (isTr ? "FİYAT · MUM + EMA9/21 + BOLLINGER + D/D" : "PRICE · CANDLES + EMA9/21 + BOLLINGER + S/R");
+  if ($("#inspect-legend-sup")) $("#inspect-legend-sup").textContent = isRu ? "Поддержка" : (isTr ? "Destek" : "Support");
+  if ($("#inspect-legend-res")) $("#inspect-legend-res").textContent = isRu ? "Сопротивление" : (isTr ? "Direnç" : "Resistance");
+  if ($("#inspect-vol-title")) $("#inspect-vol-title").textContent = isRu ? "ОБЪЕМ" : (isTr ? "HACİM" : "VOLUME");
+  if ($("#inspect-dd-title")) $("#inspect-dd-title").textContent = isRu ? "УРОВНИ ПОДДЕРЖКИ И СОПРОТИВЛЕНИЯ" : (isTr ? "DESTEK / DİRENÇ SEVİYELERİ" : "SUPPORT & RESISTANCE LEVELS");
+  if ($("#inspect-lbl-cur")) $("#inspect-lbl-cur").textContent = isRu ? "ТЕКУЩАЯ ЦЕНА" : (isTr ? "GÜNCEL FİYAT" : "CURRENT PRICE");
+  if ($("#inspect-lbl-sup")) $("#inspect-lbl-sup").textContent = isRu ? "ГЛАВНАЯ ПОДДЕРЖКА" : (isTr ? "ANA DESTEK" : "MAIN SUPPORT");
+  if ($("#inspect-lbl-res")) $("#inspect-lbl-res").textContent = isRu ? "ГЛАВНОЕ СОПРОТИВЛЕНИЕ" : (isTr ? "ANA DİRENÇ" : "MAIN RESISTANCE");
+  if ($("#inspect-pat-title")) $("#inspect-pat-title").innerHTML = isRu ? 'ПОИСК ПАТТЕРНОВ <small style="opacity:0.6">(алгоритмический)</small>' : (isTr ? 'FORMASYON TARAMASI <small style="opacity:0.6">(deneysel · kural tabanlı)</small>' : 'PATTERN SCANNER <small style="opacity:0.6">(rule-based)</small>');
+  if ($("#inspect-tech-title")) $("#inspect-tech-title").textContent = isRu ? "ТЕХНИЧЕСКИЙ АНАЛИЗ" : (isTr ? "TEKNİK OKUMA" : "TECHNICAL READING");
+  if ($("#inspect-lbl-ema-trend")) $("#inspect-lbl-ema-trend").textContent = isRu ? "ТРЕНД EMA" : (isTr ? "EMA TREND" : "EMA TREND");
+  if ($("#inspect-dikkat-badge")) $("#inspect-dikkat-badge").textContent = isRu ? "ВНИМАНИЕ" : (isTr ? "DİKKAT" : "CAUTION");
+  if ($("#inspect-plain-title")) $("#inspect-plain-title").textContent = isRu ? "ОБЪЯСНЕНИЕ ДЛЯ НАЧИНАЮЩИХ · ПРОСТЫМИ СЛОВАМИ" : (isTr ? "YENİ BAŞLAYAN AÇIKLAMASI · SADE DİLDE" : "BEGINNER SUMMARY · PLAIN WORDS");
+  if ($("#inspect-btn-glossary")) $("#inspect-btn-glossary").textContent = isRu ? "📖 Показать словарь терминов" : (isTr ? "📖 Terimler sözlüğünü göster" : "📖 Show Financial Glossary");
+  if ($("#inspect-risk-warning")) $("#inspect-risk-warning").textContent = isRu ? "⚠ Торговля с кредитным плечом несет риск ликвидации. Показатели индикаторов носят информационный характер — не финансовый совет." : (isTr ? "⚠ Kaldıraçlı futures işlemlerde likidasyon riski vardır. Buradaki tüm göstergeler geçmiş veriye uygulanan matematiksel kurallardır — garanti sinyal değildir. Kendi analizini yap, stop-loss kullan." : "⚠ Leveraged trading carries liquidation risk. Indicators are educational mathematical models, not financial advice.");
 
   // 📚 Rehber & Tüm Kartlar Dinamik Çevirisi (TR, RU, EN)
   if (isRu) {
@@ -827,21 +941,18 @@ function applyLanguage(lang) {
   if ($("#i18n-landing-disc"))  $("#i18n-landing-disc").textContent  = dict.landing_disc;
   if ($("#i18n-btn-admin"))     $("#i18n-btn-admin").textContent     = dict.btn_admin;
 
-  // Pill title'ları (hem eski id hem yeni id formatlarını destekle)
   const setEl = (id, val) => { const e = $(id); if (e && val) e.textContent = val; };
   setEl("#i18n-feat-1-title",    dict.feat_1_title);
   setEl("#i18n-feat-auto-title", dict.feat_auto_title);
   setEl("#i18n-feat-multi-title",dict.feat_multi_title);
   setEl("#i18n-feat-2-title",    dict.feat_2_title);
   setEl("#i18n-feat-3-title",    dict.feat_3_title);
-  // Pill açıklamaları
   setEl("#i18n-feat-1",          dict.feat_1);
   setEl("#i18n-feat-auto-desc",  dict.feat_auto);
   setEl("#i18n-feat-multi-desc", dict.feat_multi);
   setEl("#i18n-feat-2",          dict.feat_2);
   setEl("#i18n-feat-3",          dict.feat_3);
 
-  // Tab etiket <span>'larını güncelle — ikon korunur, sadece metin span değişir
   const stripEmoji = s => (s||"").replace(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\s]+/u,"").trim();
   const setTab = (id,val,fb) => { const e=$(id); if(e) e.textContent=stripEmoji(val)||fb; };
   setTab("#tab-lbl-wallet",   dict.tab_wallet,   "Cüzdan");
@@ -859,7 +970,11 @@ function applyLanguage(lang) {
   if ($("#i18n-lbl-pwd")) $("#i18n-lbl-pwd").textContent = dict.lbl_pwd;
   if ($("#i18n-lbl-extra-pwd")) $("#i18n-lbl-extra-pwd").textContent = dict.lbl_extra_pwd;
 
-  localStorage.setItem("elena_lang", lang);
+  // Dil değiştiğinde Canlı Piyasa Okuma analizini de anında yeni dille güncelle
+  if (window.runMarketInspection) {
+    window.runMarketInspection();
+  }
+localStorage.setItem("elena_lang", lang);
 }
 
 // Dil Modalı
@@ -1944,6 +2059,9 @@ document.getElementById("coin-search-input")?.addEventListener("input", (e) => {
 // ========================================================
 async function loadToolsTab() {
   loadAlerts();
+  if (window.runMarketInspection) {
+    window.runMarketInspection();
+  }
 }
 
 // Hesaplayıcı

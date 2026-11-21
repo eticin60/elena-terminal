@@ -797,9 +797,10 @@
     <!-- 🧠 Canlı Piyasa Okuma & Destek/Direnç Analizi (Sinyal Defteri Pro) -->
     <div class="card" style="border-top:2px solid var(--accent-gold);background:linear-gradient(135deg, rgba(22,33,62,0.85) 0%, rgba(10,16,30,0.95) 100%);padding:14px">
       
-      <!-- Üst İmza -->
-      <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;letter-spacing:0.02em">
-        Onurcan Demir ürünüdür
+      <!-- Bot Kurumsal Başlığı -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span id="inspect-head-title" style="font-size:11.5px;font-weight:700;color:var(--accent-gold);letter-spacing:0.04em">🇷🇺 Елена Хьюз · Sinyal Defteri Terminal</span>
+        <span id="inspect-head-badge" class="badge" style="background:var(--accent-gold-dim);color:var(--accent-gold);font-size:10px">Canlı Algoritma</span>
       </div>
 
       <!-- Coin Seçici Chipleri (Birebir Görsel) -->
@@ -845,22 +846,22 @@
         </div>
         <div id="inspect-big-price" style="font-size:28px;font-weight:900;color:#fff;letter-spacing:-0.5px;margin-bottom:4px">$59,315.8</div>
         <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);flex-wrap:wrap;gap:4px">
-          <div>Yüksek: <span id="inspect-high-val" style="color:#fff">$62,179.5</span> · Düşük: <span id="inspect-low-val" style="color:#fff">$55,130.0</span> · Hacim: <span id="inspect-vol-val" style="color:#fff">63.1K</span></div>
-          <div>Son güncelleme: <span id="inspect-time-val">16:11:20</span></div>
+          <div><span id="inspect-lbl-high">Yüksek</span>: <span id="inspect-high-val" style="color:#fff">$62,179.5</span> · <span id="inspect-lbl-low">Düşük</span>: <span id="inspect-low-val" style="color:#fff">$55,130.0</span> · <span id="inspect-lbl-vol">Hacim</span>: <span id="inspect-vol-val" style="color:#fff">63.1K</span></div>
+          <div><span id="inspect-lbl-time">Son güncelleme</span>: <span id="inspect-time-val">16:11:20</span></div>
         </div>
       </div>
 
       <!-- 1. KART: FİYAT · MUM + EMA9/21 + BOLLINGER + D/D (Canvas) -->
       <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;margin-bottom:10px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <span style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.04em">FİYAT · MUM + EMA9/21 + BOLLINGER + D/D</span>
+          <span id="inspect-legend-title" style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.04em">FİYAT · MUM + EMA9/21 + BOLLINGER + D/D</span>
         </div>
         <div style="display:flex;gap:10px;font-size:10px;color:var(--text-muted);margin-bottom:8px;flex-wrap:wrap">
           <span style="color:#00ffa3">— EMA 9</span>
           <span style="color:#fbbf24">— EMA 21</span>
           <span style="color:#38bdf8">— Bollinger</span>
-          <span style="color:#22d3ee">— Destek</span>
-          <span style="color:#f87171">— Direnç</span>
+          <span style="color:#22d3ee">— <span id="inspect-legend-sup">Destek</span></span>
+          <span style="color:#f87171">— <span id="inspect-legend-res">Direnç</span></span>
         </div>
         <div style="position:relative;width:100%;height:220px">
           <canvas id="inspect-candle-canvas" width="600" height="220" style="width:100%;height:100%;display:block;border-radius:6px"></canvas>
@@ -870,7 +871,7 @@
 
       <!-- 2. KART: HACİM (Canvas) -->
       <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;margin-bottom:10px">
-        <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px;letter-spacing:0.04em">HACİM</div>
+        <div id="inspect-vol-title" style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px;letter-spacing:0.04em">HACİM</div>
         <div style="width:100%;height:70px">
           <canvas id="inspect-vol-canvas" width="600" height="70" style="width:100%;height:100%;display:block;border-radius:6px"></canvas>
         </div>
@@ -879,7 +880,7 @@
       <!-- 3. KART: RSI (14) (Canvas) -->
       <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;margin-bottom:10px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <span style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.04em">RSI (14)</span>
+          <span id="inspect-rsi-title" style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.04em">RSI (14)</span>
           <span id="inspect-rsi-val-badge" style="font-size:11px;font-weight:700;color:#fbbf24">79.8</span>
         </div>
         <div style="width:100%;height:75px">
@@ -889,20 +890,20 @@
 
       <!-- 4. KART: DESTEK / DİRENÇ SEVİYELERİ -->
       <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;margin-bottom:10px">
-        <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:10px;letter-spacing:0.04em">DESTEK / DİRENÇ SEVİYELERİ</div>
+        <div id="inspect-dd-title" style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:10px;letter-spacing:0.04em">DESTEK / DİRENÇ SEVİYELERİ</div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <span style="font-size:12px;color:var(--text-muted)">GÜNCEL FİYAT</span>
+          <span id="inspect-lbl-cur" style="font-size:12px;color:var(--text-muted)">GÜNCEL FİYAT</span>
           <strong id="inspect-dd-current" style="font-size:14px;color:#fff">$59,297.7</strong>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <span style="font-size:12px;color:#38bdf8;font-weight:700">ANA DESTEK</span>
+          <span id="inspect-lbl-sup" style="font-size:12px;color:#38bdf8;font-weight:700">ANA DESTEK</span>
           <div style="text-align:right">
             <strong id="inspect-dd-sup" style="font-size:14px;color:#38bdf8">$57,848.9</strong>
             <div id="inspect-dd-sup-sub" style="font-size:10.5px;color:var(--text-muted)">-2.44% uzaklıkta · 2 temas</div>
           </div>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:12px;color:#f87171;font-weight:700">ANA DİRENÇ</span>
+          <span id="inspect-lbl-res" style="font-size:12px;color:#f87171;font-weight:700">ANA DİRENÇ</span>
           <div style="text-align:right">
             <strong id="inspect-dd-res" style="font-size:14px;color:#f87171">$60,850.0</strong>
             <div id="inspect-dd-res-sub" style="font-size:10.5px;color:var(--text-muted)">+2.62% uzaklıkta · 3 temas</div>
@@ -912,7 +913,7 @@
 
       <!-- 5. KART: FORMASYON TARAMASI -->
       <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;margin-bottom:10px">
-        <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:8px;letter-spacing:0.04em">
+        <div id="inspect-pat-title" style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:8px;letter-spacing:0.04em">
           FORMASYON TARAMASI <small style="opacity:0.6">(deneysel · kural tabanlı)</small>
         </div>
         <div id="inspect-pat-result" style="font-size:12px;color:var(--text-secondary);line-height:1.5">
@@ -922,14 +923,14 @@
 
       <!-- 6. KART: TEKNİK OKUMA (EMA TREND + RSI) -->
       <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;margin-bottom:10px">
-        <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:10px;letter-spacing:0.04em">TEKNİK OKUMA</div>
+        <div id="inspect-tech-title" style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:10px;letter-spacing:0.04em">TEKNİK OKUMA</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.05);border-radius:8px;padding:10px">
-            <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">EMA TREND</div>
+            <div id="inspect-lbl-ema-trend" style="font-size:10px;color:var(--text-muted);margin-bottom:4px">EMA TREND</div>
             <div id="inspect-ema-trend-val" style="font-size:13px;font-weight:800;color:var(--accent-green)">YÜKSELİŞ</div>
           </div>
           <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.05);border-radius:8px;padding:10px">
-            <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">RSI (14)</div>
+            <div id="inspect-lbl-rsi-trend" style="font-size:10px;color:var(--text-muted);margin-bottom:4px">RSI (14)</div>
             <div id="inspect-rsi-box-val" style="font-size:13px;font-weight:800;color:var(--accent-red)">79.8 · AŞIRI ALIM</div>
           </div>
         </div>
@@ -937,7 +938,7 @@
 
       <!-- 7. KART: DİKKAT (Sarı Rozetli Kart) -->
       <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,210,90,0.25);border-radius:10px;padding:12px;margin-bottom:10px">
-        <span class="badge" style="background:var(--accent-gold);color:#0d1322;font-weight:800;font-size:11px;margin-bottom:8px;display:inline-block">DİKKAT</span>
+        <span id="inspect-dikkat-badge" class="badge" style="background:var(--accent-gold);color:#0d1322;font-weight:800;font-size:11px;margin-bottom:8px;display:inline-block">DİKKAT</span>
         <div id="inspect-dikkat-text" style="font-size:12px;color:var(--text-secondary);line-height:1.6">
           5d grafikte EMA9, EMA21'in üzerinde — kısa vadeli momentum yukarı yönlü. RSI 79.8 ile aşırı alımda. Bu okumalar birlikte kaba bir yön fikri veriyor; tek başına giriş sinyali olarak kullanma.
         </div>
@@ -946,7 +947,7 @@
       <!-- 8. KART: YENİ BAŞLAYAN AÇIKLAMASI · SADE DİLDE -->
       <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;margin-bottom:10px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <span style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.04em">YENİ BAŞLAYAN AÇIKLAMASI · SADE DİLDE</span>
+          <span id="inspect-plain-title" style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.04em">YENİ BAŞLAYAN AÇIKLAMASI · SADE DİLDE</span>
         </div>
         <span id="inspect-plain-state-badge" class="badge" style="background:rgba(255,255,255,0.08);color:var(--text-secondary);font-size:11px;margin-bottom:10px;display:inline-block">
           YATAY / KONSOLİDASYON
@@ -956,7 +957,7 @@
           RSI 80 ile "aşırı alım" bölgesinde — fiyat kısa vadede hızlı yükselmiş demektir, bu da bir geri çekilme ihtimalini artırır (garanti etmez).<br><br>
           Unutma: bu açıklamalar geçmiş fiyat hareketine dayalı genel eğilimlerdir, ne olacağını kesin söylemez. Piyasa her an bu beklentilerin dışına çıkabilir.
         </div>
-        <button type="button" class="btn" onclick="window.toggleInspectGlossary?.()" style="padding:8px 14px;font-size:11.5px;width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1)">
+        <button type="button" id="inspect-btn-glossary" class="btn" onclick="window.toggleInspectGlossary?.()" style="padding:8px 14px;font-size:11.5px;width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1)">
           📖 Terimler sözlüğünü göster
         </button>
         <div id="inspect-glossary-box" style="display:none;margin-top:12px;padding:12px;background:rgba(0,0,0,0.35);border-radius:8px;font-size:11.5px;line-height:1.65;color:var(--text-muted)">
@@ -968,7 +969,7 @@
       </div>
 
       <!-- 9. YASAL SORUMLULUK VE LİKİDASYON UYARISI -->
-      <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:12px;font-size:11px;color:#fca5a5;line-height:1.6">
+      <div id="inspect-risk-warning" style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:12px;font-size:11px;color:#fca5a5;line-height:1.6">
         ⚠ Kaldıraçlı futures işlemlerde likidasyon riski vardır. Buradaki tüm göstergeler geçmiş veriye uygulanan matematiksel kurallardır — garanti sinyal değildir. Kendi analizini yap, stop-loss kullan.
       </div>
 

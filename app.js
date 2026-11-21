@@ -1,3 +1,17 @@
+
+// Global Hisse / Varlık Tıklaması ile TradingView ve Piyasa sekmesine geçiş
+window.openGlobalSymbol = function(sym) {
+  // Markets sekmesine geç
+  const tabBtn = document.querySelector('[data-tab="markets"]');
+  if (tabBtn) tabBtn.click();
+  setTimeout(() => {
+    setTradingViewSymbol(sym);
+    toast(`${sym} Canlı Grafiği Açıldı 📈`, "info");
+    const tvBox = document.getElementById("tv-chart-container");
+    if (tvBox) tvBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 150);
+};
+
 ﻿// Елена Хьюз · Main Mini App Terminal — Liquid Glass Fullscreen
 const tg = window.Telegram?.WebApp;
 try {
@@ -1235,6 +1249,19 @@ document.getElementById("btn-calc-compute")?.addEventListener("click", () => {
   $("#c-res-dist").textContent = "%" + distPct.toFixed(2);
   $("#c-res-size").textContent = posSize.toFixed(2) + " $";
   $("#c-res-qty").textContent = qty.toFixed(4);
+
+  // Kaldıraçlı TP1, TP2, TP3 ve Stop Projeksiyonu
+  const levVal = parseInt(document.getElementById("manual-leverage")?.value || 20);
+  const pnl1 = maxLoss; // 1R = maxLoss
+  const pnl2 = maxLoss * 2;
+  const pnl3 = maxLoss * 3;
+  const roi1 = distPct * levVal;
+
+  if ($("#c-res-tp1")) $("#c-res-tp1").textContent = `+$${pnl1.toFixed(2)} (ROI +${roi1.toFixed(1)}%)`;
+  if ($("#c-res-tp2")) $("#c-res-tp2").textContent = `+$${pnl2.toFixed(2)} (ROI +${(roi1 * 2).toFixed(1)}%)`;
+  if ($("#c-res-tp3")) $("#c-res-tp3").textContent = `+$${pnl3.toFixed(2)} (ROI +${(roi1 * 3).toFixed(1)}%)`;
+  if ($("#c-res-sl")) $("#c-res-sl").textContent = `-$${maxLoss.toFixed(2)} (ROI -${roi1.toFixed(1)}%)`;
+
   document.getElementById("calc-result-box").style.display = "block";
 });
 

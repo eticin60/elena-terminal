@@ -1165,10 +1165,12 @@ $all(".tab").forEach(t => t.addEventListener("click", () => {
 // ========================================================
 // CÜZDAN: WALLETCONNECT v2 & MULTI-CHAIN (Tron + BSC + ETH)
 // ========================================================
+const DEFAULT_WC_PROJECT_ID = "3e0464160493e3617b11034bfe2169fe";
+
 async function initWalletConnect() {
-  if (!CFG?.wc_project_id) {
-    toast("WalletConnect Project ID bulunamadı", "error");
-    return;
+  if (!CFG) CFG = {};
+  if (!CFG.wc_project_id) {
+    CFG.wc_project_id = DEFAULT_WC_PROJECT_ID;
   }
   const { SignClient } = await import("https://cdn.jsdelivr.net/npm/@walletconnect/sign-client@2/+esm");
   const { WalletConnectModal } = await import("https://cdn.jsdelivr.net/npm/@walletconnect/modal@2/+esm");
@@ -1957,6 +1959,10 @@ async function main() {
       };
     }
   } catch (e) { CFG = {}; }
+  if (!CFG) CFG = {};
+  if (!CFG.wc_project_id) {
+    CFG.wc_project_id = DEFAULT_WC_PROJECT_ID;
+  }
 
   try {
     const st = await api("/api/user/settings");

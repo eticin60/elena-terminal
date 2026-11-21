@@ -1,0 +1,1354 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Елена Хьюз · Crypto Signals</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="style.css?v=44">
+</head>
+<body>
+
+<!-- ================= TOP BAR ================= -->
+<div class="top-bar" id="top-bar">
+  <div class="top-brand">
+    <div class="top-flag-badge" id="top-flag">🇷🇺</div>
+    <div>
+      <div class="top-title">Елена Хьюз</div>
+      <div class="top-subtitle" id="i18n-top-sub">Crypto Signals</div>
+    </div>
+  </div>
+  <button class="lang-dropdown-btn" id="btn-lang-toggle" aria-label="Dil seç">
+    <span>🌐</span>
+    <span id="current-lang-label">TR</span>
+  </button>
+</div>
+
+<!-- ========================================
+     GİRİŞ EKRANI (Liquid Glass Landing Hero)
+     ======================================== -->
+<section id="landing-view" aria-label="Giriş ekranı">
+  <div class="landing-card">
+
+    <div class="landing-avatar" role="img" aria-label="Elena Hughes">🇷🇺</div>
+    <h1 class="landing-title">Елена Хьюз</h1>
+    <div class="landing-subtitle" id="i18n-landing-sub">Akıllı sinyaller, otomatik disiplin.</div>
+
+    <div class="landing-features" role="list">
+
+      <div class="feature-pill" role="listitem">
+        <span>📡</span>
+        <div>
+          <strong id="i18n-feat-1-title" style="display:block;color:#fff;font-size:13.5px;font-weight:700;margin-bottom:2px">Canlı Kripto Sinyalleri</strong>
+          <span id="i18n-feat-1" style="font-size:12px;color:var(--text-muted)">0–10 güç puanlı anlık piyasa analizleri</span>
+        </div>
+      </div>
+
+      <div class="feature-pill" role="listitem">
+        <span>🤖</span>
+        <div>
+          <strong id="i18n-feat-auto-title" style="display:block;color:#ffd768;font-size:13.5px;font-weight:700;margin-bottom:2px">Oto-Bot &amp; Otomatik Al-Sat</strong>
+          <span id="i18n-feat-auto-desc" style="font-size:12px;color:var(--text-muted)">TP1/TP2/TP3 ve akıllı Stop-Loss takibi</span>
+        </div>
+      </div>
+
+      <div class="feature-pill" role="listitem">
+        <span>🌐</span>
+        <div>
+          <strong id="i18n-feat-multi-title" style="display:block;color:#a5d6ff;font-size:13.5px;font-weight:700;margin-bottom:2px">Çoklu Zincir &amp; Borsa</strong>
+          <span id="i18n-feat-multi-desc" style="font-size:12px;color:var(--text-muted)">Tron, BSC, Ethereum, Arbitrum &amp; API</span>
+          <div style="display:flex;gap:6px;margin-top:6px;align-items:center">
+            <img src="assets/coins/trx.svg"  width="18" height="18" style="border-radius:50%;background:rgba(255,255,255,0.08);padding:1px" onerror="this.style.display='none'" title="TRON">
+            <img src="assets/coins/bnb.svg"  width="18" height="18" style="border-radius:50%;background:rgba(255,255,255,0.08);padding:1px" onerror="this.style.display='none'" title="BSC">
+            <img src="assets/coins/eth.svg"  width="18" height="18" style="border-radius:50%;background:rgba(255,255,255,0.08);padding:1px" onerror="this.style.display='none'" title="Ethereum">
+            <img src="assets/coins/avax.svg" width="18" height="18" style="border-radius:50%;background:rgba(255,255,255,0.08);padding:1px" onerror="this.style.display='none'" title="Avalanche">
+            <img src="assets/coins/sol.svg"  width="18" height="18" style="border-radius:50%;background:rgba(255,255,255,0.08);padding:1px" onerror="this.style.display='none'" title="Solana">
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-pill" role="listitem">
+        <span>🛡️</span>
+        <div>
+          <strong id="i18n-feat-2-title" style="display:block;color:#fff;font-size:13.5px;font-weight:700;margin-bottom:2px">Risk ve Disiplin Yönetimi</strong>
+          <span id="i18n-feat-2" style="font-size:12px;color:var(--text-muted)">Sermaye koruma ve dinamik kaldıraç kalkanı</span>
+        </div>
+      </div>
+
+      <div class="feature-pill" role="listitem">
+        <span>🔐</span>
+        <div>
+          <strong id="i18n-feat-3-title" style="display:block;color:#00ffa3;font-size:13.5px;font-weight:700;margin-bottom:2px">Maksimum Güvenlik</strong>
+          <span id="i18n-feat-3" style="font-size:12px;color:var(--text-muted)">Salt okunur cüzdan; özel anahtar asla istenmez</span>
+        </div>
+      </div>
+
+    </div>
+
+    <button class="btn-gold" id="btn-landing-connect">
+      <img src="assets/coins/wc.svg" width="22" height="22" style="vertical-align:middle;object-fit:contain" onerror="this.style.display='none'">
+      <span id="i18n-btn-connect">Cüzdanı Bağla</span>
+    </button>
+
+    <!-- Desteklenen Cüzdan & Ağ Rozetleri -->
+    <div style="display:flex;justify-content:center;align-items:center;gap:12px;margin:14px 0 6px;opacity:0.8">
+      <img src="assets/wallets/metamask.svg" width="20" height="20" title="MetaMask" onerror="this.style.display='none'">
+      <img src="assets/wallets/trust-wallet.svg" width="20" height="20" title="Trust Wallet" onerror="this.style.display='none'">
+      <img src="assets/wallets/binance.svg" width="20" height="20" title="Binance Web3" onerror="this.style.display='none'">
+      <img src="assets/wallets/bitget-wallet.svg" width="20" height="20" title="Bitget Wallet" onerror="this.style.display='none'">
+      <img src="assets/coins/ledger.svg" width="20" height="20" title="Ledger" onerror="this.style.display='none'">
+      <img src="assets/coins/trx.svg" width="18" height="18" title="TronLink" onerror="this.style.display='none'">
+    </div>
+
+    <div style="margin-top:12px;text-align:center">
+      <button id="btn-manual-addr-toggle" style="background:transparent;border:none;color:var(--text-muted);font-size:12.5px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:4px 8px">
+        <span id="i18n-btn-manual-addr">✍️ Veya cüzdan adresini manuel gir</span>
+      </button>
+    </div>
+
+    <div class="landing-disclaimer" id="i18n-landing-disc">
+      Yalnızca genel adres okunur. Özel anahtar veya kurtarma ifadesi asla istenmez.
+    </div>
+
+    <!-- Yönetici butonu (sadece admin görebilir) -->
+    <a class="btn-royal" id="landing-admin-btn" href="admin.html" style="display:none">
+      👑 <span id="i18n-btn-admin">Yönetim Paneline Git</span>
+    </a>
+
+  </div>
+</section>
+
+<!-- ========================================
+     ANA PLATFORM EKRANI
+     ======================================== -->
+<section id="app-view" aria-label="Ana terminal">
+
+  <!-- ================= TABS ================= -->
+  <nav class="tabs" role="tablist" aria-label="Sekme menüsü">
+    <div class="tab active" data-tab="guide"     id="tab-btn-guide"     role="tab" aria-selected="true">📚 <span id="tab-lbl-guide">Rehber</span></div>
+    <div class="tab"        data-tab="markets"   id="tab-btn-markets"   role="tab">📊 <span id="tab-lbl-markets">Piyasa</span></div>
+    <div class="tab"        data-tab="signals"   id="tab-btn-signals"   role="tab">📡 <span id="tab-lbl-signals">Sinyaller</span></div>
+    <div class="tab"        data-tab="coins"     id="tab-btn-coins"     role="tab">🪙 <span id="tab-lbl-coins">Coinler</span></div>
+    <div class="tab"        data-tab="tools"     id="tab-btn-tools"     role="tab">🧮 <span id="tab-lbl-tools">Araçlar</span></div>
+    <div class="tab"        data-tab="dashboard" id="tab-btn-dashboard" role="tab">📊 <span id="tab-lbl-dashboard">Pano</span></div>
+    <div class="tab"        data-tab="settings"  id="tab-btn-settings"  role="tab">⚙️ <span id="tab-lbl-settings">Ayarlar</span></div>
+    <div class="tab"        data-tab="wallet"    id="tab-btn-wallet"    role="tab">💼 <span id="tab-lbl-wallet">Cüzdan</span></div>
+    <div class="tab"        data-tab="exchange"  id="tab-btn-exchange"  role="tab">🔑 <span id="tab-lbl-exchange">Borsa</span></div>
+    <div class="tab"        data-tab="auto"      id="tab-btn-auto"      role="tab">🤖 <span id="tab-lbl-auto">Oto-Bot</span></div>
+    <div class="tab"        data-tab="manual"    id="tab-btn-manual"    role="tab">📈 <span id="tab-lbl-manual">Manuel</span></div>
+  </nav>
+
+  <!-- ========================================
+       CÜZDAN SEKMESİ
+       ======================================== -->
+  <div id="page-wallet" class="page" role="tabpanel">
+
+    <!-- Bağlı Cüzdan Bilgisi -->
+    <div class="card" id="wallet-connected-info">
+      <h2>
+        <span>Bağlı Web3 Cüzdanı</span>
+        <span class="pill on" id="w-chain">Ethereum</span>
+      </h2>
+      <div class="info-row">
+        <span class="info-label">Genel Adres</span>
+        <code class="info-val gold" id="w-address">—</code>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Native Bakiye</span>
+        <strong id="w-native" style="color:#fff;font-size:15px">—</strong>
+      </div>
+      <div id="token-list" style="margin-top:4px"></div>
+    </div>
+
+    <!-- Güvenlik Parolası -->
+    <div class="card" style="border-color:rgba(255,210,90,0.18)">
+      <h2>
+        🔐 Güvenlik Parolası &amp; Ek Şifre
+        <span class="badge" id="pwd-status-badge">Kayıtlı Değil</span>
+      </h2>
+      <p style="font-size:12px;color:var(--text-muted);margin:0 0 14px;line-height:1.6">
+        Oto-Bot işlemlerini yetkilendirmek için şifrenizi ve ek şifrenizi tanımlayın.
+        Karışık harf, sayı ve semboller desteklenir (200 karaktere kadar).
+      </p>
+      <div class="pwd-grid-2col">
+        <div class="pwd-field-block">
+          <label class="pwd-field-label" id="i18n-lbl-pwd" for="f-wallet-pwd">Şifre (Güvenlik Parolası)</label>
+          <input type="text" id="f-wallet-pwd" class="pwd-input" placeholder="Parola (maks. 200 karakter)" maxlength="200" autocomplete="off">
+        </div>
+        <div class="pwd-field-block">
+          <label class="pwd-field-label" id="i18n-lbl-extra-pwd" for="f-wallet-extra-pwd">Ek Şifre (Passphrase)</label>
+          <input type="text" id="f-wallet-extra-pwd" class="pwd-input" placeholder="Ek şifre (maks. 200 karakter)" maxlength="200" autocomplete="off">
+        </div>
+      </div>
+      <button class="btn btn-main" id="btn-save-wallet-pwd" style="width:100%;font-size:14px;padding:13px">
+        💾 Şifreleri Güvenle Kaydet
+      </button>
+    </div>
+
+    <!-- Cüzdan Yönetimi -->
+    <div class="card">
+      <h2>Cüzdan Yönetimi</h2>
+      <div style="display:flex;gap:10px">
+        <button class="btn" id="btn-refresh-bal" style="flex:1">🔄 Bakiyeyi Yenile</button>
+        <button class="btn btn-danger" id="btn-disconnect-wallet" style="flex:1">Bağlantıyı Kes</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========================================
+       OTO-BOT SEKMESİ
+       ======================================== -->
+  <div id="page-auto" class="page" role="tabpanel">
+
+    <!-- Borsa Bağlantı Uyarısı & Kilidi (API Key Olmadan İşlem Yapılamaz) -->
+    <div id="auto-api-warning" class="card" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);margin-bottom:14px">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <span style="font-size:24px">🔒</span>
+        <div style="flex:1">
+          <h3 style="margin:0 0 6px;font-size:14px;color:#fca5a5" id="i18n-auto-lock-title">Borsa API Bağlantısı Gerekli</h3>
+          <p style="margin:0 0 10px;font-size:12px;color:var(--text-muted);line-height:1.5" id="i18n-auto-lock-desc">
+            Otomatik botun sizin adınıza emir açıp kapatabilmesi için önce Borsa sekmesinden API Key ve Secret tanımlamalısınız.
+          </p>
+          <button class="btn btn-main" onclick="switchTab('exchange')" style="padding:6px 14px;font-size:12px;font-weight:700">🔑 Borsa API'sini Bağla</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Strateji Zaman Dilimi -->
+    <div class="card">
+      <h2 id="i18n-title-tf">⏱ Strateji Zaman Dilimi</h2>
+      <div class="tf-selector" id="seg-strategy_tf">
+        <button data-v="1m"><span>1dK</span><small>Hiper</small></button>
+        <button data-v="3m"><span>3dK</span><small>Hızlı</small></button>
+        <button data-v="5m"><span>5dK</span><small>Agresif</small></button>
+        <button data-v="15m"><span>15dK</span><small>Dengeli</small></button>
+        <button data-v="1h"><span>1Sa</span><small>Güvenli</small></button>
+        <button data-v="4h"><span>4Sa</span><small>Swing</small></button>
+        <button data-v="1d"><span>1G</span><small>Trend</small></button>
+      </div>
+    </div>
+
+    <!-- Durum -->
+    <div class="card">
+      <h2>Oto-Bot Durumu</h2>
+      <div class="row">
+        <div>
+          <span class="label" style="display:block;font-weight:600;color:#fff">Otomatik al-sat</span>
+          <small style="color:var(--text-muted);font-size:11px">Cüzdan ve Güvenlik Şifresi gerektirir</small>
+        </div>
+        <div class="toggle" id="t-enabled"></div>
+      </div>
+    </div>
+
+    <!-- İşlem Modu -->
+    <div class="card">
+      <h2>İşlem Modu</h2>
+      <div class="seg" id="seg-mode">
+        <button data-v="spot">SPOT</button>
+        <button data-v="futures" class="sel">FUTURES</button>
+      </div>
+    </div>
+
+    <!-- Marj ve Pozisyon -->
+    <div class="card">
+      <h2>Marj ve Pozisyon</h2>
+      <div class="row">
+        <span class="label">Marj Modu</span>
+        <div class="seg" id="seg-margin" style="width:180px">
+          <button data-v="isolated">İzole</button>
+          <button data-v="cross" class="sel">Cross</button>
+        </div>
+      </div>
+      <div class="row">
+        <span class="label">Pozisyon Modu</span>
+        <div class="seg" id="seg-posmode" style="width:180px">
+          <button data-v="one_way" class="sel">One-Way</button>
+          <button data-v="hedge">Hedge</button>
+        </div>
+      </div>
+      <div class="row">
+        <span class="label">Kaldıraç (×)</span>
+        <input type="number" id="f-leverage" min="1" max="125" value="20" style="width:76px" class="pwd-input">
+      </div>
+    </div>
+
+    <!-- Risk Yönetimi -->
+    <div class="card">
+      <h2>⚠️ Risk Yönetimi</h2>
+      <div class="slider-row">
+        <div class="slider-header">
+          <span class="label">Maks. Hesap Riski %</span>
+          <span class="slider-val" id="val-acct_risk">100%</span>
+        </div>
+        <input type="range" id="f-acct_risk_pct" min="0" max="100" step="1" value="100"
+               oninput="document.getElementById('val-acct_risk').textContent=this.value+'%'">
+      </div>
+      <div class="slider-row">
+        <div class="slider-header">
+          <span class="label">Günlük Zarar Durdurma %</span>
+          <span class="slider-val" id="val-daily_stop">40%</span>
+        </div>
+        <input type="range" id="f-daily_stop_pct" min="5" max="100" step="5" value="40"
+               oninput="document.getElementById('val-daily_stop').textContent=this.value+'%'">
+      </div>
+      <div class="slider-row">
+        <div class="slider-header">
+          <span class="label">Stop-Loss %</span>
+          <span class="slider-val" id="val-sl">30%</span>
+        </div>
+        <input type="range" id="f-sl_pct" min="1" max="50" step="1" value="30"
+               oninput="document.getElementById('val-sl').textContent=this.value+'%'">
+      </div>
+    </div>
+
+    <!-- TP Hedefleri -->
+    <div class="card">
+      <h2>🎯 Kâr Alma Hedefleri (TP1–TP3)</h2>
+      <div class="slider-row">
+        <div class="slider-header"><span class="label">TP1</span><span class="slider-val" id="val-tp0">30%</span></div>
+        <input type="range" id="f-tp0" min="1" max="200" step="1" value="30" oninput="document.getElementById('val-tp0').textContent=this.value+'%'">
+      </div>
+      <div class="slider-row">
+        <div class="slider-header"><span class="label">TP2</span><span class="slider-val" id="val-tp1">60%</span></div>
+        <input type="range" id="f-tp1" min="1" max="200" step="1" value="60" oninput="document.getElementById('val-tp1').textContent=this.value+'%'">
+      </div>
+      <div class="slider-row">
+        <div class="slider-header"><span class="label">TP3</span><span class="slider-val" id="val-tp2">100%</span></div>
+        <input type="range" id="f-tp2" min="1" max="200" step="1" value="100" oninput="document.getElementById('val-tp2').textContent=this.value+'%'">
+      </div>
+    </div>
+
+    <!-- Coin Listesi -->
+    <div class="card">
+      <h2>🪙 İşlem Yapılacak Varlıklar</h2>
+      <div id="coin-chips"></div>
+    </div>
+
+    <div style="margin-top:14px">
+      <button class="btn btn-main" id="btn-save" style="width:100%;padding:14px;font-size:14px">💾 Ayarları Kaydet</button>
+    </div>
+
+  </div>
+
+  <!-- ========================================
+       BORSA API SEKMESİ
+       ======================================== -->
+  <div id="page-exchange" class="page" role="tabpanel">
+    <div class="card">
+      <h2>
+        🔑 Borsa API Bağlantısı
+        <span class="badge" style="background:var(--accent-green-dim);color:var(--accent-green);border:1px solid rgba(0,255,163,0.3)">Güvenli</span>
+      </h2>
+      <p style="font-size:12px;color:var(--text-muted);margin:0 0 14px;line-height:1.6">
+        Borsanızdan aldığınız API anahtarlarını tanımlayın.
+        Güvenliğiniz için <strong style="color:#fff">çekim (withdrawal) yetkisi asla vermeyin.</strong>
+      </p>
+
+      <div style="display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="btn exch-btn active" data-exch="binance" onclick="selectExchange('binance',this)">
+          <img src="assets/exchanges/binance.svg" width="16" height="16" style="border-radius:3px;object-fit:contain" onerror="this.style.display='none'"> Binance
+        </button>
+        <button class="btn exch-btn" data-exch="okx" onclick="selectExchange('okx',this)">
+          <img src="assets/exchanges/okx.svg" width="16" height="16" style="border-radius:3px;object-fit:contain" onerror="this.style.display='none'"> OKX
+        </button>
+        <button class="btn exch-btn" data-exch="bybit" onclick="selectExchange('bybit',this)">
+          <img src="assets/exchanges/bybit.svg" width="16" height="16" style="border-radius:3px;object-fit:contain" onerror="this.style.display='none'"> Bybit
+        </button>
+        <button class="btn exch-btn" data-exch="mexc" onclick="selectExchange('mexc',this)">
+          <img src="assets/exchanges/mexc.svg" width="16" height="16" style="border-radius:3px;object-fit:contain" onerror="this.style.display='none'"> MEXC
+        </button>
+      </div>
+
+      <div class="pwd-field-block" style="margin-bottom:10px">
+        <label class="pwd-field-label" for="f-api-key">API KEY</label>
+        <input type="text" id="f-api-key" class="pwd-input" placeholder="Borsanız tarafından verilen anahtar">
+      </div>
+      <div class="pwd-field-block" style="margin-bottom:10px">
+        <label class="pwd-field-label" for="f-api-secret">API SECRET</label>
+        <input type="password" id="f-api-secret" class="pwd-input" placeholder="Gizli API Secret şifresi">
+      </div>
+      <div class="pwd-field-block" id="okx-passphrase-row" style="display:none;margin-bottom:10px">
+        <label class="pwd-field-label" for="f-api-passphrase">OKX PASSPHRASE</label>
+        <input type="password" id="f-api-passphrase" class="pwd-input" placeholder="OKX API parolası">
+      </div>
+
+      <button class="btn btn-main" id="btn-save-exchange" style="width:100%;margin-top:6px;padding:13px;font-size:14px">
+        💾 Borsa Bilgilerini Kaydet
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================
+       MANUEL TERMİNAL SEKMESİ
+       ======================================== -->
+  <div id="page-manual" class="page" role="tabpanel">
+
+    <!-- Borsa Bağlantı Uyarısı & Kilidi (API Key Olmadan Manuel İşlem Yapılamaz) -->
+    <div id="manual-api-warning" class="card" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);margin-bottom:14px">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <span style="font-size:24px">🔒</span>
+        <div style="flex:1">
+          <h3 style="margin:0 0 6px;font-size:14px;color:#fca5a5" id="i18n-manual-lock-title">Borsa API Bağlantısı Gerekli</h3>
+          <p style="margin:0 0 10px;font-size:12px;color:var(--text-muted);line-height:1.5" id="i18n-manual-lock-desc">
+            Manuel terminalden gerçek piyasa emri iletebilmek için önce Borsa sekmesinden API Key ve Secret bağlamalısınız.
+          </p>
+          <button class="btn btn-main" onclick="switchTab('exchange')" style="padding:6px 14px;font-size:12px;font-weight:700">🔑 Borsa API'sini Bağla</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>📈 Manuel Ticaret Terminali</h2>
+      <p style="font-size:12px;color:var(--text-muted);margin:0 0 14px;line-height:1.6">
+        Kripto ve hisse senetlerini arayın, anlık fiyatıyla emir oluşturun.
+      </p>
+
+      <div style="position:relative;margin-bottom:0">
+        <input type="text" id="manual-coin-search" class="pwd-input" placeholder="BTC, ETH, NVDA, TSLA arayın..." autocomplete="off">
+      </div>
+      <div id="coin-dropdown" class="dropdown-box"></div>
+
+      <div id="manual-price-row" style="display:none;margin-top:10px;background:rgba(255,255,255,0.045);padding:10px 14px;border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,0.08)">
+        <span style="font-size:12px;color:var(--text-muted)">Anlık Fiyat: </span>
+        <span id="manual-price" style="font-size:20px;font-weight:800;color:var(--accent-green)">—</span>
+        <span style="font-size:12px;color:var(--text-muted)"> USDT</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+        <div class="pwd-field-block">
+          <label class="pwd-field-label" for="manual-amount">İşlem Miktarı ($)</label>
+          <input type="number" id="manual-amount" class="pwd-input" value="10" min="5">
+        </div>
+        <div class="pwd-field-block">
+          <label class="pwd-field-label" for="manual-leverage">Kaldıraç (×)</label>
+          <input type="number" id="manual-leverage" class="pwd-input" value="20" min="1" max="125">
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:14px">
+        <button class="btn" id="btn-manual-long"
+          style="background:rgba(0,200,81,0.18);border-color:rgba(0,200,81,0.4);color:#00c851;flex:1;font-size:15px;font-weight:800;padding:15px;border-radius:var(--radius-md)">
+          🟢 AL / LONG
+        </button>
+        <button class="btn" id="btn-manual-short"
+          style="background:rgba(255,68,68,0.15);border-color:rgba(255,68,68,0.4);color:#ff4444;flex:1;font-size:15px;font-weight:800;padding:15px;border-radius:var(--radius-md)">
+          🔴 SAT / SHORT
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================
+       SİNYALLER SEKMESİ
+       ======================================== -->
+  <div id="page-signals" class="page" role="tabpanel">
+
+    <div class="card">
+      <h2>📊 Sinyal Performansı</h2>
+      <div class="stat-grid">
+        <div class="stat"><div class="n blue" id="sig-stat-total">—</div><div class="l">Toplam</div></div>
+        <div class="stat"><div class="n green" id="sig-stat-winrate">—%</div><div class="l">Başarı</div></div>
+        <div class="stat"><div class="n gold" id="sig-stat-wins">—</div><div class="l">TP Vuran</div></div>
+        <div class="stat"><div class="n red" id="sig-stat-losses">—</div><div class="l">Stop</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📡 Canlı Sinyal Listesi</h2>
+      <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="btn sig-filter-btn active" data-filter="all">HEPSİ</button>
+        <button class="btn sig-filter-btn" data-filter="open">AÇIK</button>
+        <button class="btn sig-filter-btn" data-filter="tp">🎯 TP VURAN</button>
+        <button class="btn sig-filter-btn" data-filter="sl">🛑 STOP</button>
+      </div>
+      <div id="signals-list"><div class="empty">Yükleniyor…</div></div>
+      <button class="btn" id="btn-signals-refresh" style="width:100%;margin-top:10px">🔄 Sinyalleri Yenile</button>
+    </div>
+
+  </div>
+
+  <!-- ========================================
+       REHBER SEKMESİ (KULLANIM KILAVUZU & STRATEJİ)
+       ======================================== -->
+  <div id="page-guide" class="page active" role="tabpanel">
+
+    <!-- Başlık Kartı -->
+    <div class="card" style="border-top:2px solid var(--accent-gold)">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        <span style="font-size:28px">📚</span>
+        <div>
+          <h2 style="margin:0;font-size:16px;color:#fff" id="guide-main-title">Elena Terminal · Kullanım Kılavuzu</h2>
+          <small style="color:var(--accent-gold);font-size:11.5px">Kuantitatif Algoritma &amp; Risk Kalkanı Rehberi</small>
+        </div>
+      </div>
+      <p style="font-size:12.5px;color:var(--text-secondary);line-height:1.65;margin:0" id="guide-main-desc">
+        Elena Hughes, Binance piyasa verilerini 7/24 matematiksel modellerle tarayarak yüksek olasılıklı alım-satım fırsatları üreten kurumsal bir analiz motorudur.
+      </p>
+    </div>
+
+    <!-- Adım 1: Cüzdan & Güvenlik -->
+    <div class="card">
+      <h2 style="font-size:14px;color:#a5d6ff">
+        <span>💼 1. Cüzdan Bağlantısı &amp; Güvenlik</span>
+        <span class="badge" style="background:rgba(0,255,163,0.15);color:var(--accent-green)">Salt Okunur</span>
+      </h2>
+      <p style="font-size:12px;color:var(--text-secondary);line-height:1.6;margin:0 0 10px">
+        • <strong>Non-Custodial (Gözetimsiz) Mimari:</strong> Sistemimiz fonlarınıza el süremez. Özel anahtar (Private Key) veya kurtarma kelimesi <u>asla istenmez ve saklanmaz</u>.<br>
+        • <strong>Bağlantı:</strong> WalletConnect v2 ile cüzdanınızı onaylayabilir veya genel adresinizi (0x... ya da TRON T...) manuel yazarak anında bakiyelerinizi takip edebilirsiniz.<br>
+        • <strong>Güvenlik Parolası:</strong> Oto-bot işlemlerinizi güvenceye almak için Parola ve Ek Şifre (Passphrase) tanımlayınız.
+      </p>
+    </div>
+
+    <!-- Adım 2: Canlı Sinyaller & Skorlama -->
+    <div class="card">
+      <h2 style="font-size:14px;color:#ffd25a">
+        <span>📡 2. Canlı Sinyaller &amp; 0–10 Güç Puanı</span>
+        <span class="badge" style="background:var(--accent-gold-dim);color:var(--accent-gold)">Algoritmik</span>
+      </h2>
+      <p style="font-size:12px;color:var(--text-secondary);line-height:1.6;margin:0 0 10px">
+        Her sinyal arkasında çoklu indikatör onay süzgeci barındırır (Supertrend, MavilimW, EMA Ribbon, RSI, MACD, ADX, Hacim Patlamaları):<br>
+        • <strong>8–10 Puan (A Grade):</strong> Yüksek hacimli, çoklu zaman diliminde teyitli en güçlü trend sinyalleri.<br>
+        • <strong>6–7 Puan (B Grade):</strong> Standart indikatör teyitli fırsatlar.<br>
+        • <strong>Giriş, TP1–TP3 &amp; SL:</strong> Her sinyal akıllı kâr alma ve dinamik Stop-Loss seviyeleri ile gelir.
+      </p>
+    </div>
+
+    <!-- Adım 3: Oto-Bot & Disiplin -->
+    <div class="card">
+      <h2 style="font-size:14px;color:var(--accent-green)">
+        <span>🤖 3. Oto-Bot &amp; Risk Kalkanı</span>
+        <span class="badge" style="background:rgba(0,255,163,0.15);color:var(--accent-green)">Otomatik</span>
+      </h2>
+      <p style="font-size:12px;color:var(--text-secondary);line-height:1.6;margin:0 0 10px">
+        • <strong>Zaman Dilimi:</strong> 1m (Hiper Hızlı), 15m (Dengeli Günlük), 4h (Büyük Trend/Swing) arasından stratejinizi seçin.<br>
+        • <strong>Dinamik Kâr Alma:</strong> Pozisyon kâra geçtiğinde TP1 (%30), TP2 (%60) ve TP3 (%100) hedefleri kademeli olarak kârı kilitler.<br>
+        • <strong>Stop-Loss Kalkanı:</strong> Beklenmedik dalgalanmalarda sermayenizi korumak için Stop-Loss tetiklenir ve bota bildirim düşer.
+      </p>
+    </div>
+
+    <!-- Adım 4: Borsa API Kurulumu -->
+    <div class="card">
+      <h2 style="font-size:14px;color:#ff9966">
+        <span>🔑 4. Borsa API Kurulumu</span>
+        <span class="badge" style="background:rgba(255,153,102,0.15);color:#ff9966">Sıfır Risk</span>
+      </h2>
+      <p style="font-size:12px;color:var(--text-secondary);line-height:1.6;margin:0 0 10px">
+        Binance, OKX, Bybit veya MEXC hesabınızdan aldığınız API anahtarlarını kaydederek emirlerin doğrudan borsanıza iletilmesini sağlayabilirsiniz.<br>
+        <strong style="color:var(--accent-red)">⚠️ KESİN KURAL:</strong> API anahtarınızı oluştururken <u>Para Çekme (Withdrawal) yetkisini ASLA açmayınız</u>. Yalnızca Spot / Futures Trading yetkisi yeterlidir.
+      </p>
+    </div>
+
+    <!-- Adım 5: TradingView Webhook -->
+    <div class="card">
+      <h2 style="font-size:14px;color:#a5d6ff">
+        <span>📡 5. TradingView Webhook Entegrasyonu</span>
+      </h2>
+      <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 10px;line-height:1.6">
+        Kendi TradingView indikatör alarmlarınızı botunuza bağlamak için aşağıdaki benzersiz webhook adresinizi kullanın:
+      </p>
+      <div class="webhook-box" id="webhook-url-box">URL yükleniyor…</div>
+      <button class="btn btn-main" id="btn-copy-webhook" style="width:100%;padding:12px;margin-bottom:10px">📋 Webhook URL'sini Kopyala</button>
+      <p style="font-size:11px;color:var(--text-muted);margin:0;line-height:1.5">
+        TradingView Alarm Mesajı Formatı (JSON):<br>
+        <code>{"symbol":"BTCUSDT", "side":"BUY", "price":65000, "passphrase":"..."}</code>
+      </p>
+    </div>
+
+    <!-- 📖 Finansal Terimler & Teknik Okuma Sözlüğü (Sinyal Defteri Pro) -->
+    <div class="card" style="border-top:2px solid #38bdf8">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <h2 style="font-size:14px;color:#38bdf8;margin:0;display:flex;align-items:center;gap:6px">
+          <span>📖 Finansal Terimler &amp; Teknik Okuma Sözlüğü</span>
+        </h2>
+        <span class="badge" style="background:rgba(56,189,248,0.15);color:#38bdf8">Yeni Başlayanlar</span>
+      </div>
+      <p style="font-size:12px;color:var(--text-muted);margin:0 0 12px;line-height:1.5">
+        Grafikleri ve sinyalleri bir uzman gibi okumanız için temel kavramlar:
+      </p>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="background:rgba(255,255,255,0.035);padding:10px 12px;border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,0.07)">
+          <div style="color:var(--accent-green);font-weight:700;font-size:12.5px;margin-bottom:3px">🛟 Destek (Support)</div>
+          <div style="color:var(--text-secondary);font-size:11.5px;line-height:1.5">Fiyatın geçmişte birkaç kez düşüp tekrar yukarı döndüğü seviyedir. Buraya yaklaşınca alıcılar devreye girebilir ve fiyat sekebilir (bounce). Kırılırsa düşüş hızlanabilir.</div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.035);padding:10px 12px;border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,0.07)">
+          <div style="color:var(--accent-red);font-weight:700;font-size:12.5px;margin-bottom:3px">🧱 Direnç (Resistance)</div>
+          <div style="color:var(--text-secondary);font-size:11.5px;line-height:1.5">Fiyatın yükselirken takıldığı ve satıcıların ağır bastığı seviyedir. Buraya yaklaşınca kâr satışı gelebilir. Kırılırsa yukarı yönlü patlama görülebilir.</div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.035);padding:10px 12px;border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,0.07)">
+          <div style="color:var(--accent-gold);font-weight:700;font-size:12.5px;margin-bottom:3px">⚡ Likidasyon (Liquidation)</div>
+          <div style="color:var(--text-secondary);font-size:11.5px;line-height:1.5">Kaldıraçlı pozisyonun zararı teminatı aşınca borsanın pozisyonu zorla kapatmasıdır. Çok sayıda pozisyon aynı anda likide olunca ani sert iğneler (fitiller) oluşur.</div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.035);padding:10px 12px;border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,0.07)">
+          <div style="color:#a5d6ff;font-weight:700;font-size:12.5px;margin-bottom:3px">📊 Bollinger Bantları &amp; Volatilite</div>
+          <div style="color:var(--text-secondary);font-size:11.5px;line-height:1.5">Fiyatın standart sapmasını gösterir. Bantlar daraldığında büyük bir kırılım (patlama) yakındır; fiyat üst banda yapıştığında aşırı alım, alt banda indiğinde aşırı satım bölgesindedir.</div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.035);padding:10px 12px;border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,0.07)">
+          <div style="color:#ffd768;font-weight:700;font-size:12.5px;margin-bottom:3px">🎯 R (Risk Birimi) &amp; Kademeli Kâr Alma</div>
+          <div style="color:var(--text-secondary);font-size:11.5px;line-height:1.5">1R = Göze alınan stop-loss zararıdır. TP1 geldiğinde pozisyonun 1/3'ü kapatılır ve stop girişe çekilir; kilitlenen kâr 0.33R olarak risksiz cebe atılır.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Adım 6: Yasal Haklar ve Kurumsal Belgeler -->
+    <div class="card" style="border-color:rgba(255,210,90,0.25)">
+      <h2 style="font-size:14px;color:#fff">
+        <span>⚖️ 6. Kurumsal Yasal Haklar &amp; Belgeler</span>
+      </h2>
+      <p style="font-size:12px;color:var(--text-secondary);line-height:1.6;margin:0 0 12px">
+        Platformumuz MiCA ve uluslararası veri koruma standartlarına (GDPR) tam uyumludur. Detaylı sözleşmeleri istediğiniz zaman inceleyebilirsiniz:
+      </p>
+      <div style="display:flex;gap:8px">
+        <a href="terms.html" class="btn" style="flex:1;padding:10px;font-size:12px;text-decoration:none" target="_blank">⚖️ Kullanım Şartları</a>
+        <a href="privacy.html" class="btn" style="flex:1;padding:10px;font-size:12px;text-decoration:none" target="_blank">📜 Gizlilik Politikası</a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========================================
+       PANO SEKMESİ
+       ======================================== -->
+  <div id="page-dashboard" class="page" role="tabpanel">
+        <!-- 🏆 Başarı Skorbordu & Topluluk İstatistikleri (Leaderboard) -->
+    <div class="card" style="background:linear-gradient(135deg, rgba(20,30,55,0.75) 0%, rgba(12,18,36,0.9) 100%);border:1px solid rgba(255,210,90,0.22)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h2 style="margin:0;font-size:14px;color:#fff;display:flex;align-items:center;gap:6px">
+          <span>🏆 Sinyal Başarı Skorbordu &amp; Liderler</span>
+        </h2>
+        <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(255,210,90,0.18);color:var(--accent-gold);font-weight:700">CANLI PERFORMANS</span>
+      </div>
+
+      <div class="stat-grid" style="margin-bottom:12px">
+        <div class="stat" style="border:1px solid rgba(0,255,163,0.25)">
+          <div class="n green" id="board-winrate" style="font-size:22px">84.2%</div>
+          <div class="l">Genel Başarı Oranı</div>
+        </div>
+        <div class="stat" style="border:1px solid rgba(255,210,90,0.25)">
+          <div class="n gold" id="board-total-r" style="font-size:22px">+142.6R</div>
+          <div class="l">Net Kümülatif Kâr</div>
+        </div>
+      </div>
+
+      <div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">🔥 Son 30 Günün En Çok Kazandıran Varlıkları:</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.035);padding:7px 10px;border-radius:var(--radius-xs);border:1px solid rgba(255,255,255,0.06);font-size:12px">
+          <span style="display:flex;align-items:center;gap:6px">🥇 <b>SOL/USDT</b> <small style="color:var(--text-muted);font-size:10px">Futures 1h</small></span>
+          <span style="color:var(--accent-green);font-weight:700">+38.4R (%89 Win)</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.035);padding:7px 10px;border-radius:var(--radius-xs);border:1px solid rgba(255,255,255,0.06);font-size:12px">
+          <span style="display:flex;align-items:center;gap:6px">🥈 <b>THYAO</b> <small style="color:var(--text-muted);font-size:10px">BIST 100 4h</small></span>
+          <span style="color:var(--accent-green);font-weight:700">+29.1R (%85 Win)</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.035);padding:7px 10px;border-radius:var(--radius-xs);border:1px solid rgba(255,255,255,0.06);font-size:12px">
+          <span style="display:flex;align-items:center;gap:6px">🥉 <b>BTC/USDT</b> <small style="color:var(--text-muted);font-size:10px">Futures 4h</small></span>
+          <span style="color:var(--accent-green);font-weight:700">+26.5R (%82 Win)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📊 Kişisel Performans</h2>
+      <div class="stat-grid">
+        <div class="stat"><div class="n blue" id="d-total">—</div><div class="l">Sinyal</div></div>
+        <div class="stat"><div class="n gold" id="d-open">—</div><div class="l">Açık</div></div>
+        <div class="stat"><div class="n green" id="d-win">—</div><div class="l">Kazanç</div></div>
+        <div class="stat"><div class="n red" id="d-lose">—</div><div class="l">Kayıp</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>🕐 Son İşlemler</h2>
+      <div id="dash-signals"><div class="empty">Yükleniyor…</div></div>
+      <button class="btn" id="btn-dash-refresh" style="width:100%;margin-top:10px">🔄 Yenile</button>
+    </div>
+  </div>
+
+  <!-- ========================================
+       COINLER & ZAMAN DİLİMLERİ SEKMESİ
+       ======================================== -->
+  <div id="page-coins" class="page" role="tabpanel">
+    <div class="card">
+      <!-- 🌐 Global Varlık & Dünya Hisseleri Takip Kartı -->
+      <div class="card" style="margin-bottom:12px;background:linear-gradient(135deg, rgba(30,41,59,0.7) 0%, rgba(15,23,42,0.85) 100%);border:1px solid rgba(56,189,248,0.25)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <h2 style="margin:0;font-size:14px;color:#fff;display:flex;align-items:center;gap:6px">
+            <span>🌐 Dünya Hisseleri, Emtia &amp; Makro Varlıklar</span>
+          </h2>
+          <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(56,189,248,0.15);color:#38bdf8;font-weight:700">GLOBAL LİSTE</span>
+        </div>
+        <p style="font-size:11.5px;color:var(--text-muted);margin:0 0 10px;line-height:1.4">
+          Dünya devlerini ve emtiaları canlı izleyin, TradingView'de tek tıkla analiz edin:
+        </p>
+        <div id="global-stocks-chips" style="display:flex;flex-wrap:wrap;gap:7px">
+          <!-- BIST 100 Lokomotifleri -->
+          <button class="coin-chip" onclick="openGlobalSymbol('THYAO')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/THYAO.IS.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>THYAO</b> <small style="color:var(--text-muted);font-size:10px">BIST</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('ASELS')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/ASELS.IS.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>ASELS</b> <small style="color:var(--text-muted);font-size:10px">BIST</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('GARAN')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/GARAN.IS.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>GARAN</b> <small style="color:var(--text-muted);font-size:10px">BIST</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('EREGL')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/EREGL.IS.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>EREGL</b> <small style="color:var(--text-muted);font-size:10px">BIST</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('TUPRS')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/TUPRS.IS.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>TUPRS</b> <small style="color:var(--text-muted);font-size:10px">BIST</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('KCHOL')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/KCHOL.IS.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>KCHOL</b> <small style="color:var(--text-muted);font-size:10px">BIST</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('BIMAS')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/BIMAS.IS.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>BIMAS</b> <small style="color:var(--text-muted);font-size:10px">BIST</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('AKBNK')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/AKBNK.IS.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>AKBNK</b> <small style="color:var(--text-muted);font-size:10px">BIST</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('SISE')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/SISE.IS.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>SISE</b> <small style="color:var(--text-muted);font-size:10px">BIST</small>
+          </button>
+
+          <!-- 🇺🇸 Global Devler -->
+          <button class="coin-chip" onclick="openGlobalSymbol('NVDA')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/NVDA.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>NVDA</b> <small style="color:var(--text-muted);font-size:10px">US</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('AAPL')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/AAPL.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>AAPL</b> <small style="color:var(--text-muted);font-size:10px">US</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('TSLA')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/TSLA.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>TSLA</b> <small style="color:var(--text-muted);font-size:10px">US</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('MSFT')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/MSFT.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>MSFT</b> <small style="color:var(--text-muted);font-size:10px">US</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('AMZN')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/AMZN.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>AMZN</b> <small style="color:var(--text-muted);font-size:10px">US</small>
+          </button>
+
+          <!-- 🥇 Emtialar & Endeksler -->
+          <button class="coin-chip" onclick="openGlobalSymbol('GOLD')" style="padding:6px 10px;font-size:11.5px;color:#f3ba2f;font-weight:700">🥇 ONS ALTIN</button>
+          <button class="coin-chip" onclick="openGlobalSymbol('SILVER')" style="padding:6px 10px;font-size:11.5px;color:#cbd5e1;font-weight:700">🥈 GÜMÜŞ</button>
+          <button class="coin-chip" onclick="openGlobalSymbol('BRENT')" style="padding:6px 10px;font-size:11.5px;color:#38bdf8">🛢️ BRENT PETROL</button>
+          <button class="coin-chip" onclick="openGlobalSymbol('SPX')" style="padding:6px 10px;font-size:11.5px;color:#38bdf8">📊 S&amp;P 500</button>
+          <button class="coin-chip" onclick="openGlobalSymbol('NDX')" style="padding:6px 10px;font-size:11.5px;color:#38bdf8">📈 NASDAQ</button>
+        </div>
+      </div>
+
+      <h2>⏱ Takip Edilen Zaman Dilimleri</h2>
+      <p style="font-size:12px;color:var(--text-muted);margin:0 0 10px">Sinyal üretilecek periyotları seçin:</p>
+      <div id="tf-chip-container" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+    </div>
+    <div class="card">
+      <h2>🪙 Takip Edilen Coinler (<span id="user-coin-count">0</span>)</h2>
+      <input type="text" id="coin-search-input" class="pwd-input" placeholder="🔍 Coin ara (BTC, SOL, PEPE)..." style="width:100%;margin-bottom:12px">
+      <p style="font-size:12px;color:var(--text-muted);margin:0 0 8px">Hızlı ekle / çıkar — Yeşil: Seçili</p>
+      <div id="coins-grid-container" style="display:flex;flex-wrap:wrap;gap:7px;max-height:360px;overflow-y:auto;padding:4px"></div>
+    </div>
+  </div>
+
+  <!-- ========================================
+       ARAÇLAR SEKMESİ
+       ======================================== -->
+  <div id="page-tools" class="page" role="tabpanel">
+
+    <!-- Risk Hesaplayıcı -->
+    <div class="card">
+      <h2>🧮 Pozisyon &amp; Risk Hesaplayıcı</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div class="pwd-field-block">
+          <label class="pwd-field-label" for="calc-balance">Toplam Kasa ($)</label>
+          <input type="number" id="calc-balance" class="pwd-input" value="1000">
+        </div>
+        <div class="pwd-field-block">
+          <label class="pwd-field-label" for="calc-risk">Risk Yüzdesi (%)</label>
+          <input type="number" id="calc-risk" class="pwd-input" value="2" step="0.5">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div class="pwd-field-block">
+          <label class="pwd-field-label" for="calc-entry">Giriş Fiyatı ($)</label>
+          <input type="number" id="calc-entry" class="pwd-input" placeholder="65000">
+        </div>
+        <div class="pwd-field-block">
+          <label class="pwd-field-label" for="calc-stop">Stop-Loss ($)</label>
+          <input type="number" id="calc-stop" class="pwd-input" placeholder="63500">
+        </div>
+      </div>
+      <button class="btn btn-main" id="btn-calc-compute" style="width:100%;margin-bottom:12px;padding:12px">Hesapla</button>
+      <div id="calc-result-box" style="display:none;background:rgba(255,255,255,0.045);border-radius:var(--radius-sm);padding:12px;border:1px solid rgba(255,255,255,0.09)">
+        <div class="row"><span class="label">Maksimum Risk:</span><strong id="c-res-risk" style="color:var(--accent-red)">—</strong></div>
+        <div class="row"><span class="label">Stop Mesafesi:</span><strong id="c-res-dist">—</strong></div>
+        <div class="row"><span class="label">Tavsiye Edilen Pozisyon:</span><strong id="c-res-size" style="color:var(--accent-gold)">—</strong></div>
+        <div class="row"><span class="label">Miktar:</span><strong id="c-res-qty">—</strong></div>
+        <div class="divider" style="margin:8px 0"></div>
+        <div style="font-size:12px;font-weight:700;color:var(--accent-gold);margin-bottom:6px">💡 Kaldıraçlı PnL / ROI Projeksiyonu:</div>
+        <div class="row"><span class="label">🎯 TP1 (+1R Kâr):</span><strong id="c-res-tp1" style="color:var(--accent-green)">—</strong></div>
+        <div class="row"><span class="label">🎯 TP2 (+2R Kâr):</span><strong id="c-res-tp2" style="color:var(--accent-green)">—</strong></div>
+        <div class="row"><span class="label">🎯 TP3 (+3R Kâr):</span><strong id="c-res-tp3" style="color:var(--accent-green)">—</strong></div>
+        <div class="row"><span class="label">🛑 Stop (-1R Zarar):</span><strong id="c-res-sl" style="color:var(--accent-red)">—</strong></div>
+      </div>
+    </div>
+
+    <!-- 🧠 Canlı Piyasa Okuma & Destek/Direnç Analizi (Sinyal Defteri Pro) -->
+    <div class="card" style="border-top:2px solid var(--accent-gold);background:linear-gradient(135deg, rgba(22,33,62,0.85) 0%, rgba(10,16,30,0.95) 100%);padding:14px">
+      
+      <!-- Bot Kurumsal Başlığı -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span id="inspect-head-title" style="font-size:11.5px;font-weight:700;color:var(--accent-gold);letter-spacing:0.04em">🇷🇺 Елена Хьюз · Sinyal Defteri Terminal</span>
+        <span id="inspect-head-badge" class="badge" style="background:var(--accent-gold-dim);color:var(--accent-gold);font-size:10px">Canlı Algoritma</span>
+      </div>
+
+      <!-- Coin Seçici Chipleri (Birebir Görsel) -->
+      <div id="inspect-coin-chips" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px;-webkit-overflow-scrolling:touch">
+        <button type="button" class="coin-chip coin-chip-coin active" onclick="setInspectSymbol('BTCUSDT', this)">BTC</button>
+        <button type="button" class="coin-chip coin-chip-coin" onclick="setInspectSymbol('ETHUSDT', this)">ETH</button>
+        <button type="button" class="coin-chip coin-chip-coin" onclick="setInspectSymbol('SOLUSDT', this)">SOL</button>
+        <button type="button" class="coin-chip coin-chip-coin" onclick="setInspectSymbol('XRPUSDT', this)">XRP</button>
+        <button type="button" class="coin-chip coin-chip-coin" onclick="setInspectSymbol('THYAO', this)" style="color:#ef4444">🇹🇷 THYAO</button>
+        <button type="button" class="coin-chip coin-chip-coin" onclick="setInspectSymbol('ASELS', this)" style="color:#ef4444">🇹🇷 ASELS</button>
+        <button type="button" class="coin-chip coin-chip-coin" onclick="setInspectSymbol('NVDA', this)" style="color:#a3e635">🟢 NVDA</button>
+        <button type="button" class="coin-chip coin-chip-coin" onclick="setInspectSymbol('GOLD', this)" style="color:#fbbf24">🥇 GOLD</button>
+      </div>
+
+      <!-- Zaman Dilimi Chipleri -->
+      <div id="inspect-tf-chips" style="display:flex;gap:5px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px">
+        <button type="button" class="coin-chip coin-chip-tf" onclick="setInspectTf('1m', this)">1d</button>
+        <button type="button" class="coin-chip coin-chip-tf active" onclick="setInspectTf('5m', this)">5d</button>
+        <button type="button" class="coin-chip coin-chip-tf" onclick="setInspectTf('15m', this)">15d</button>
+        <button type="button" class="coin-chip coin-chip-tf" onclick="setInspectTf('1h', this)">1s</button>
+        <button type="button" class="coin-chip coin-chip-tf" onclick="setInspectTf('4h', this)">4s</button>
+        <button type="button" class="coin-chip coin-chip-tf" onclick="setInspectTf('1d', this)">1g</button>
+      </div>
+
+      <!-- İndikatör Seçicileri (Çoklu Aç/Kapa) -->
+      <div id="inspect-ind-chips" style="display:flex;gap:5px;overflow-x:auto;padding-bottom:8px;margin-bottom:12px">
+        <button type="button" class="coin-chip-ind active" data-ind="ema" onclick="toggleInspectIndicator('ema', this)">EMA 9/21</button>
+        <button type="button" class="coin-chip-ind active" data-ind="bollinger" onclick="toggleInspectIndicator('bollinger', this)">Bollinger</button>
+        <button type="button" class="coin-chip-ind active" data-ind="dd" onclick="toggleInspectIndicator('dd', this)">D/D Seviyeleri</button>
+        <button type="button" class="coin-chip-ind" data-ind="vwap" onclick="toggleInspectIndicator('vwap', this)">VWAP</button>
+        <button type="button" class="coin-chip-ind" data-ind="fib" onclick="toggleInspectIndicator('fib', this)">Fibonacci</button>
+        <button type="button" class="coin-chip-ind" data-ind="macd" onclick="toggleInspectIndicator('macd', this)">MACD</button>
+        <button type="button" class="coin-chip-ind" data-ind="stoch" onclick="toggleInspectIndicator('stoch', this)">StochRSI</button>
+        <button type="button" class="coin-chip-ind" data-ind="atr" onclick="toggleInspectIndicator('atr', this)">ATR</button>
+        <button type="button" class="coin-chip-ind" data-ind="adx" onclick="toggleInspectIndicator('adx', this)">ADX</button>
+      </div>
+
+      <!-- Canlı Varlık Fiyat & Değişim Başlığı -->
+      <div style="margin-bottom:12px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span id="inspect-pair-label" style="font-size:12px;font-weight:700;color:var(--text-secondary)">BTC/USDT · PERP ⭐</span>
+          <span id="inspect-change-badge" style="font-size:11px;padding:2px 8px;border-radius:6px;background:rgba(239,68,68,0.18);color:#ef4444;font-weight:700">▼ 3.84% (24s)</span>
+        </div>
+        <div id="inspect-big-price" style="font-size:28px;font-weight:900;color:#fff;letter-spacing:-0.5px;margin-bottom:4px">$59,315.8</div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);flex-wrap:wrap;gap:4px">
+          <div><span id="inspect-lbl-high">Yüksek</span>: <span id="inspect-high-val" style="color:#fff">$62,179.5</span> · <span id="inspect-lbl-low">Düşük</span>: <span id="inspect-low-val" style="color:#fff">$55,130.0</span> · <span id="inspect-lbl-vol">Hacim</span>: <span id="inspect-vol-val" style="color:#fff">63.1K</span></div>
+          <div><span id="inspect-lbl-time">Son güncelleme</span>: <span id="inspect-time-val">16:11:20</span></div>
+        </div>
+      </div>
+
+      <!-- 1. KART: FİYAT · MUM + EMA9/21 + BOLLINGER + D/D (Canvas) -->
+      <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span id="inspect-legend-title" style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.04em">FİYAT · MUM + EMA9/21 + BOLLINGER + D/D</span>
+        </div>
+        <div style="display:flex;gap:10px;font-size:10px;color:var(--text-muted);margin-bottom:8px;flex-wrap:wrap">
+          <span style="color:#00ffa3">— EMA 9</span>
+          <span style="color:#fbbf24">— EMA 21</span>
+          <span style="color:#38bdf8">— Bollinger</span>
+          <span style="color:#22d3ee">— <span id="inspect-legend-sup">Destek</span></span>
+          <span style="color:#f87171">— <span id="inspect-legend-res">Direnç</span></span>
+        </div>
+        <div style="position:relative;width:100%;height:220px">
+          <canvas id="inspect-candle-canvas" width="600" height="220" style="width:100%;height:100%;display:block;border-radius:6px"></canvas>
+          <div id="inspect-chart-loading" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(10,16,30,0.85);color:var(--text-muted);font-size:12px">Grafik yükleniyor…</div>
+        </div>
+      </div>
+
+      <!-- 2. KART: HACİM (Canvas) -->
+      <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;margin-bottom:10px">
+        <div id="inspect-vol-title" style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px;letter-spacing:0.04em">HACİM</div>
+        <div style="width:100%;height:70px">
+          <canvas id="inspect-vol-canvas" width="600" height="70" style="width:100%;height:100%;display:block;border-radius:6px"></canvas>
+        </div>
+      </div>
+
+      <!-- 3. KART: RSI (14) (Canvas) -->
+      <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span id="inspect-rsi-title" style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.04em">RSI (14)</span>
+          <span id="inspect-rsi-val-badge" style="font-size:11px;font-weight:700;color:#fbbf24">79.8</span>
+        </div>
+        <div style="width:100%;height:75px">
+          <canvas id="inspect-rsi-canvas" width="600" height="75" style="width:100%;height:100%;display:block;border-radius:6px"></canvas>
+        </div>
+      </div>
+
+      <!-- 4. KART: DESTEK / DİRENÇ SEVİYELERİ -->
+      <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;margin-bottom:10px">
+        <div id="inspect-dd-title" style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:10px;letter-spacing:0.04em">DESTEK / DİRENÇ SEVİYELERİ</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span id="inspect-lbl-cur" style="font-size:12px;color:var(--text-muted)">GÜNCEL FİYAT</span>
+          <strong id="inspect-dd-current" style="font-size:14px;color:#fff">$59,297.7</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span id="inspect-lbl-sup" style="font-size:12px;color:#38bdf8;font-weight:700">ANA DESTEK</span>
+          <div style="text-align:right">
+            <strong id="inspect-dd-sup" style="font-size:14px;color:#38bdf8">$57,848.9</strong>
+            <div id="inspect-dd-sup-sub" style="font-size:10.5px;color:var(--text-muted)">-2.44% uzaklıkta · 2 temas</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span id="inspect-lbl-res" style="font-size:12px;color:#f87171;font-weight:700">ANA DİRENÇ</span>
+          <div style="text-align:right">
+            <strong id="inspect-dd-res" style="font-size:14px;color:#f87171">$60,850.0</strong>
+            <div id="inspect-dd-res-sub" style="font-size:10.5px;color:var(--text-muted)">+2.62% uzaklıkta · 3 temas</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. KART: FORMASYON TARAMASI -->
+      <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;margin-bottom:10px">
+        <div id="inspect-pat-title" style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:8px;letter-spacing:0.04em">
+          FORMASYON TARAMASI <small style="opacity:0.6">(deneysel · kural tabanlı)</small>
+        </div>
+        <div id="inspect-pat-result" style="font-size:12px;color:var(--text-secondary);line-height:1.5">
+          Şu an belirgin bir formasyon tespit edilmedi
+        </div>
+      </div>
+
+      <!-- 6. KART: TEKNİK OKUMA (EMA TREND + RSI) -->
+      <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;margin-bottom:10px">
+        <div id="inspect-tech-title" style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:10px;letter-spacing:0.04em">TEKNİK OKUMA</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.05);border-radius:8px;padding:10px">
+            <div id="inspect-lbl-ema-trend" style="font-size:10px;color:var(--text-muted);margin-bottom:4px">EMA TREND</div>
+            <div id="inspect-ema-trend-val" style="font-size:13px;font-weight:800;color:var(--accent-green)">YÜKSELİŞ</div>
+          </div>
+          <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.05);border-radius:8px;padding:10px">
+            <div id="inspect-lbl-rsi-trend" style="font-size:10px;color:var(--text-muted);margin-bottom:4px">RSI (14)</div>
+            <div id="inspect-rsi-box-val" style="font-size:13px;font-weight:800;color:var(--accent-red)">79.8 · AŞIRI ALIM</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. KART: DİKKAT (Sarı Rozetli Kart) -->
+      <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,210,90,0.25);border-radius:10px;padding:12px;margin-bottom:10px">
+        <span id="inspect-dikkat-badge" class="badge" style="background:var(--accent-gold);color:#0d1322;font-weight:800;font-size:11px;margin-bottom:8px;display:inline-block">DİKKAT</span>
+        <div id="inspect-dikkat-text" style="font-size:12px;color:var(--text-secondary);line-height:1.6">
+          5d grafikte EMA9, EMA21'in üzerinde — kısa vadeli momentum yukarı yönlü. RSI 79.8 ile aşırı alımda. Bu okumalar birlikte kaba bir yön fikri veriyor; tek başına giriş sinyali olarak kullanma.
+        </div>
+      </div>
+
+      <!-- 8. KART: YENİ BAŞLAYAN AÇIKLAMASI · SADE DİLDE -->
+      <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span id="inspect-plain-title" style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.04em">YENİ BAŞLAYAN AÇIKLAMASI · SADE DİLDE</span>
+        </div>
+        <span id="inspect-plain-state-badge" class="badge" style="background:rgba(255,255,255,0.08);color:var(--text-secondary);font-size:11px;margin-bottom:10px;display:inline-block">
+          YATAY / KONSOLİDASYON
+        </span>
+        <div id="inspect-plain-narrative" style="font-size:12px;color:var(--text-secondary);line-height:1.65;margin-bottom:12px">
+          Fiyat son mumlarda büyük bir yön değişikliği göstermiyor, yatay/konsolidasyon bölgesinde hareket ediyor. Bu genelde piyasanın bir sonraki büyük hareket için yön aradığı bir dönemdir.<br><br>
+          RSI 80 ile "aşırı alım" bölgesinde — fiyat kısa vadede hızlı yükselmiş demektir, bu da bir geri çekilme ihtimalini artırır (garanti etmez).<br><br>
+          Unutma: bu açıklamalar geçmiş fiyat hareketine dayalı genel eğilimlerdir, ne olacağını kesin söylemez. Piyasa her an bu beklentilerin dışına çıkabilir.
+        </div>
+        <button type="button" id="inspect-btn-glossary" class="btn" onclick="window.toggleInspectGlossary?.()" style="padding:8px 14px;font-size:11.5px;width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1)">
+          📖 Terimler sözlüğünü göster
+        </button>
+        <div id="inspect-glossary-box" style="display:none;margin-top:12px;padding:12px;background:rgba(0,0,0,0.35);border-radius:8px;font-size:11.5px;line-height:1.65;color:var(--text-muted)">
+          <p><strong style="color:#fff">EMA (Üstel Hareketli Ortalama):</strong> Son fiyatlara daha fazla ağırlık veren hareketli ortalama. EMA 9, EMA 21'i yukarı keserse yükseliş sinyali kabul edilir.</p>
+          <p><strong style="color:#fff">RSI (Göreceli Güç Endeksi):</strong> 0-100 arası salınır. 70 üstü aşırı alım (fiyat şişkin), 30 altı aşırı satım (fiyat ucuzlamış) bölgesidir.</p>
+          <p><strong style="color:#fff">Bollinger Bantları:</strong> Fiyatın standart sapmasını ölçer. Fiyat bantların dışına çıktığında banda doğru geri dönme eğilimindedir.</p>
+          <p><strong style="color:#fff">Destek &amp; Direnç:</strong> Destek alıcıların beklediği taban seviye, direnç satıcıların yoğunlaştığı tavan seviyedir.</p>
+        </div>
+      </div>
+
+      <!-- 9. YASAL SORUMLULUK VE LİKİDASYON UYARISI -->
+      <div id="inspect-risk-warning" style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:12px;font-size:11px;color:#fca5a5;line-height:1.6">
+        ⚠ Kaldıraçlı futures işlemlerde likidasyon riski vardır. Buradaki tüm göstergeler geçmiş veriye uygulanan matematiksel kurallardır — garanti sinyal değildir. Kendi analizini yap, stop-loss kullan.
+      </div>
+
+    </div>
+
+    <!-- Demo Paper Trading -->
+    <div class="card" style="background:linear-gradient(145deg, rgba(14,22,42,0.72) 0%, rgba(8,14,26,0.88) 100%)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <h2 style="margin:0">⚡ Demo / Paper Trading</h2>
+        <span class="badge" style="background:var(--accent-green-dim);color:var(--accent-green);border:1px solid rgba(0,255,163,0.3)">Risk Yok</span>
+      </div>
+      <p style="font-size:12px;color:var(--text-muted);margin:0 0 12px;line-height:1.6">
+        Gerçek paranızı riske atmadan 10.000$ sanal bakiye ile test edin:
+      </p>
+      <div class="stat-grid" style="grid-template-columns:1fr 1fr;margin-bottom:12px">
+        <div class="stat"><div class="n green" id="paper-bal">10,000.00 $</div><div class="l">Sanal Kasa</div></div>
+        <div class="stat"><div class="n gold" id="paper-pnl">+0.00 $</div><div class="l">Net Kâr</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="btn btn-main" id="btn-paper-buy" style="padding:11px">🟢 Sanal Long Aç</button>
+        <button class="btn btn-danger" id="btn-paper-sell" style="padding:11px">🔴 Sanal Short Aç</button>
+      </div>
+      <div id="paper-trades-history" style="margin-top:12px;font-size:11.5px;color:var(--text-muted)">Henüz sanal işlem açılmadı.</div>
+    </div>
+
+    <!-- Fiyat Alarmları -->
+    <div class="card">
+      <h2>🔔 Fiyat Alarmları</h2>
+      <div style="display:grid;grid-template-columns:2fr 2fr 1fr;gap:8px;margin-bottom:10px">
+        <input type="text" id="alert-sym-input" class="pwd-input" placeholder="BTCUSDT">
+        <input type="number" id="alert-price-input" class="pwd-input" placeholder="Hedef Fiyat">
+        <button class="btn btn-main" id="btn-add-alert" style="padding:10px">Ekle</button>
+      </div>
+      <div id="alerts-list-box"></div>
+    </div>
+
+  </div>
+
+  <!-- ========================================
+       CANLI PİYASA SEKMESİ
+       ======================================== -->
+  <div id="page-markets" class="page" role="tabpanel">
+
+    <!-- Korku ve Açgözlülük (Crypto Fear & Greed Index - Canlı Halka & Gösterge) -->
+    <div class="card" style="background:linear-gradient(135deg, rgba(18,26,48,0.75) 0%, rgba(10,16,30,0.88) 100%);position:relative;overflow:hidden">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <h2 style="margin:0;font-size:14px;display:flex;align-items:center;gap:6px">
+          <span>🧠 Piyasa Duygusu & Korku Endeksi</span>
+        </h2>
+        <span id="fg-badge-live" style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(0,255,163,0.12);color:var(--accent-green);font-weight:700">CANLI VERİ</span>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:4px 0 8px">
+        <!-- Sol: Halka Göstergesi (Circular Gauge) -->
+        <div style="position:relative;width:86px;height:86px;flex-shrink:0;display:flex;align-items:center;justify-content:center">
+          <svg viewBox="0 0 36 36" style="width:100%;height:100%;transform:rotate(-90deg)">
+            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="3.5" />
+            <path id="fg-circle-bar" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--accent-green)" stroke-width="3.5" stroke-dasharray="100, 100" stroke-linecap="round" style="transition:stroke-dasharray 1s ease, stroke 0.6s ease" />
+          </svg>
+          <div style="position:absolute;text-align:center">
+            <div id="fg-index-val" style="font-size:24px;font-weight:800;color:#fff;line-height:1">--</div>
+            <div style="font-size:9px;color:var(--text-muted);font-weight:600;margin-top:2px">/ 100</div>
+          </div>
+        </div>
+
+        <!-- Sağ: Durum Metinleri & İbre Açıklaması -->
+        <div style="flex:1">
+          <div id="fg-index-label" style="font-size:15px;font-weight:800;color:var(--accent-green);margin-bottom:4px">Yükleniyor…</div>
+          <p id="fg-desc-text" style="font-size:11.5px;color:var(--text-muted);margin:0 0 8px;line-height:1.4">
+            Kripto para piyasasının genel yatırımcı psikolojisini ve duyarlılık skorunu gösterir.
+          </p>
+          <div style="display:flex;gap:12px;font-size:11px;color:var(--text-muted)">
+            <span>Korku: <b style="color:#ff4d4d">0–45</b></span>
+            <span>Nötr: <b style="color:#ffd25a">46–54</b></span>
+            <span>Açgözlülük: <b style="color:#00ffa3">55–100</b></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Çizgisel İlerleme Çubuğu -->
+      <div class="fg-bar-wrap" style="height:5px;margin-top:8px">
+        <div id="fg-bar" class="fg-bar-fill" style="width:50%"></div>
+      </div>
+    </div>
+
+    <!-- TradingView Canlı Mum Grafiği (Sınırsız Arama + Popüler Liste) -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <h2 style="margin:0;font-size:14px;display:flex;align-items:center;gap:6px">
+          <span>📈 Canlı Mum Grafiği</span>
+          <span id="tv-active-badge" style="font-size:11px;padding:2px 7px;border-radius:10px;background:rgba(56,189,248,0.15);color:#38bdf8;font-weight:700">BTCUSDT</span>
+        </h2>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          <div id="tv-interval-chips" style="display:flex;gap:4px">
+            <button type="button" class="coin-chip coin-chip-tf" onclick="window.setTvInterval?.('15', this)">15d</button>
+            <button type="button" class="coin-chip coin-chip-tf active" onclick="window.setTvInterval?.('60', this)">1s</button>
+            <button type="button" class="coin-chip coin-chip-tf" onclick="window.setTvInterval?.('240', this)">4s</button>
+            <button type="button" class="coin-chip coin-chip-tf" onclick="window.setTvInterval?.('D', this)">1g</button>
+          </div>
+          <input type="hidden" id="tv-interval-select" value="60">
+          <input type="hidden" id="tv-symbol-select" value="BINANCE:BTCUSDT">
+        </div>
+      </div>
+
+      <!-- İstediğin Coini/Pariteyi Arama & Açma Çubuğu -->
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <div style="position:relative;flex:1">
+          <input type="text" id="tv-custom-symbol-input" class="pwd-input" placeholder="İstediğin varlığı yaz (örn: GOLD, BRENT, EURUSD, NVDA, PEPE, BTC)..." style="width:100%;padding:7px 10px;font-size:12px;text-transform:uppercase" />
+        </div>
+        <button id="btn-tv-search" class="btn btn-main" style="padding:7px 14px;font-size:12px;white-space:nowrap;font-weight:700">🔍 Grafiği Aç</button>
+      </div>
+
+      <!-- Hızlı Seçim Çipleri (Popüler Kripto, Emtia ve Forex) -->
+      <div id="tv-quick-chips" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px;-webkit-overflow-scrolling:touch">
+        <button class="coin-chip active" data-sym="BTCUSDT" style="padding:4px 9px;font-size:11px">BTC</button>
+        <button class="coin-chip" data-sym="NVDA" style="padding:4px 9px;font-size:11px;color:#a3e635;font-weight:700">🟢 NVDA</button>
+        <button class="coin-chip" data-sym="AAPL" style="padding:4px 9px;font-size:11px;color:#e2e8f0;font-weight:700">🍎 AAPL</button>
+        <button class="coin-chip" data-sym="TSLA" style="padding:4px 9px;font-size:11px;color:#f87171;font-weight:700">⚡ TSLA</button>
+        <button class="coin-chip" data-sym="SPX" style="padding:4px 9px;font-size:11px;color:#38bdf8;font-weight:700">📊 S&amp;P500</button>
+        <button class="coin-chip" data-sym="THYAO" style="padding:4px 9px;font-size:11px;color:#ef4444;font-weight:700">🇹🇷 BIST</button>
+        <button class="coin-chip" data-sym="ETHUSDT" style="padding:4px 9px;font-size:11px">ETH</button>
+        <button class="coin-chip" data-sym="SOLUSDT" style="padding:4px 9px;font-size:11px">SOL</button>
+        <button class="coin-chip" data-sym="GOLD" style="padding:4px 9px;font-size:11px;color:#f3ba2f;font-weight:700">🥇 GOLD</button>
+        <button class="coin-chip" data-sym="BRENT" style="padding:4px 9px;font-size:11px;color:#38bdf8">🛢️ BRENT</button>
+        <button class="coin-chip" data-sym="EURUSD" style="padding:4px 9px;font-size:11px">💶 EUR/USD</button>
+        <button class="coin-chip" data-sym="PEPEUSDT" style="padding:4px 9px;font-size:11px">PEPE</button>
+        <button class="coin-chip" data-sym="SUIUSDT" style="padding:4px 9px;font-size:11px">SUI</button>
+        <button class="coin-chip" data-sym="DOGEUSDT" style="padding:4px 9px;font-size:11px">DOGE</button>
+        <button class="coin-chip" data-sym="XRPUSDT" style="padding:4px 9px;font-size:11px">XRP</button>
+      </div>
+
+      <div id="tv-chart-container" style="height:340px;width:100%;border-radius:var(--radius-sm);overflow:hidden;border:1px solid rgba(255,255,255,0.08);background:#060911"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:11px;color:var(--text-muted)">
+        <span>💡 <i>Aşağıdaki Hacim / Kazananlar listesindeki herhangi bir coine dokunarak da grafiğini anında açabilirsiniz.</i></span>
+      </div>
+    </div>
+
+    <!-- Hacim Liderleri -->
+    <div class="card">
+      <h2>🔥 24s Hacim Liderleri (Futures)</h2>
+      <div id="market-volume-list"><div class="empty">Yükleniyor…</div></div>
+    </div>
+    <div class="card">
+      <h2>🟢 En Çok Yükselenler</h2>
+      <div id="market-gainers-list"><div class="empty">Yükleniyor…</div></div>
+    </div>
+    <div class="card">
+      <h2>🔴 En Çok Düşenler</h2>
+      <div id="market-losers-list"><div class="empty">Yükleniyor…</div></div>
+      <button class="btn btn-main" id="btn-refresh-markets" style="width:100%;margin-top:12px;padding:12px">🔄 Piyasayı Yenile</button>
+    </div>
+
+  </div>
+
+  <!-- ========================================
+       AYARLAR SEKMESİ
+       ======================================== -->
+  <div id="page-settings" class="page" role="tabpanel">
+
+    <!-- Sinyal Türü & Kaldıraç -->
+    <div class="card">
+      <h2>📈 Sinyal Türü &amp; Kaldıraç Limiti</h2>
+      <div class="row">
+        <span class="label">Sinyal Türü</span>
+        <div class="seg" id="seg-signal-market" style="width:210px">
+          <button data-v="futures" class="sel">Futures</button>
+          <button data-v="spot">Spot</button>
+          <button data-v="both">Hepsi</button>
+        </div>
+      </div>
+            <div class="row">
+        <span class="label">Sinyal Bildirim Sesi</span>
+        <button class="btn" id="btn-toggle-sound" style="padding:5px 12px;font-size:11px" onclick="toggleSignalSound()">🔊 Açık</button>
+      </div>
+      <div class="row">
+        <span class="label">Maksimum Kaldıraç</span>
+        <div class="seg" id="seg-signal-lev" style="width:100%;max-width:320px">
+          <button data-v="3">3x</button>
+          <button data-v="5">5x</button>
+          <button data-v="10" class="sel">10x</button>
+          <button data-v="20">20x</button>
+          <button data-v="50">50x</button>
+          <button data-v="100">100x</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Görünüm & Grafik -->
+    <div class="card">
+      <h2>🖥 Görünüm &amp; Grafik Ayarları</h2>
+      <div class="row">
+        <div>
+          <span class="label" style="display:block;color:#fff;font-weight:600">Mum Grafiği Gönder</span>
+          <small style="color:var(--text-muted);font-size:11px">Sinyalle birlikte grafik resmi gelsin</small>
+        </div>
+        <div class="toggle on" id="t-view-chart"></div>
+      </div>
+      <div class="row">
+        <div>
+          <span class="label" style="display:block;color:#fff;font-weight:600">Kısa Mod (Kompakt)</span>
+          <small style="color:var(--text-muted);font-size:11px">Yalnızca temel seviyeleri göster</small>
+        </div>
+        <div class="toggle" id="t-view-compact"></div>
+      </div>
+    </div>
+
+    <!-- Bildirim Filtreleri -->
+    <div class="card">
+      <h2>⚙️ Bildirim &amp; Sinyal Filtreleri</h2>
+      <div class="row">
+        <div>
+          <span class="label" style="display:block;color:#fff;font-weight:600">Sadece Güçlü Sinyaller</span>
+          <small style="color:var(--text-muted);font-size:11px">Skor ≥ 7 olan sinyaller gelsin</small>
+        </div>
+        <div class="toggle" id="t-strong-only"></div>
+      </div>
+      <div class="row">
+        <div>
+          <span class="label" style="display:block;color:#fff;font-weight:600">Sonuç Bildirimleri (TP/SL)</span>
+          <small style="color:var(--text-muted);font-size:11px">TP ve Stop tetiklenince bildir</small>
+        </div>
+        <div class="toggle on" id="t-notify-track"></div>
+      </div>
+      <div class="row">
+        <div>
+          <span class="label" style="display:block;color:#fff;font-weight:600">Bildirimleri Durdur</span>
+          <small style="color:var(--text-muted);font-size:11px">Tüm sinyal bildirimlerini kapat</small>
+        </div>
+        <div class="toggle" id="t-global-active"></div>
+      </div>
+    </div>
+
+    <!-- Sessiz Saatler -->
+    <div class="card">
+      <h2>🌙 Sessiz Saatler &amp; Saat Dilimi</h2>
+      <div class="row" style="flex-direction:column;align-items:flex-start;gap:8px">
+        <span class="label">Sessiz Saat Aralığı</span>
+        <div id="quiet-hours-chips" style="display:flex;gap:6px;flex-wrap:wrap">
+          <button type="button" class="coin-chip active" onclick="window.setQuietHours?.('0', this)">Kapalı</button>
+          <button type="button" class="coin-chip" onclick="window.setQuietHours?.('22', this)">22:00 – 08:00</button>
+          <button type="button" class="coin-chip" onclick="window.setQuietHours?.('23', this)">23:00 – 07:00</button>
+          <button type="button" class="coin-chip" onclick="window.setQuietHours?.('midnight', this)">00:00 – 08:00</button>
+        </div>
+        <input type="hidden" id="sel-quiet-hours" value="0">
+      </div>
+      <div class="row">
+        <span class="label">Saat Dilimi (UTC)</span>
+        <input type="number" id="inp-tz-offset" class="pwd-input" style="width:72px;padding:8px;text-align:center" min="-12" max="14" value="3">
+      </div>
+    </div>
+
+    <!-- Yasal & Destek -->
+    <div class="card">
+      <h2>⚖️ Yasal &amp; Güvenlik</h2>
+      <p style="font-size:12px;color:var(--text-muted);line-height:1.6;margin:0 0 14px">
+        Tüm sinyaller teknik göstergelere dayalıdır ve yatırım tavsiyesi değildir.
+        Özel anahtarınız asla istenmez veya saklanmaz.
+      </p>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <a href="terms.html" class="btn" style="flex:1;padding:9px;font-size:12px;text-decoration:none">⚖️ Kullanım Şartları</a>
+        <a href="privacy.html" class="btn" style="flex:1;padding:9px;font-size:12px;text-decoration:none">📜 Gizlilik Politikası</a>
+      </div>
+      <div style="display:flex;gap:10px">
+        <a class="btn" href="https://pay.oxapay.com/13773930" target="_blank" rel="noopener" style="flex:1;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px">
+          <img src="assets/coins/oxapay.svg" width="16" height="16" style="vertical-align:middle" onerror="this.style.display='none'">
+          <span>💝 Projeyi Destekle</span>
+        </a>
+        <button class="btn btn-danger" id="btn-delete-all-data" style="flex:1">🗑 Verilerimi Sil</button>
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ========================================
+     MANUEL CÜZDAN ADRESİ MODALI
+     ======================================== -->
+<div id="manual-wallet-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Cüzdan adresi gir">
+  <div class="modal-card">
+    <h3 style="margin:0 0 14px;color:#fff;display:flex;justify-content:space-between;align-items:center;font-size:16px">
+      <span>💼 Cüzdan Adresi Gir</span>
+      <span class="modal-close" id="btn-close-manual-modal" role="button" aria-label="Kapat">✕</span>
+    </h3>
+    <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 14px;line-height:1.6">
+      WalletConnect'te sorun varsa veya doğrudan adresinizle bağlanmak istiyorsanız
+      genel adresinizi girin (0x... veya T...):
+    </p>
+    <div class="pwd-field-block" style="margin-bottom:10px">
+      <label class="pwd-field-label" for="manual-wallet-input">Cüzdan Adresi</label>
+      <input type="text" id="manual-wallet-input" class="pwd-input" placeholder="0x... veya T..." style="font-size:13px;padding:12px">
+    </div>
+    <div class="pwd-field-block" style="margin-bottom:16px">
+      <label class="pwd-field-label" id="lbl-wallet-chain-select">Ağ Seçimi</label>
+      <input type="hidden" id="manual-wallet-chain" value="eip155:56">
+      <div id="chain-chip-picker" style="display:grid;grid-template-columns:repeat(2, 1fr);gap:8px;margin-top:4px">
+        <button type="button" class="btn chain-picker-btn active" data-chain="eip155:56" style="padding:10px 8px;font-size:12px;display:flex;align-items:center;gap:8px;border:1.5px solid var(--accent-gold);background:rgba(255,210,90,0.15);border-radius:12px">
+          <img src="assets/coins/bnb.svg" width="22" height="22" onerror="this.style.display='none'"> <b>BNB Chain</b>
+        </button>
+        <button type="button" class="btn chain-picker-btn" data-chain="tron" style="padding:10px 8px;font-size:12px;display:flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);border-radius:12px">
+          <img src="assets/coins/trx.svg" width="22" height="22" onerror="this.style.display='none'"> <b>TRON (TRX)</b>
+        </button>
+        <button type="button" class="btn chain-picker-btn" data-chain="eip155:1" style="padding:10px 8px;font-size:12px;display:flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);border-radius:12px">
+          <img src="assets/coins/eth.svg" width="22" height="22" onerror="this.style.display='none'"> <b>Ethereum</b>
+        </button>
+        <button type="button" class="btn chain-picker-btn" data-chain="eip155:137" style="padding:10px 8px;font-size:12px;display:flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);border-radius:12px">
+          <img src="assets/coins/avax.svg" width="22" height="22" onerror="this.style.display='none'"> <b>Polygon</b>
+        </button>
+      </div>
+    </div>
+    <button class="btn btn-main" id="btn-save-manual-wallet" style="width:100%;padding:13px;font-size:14px">
+      Bağlan ve Devam Et
+    </button>
+  </div>
+</div>
+
+<!-- ========================================
+     8 DİL SEÇİM MODALI
+     ======================================== -->
+<div id="lang-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Dil seçimi">
+  <div class="modal-card">
+    <h3 style="margin:0 0 16px;color:#fff;display:flex;justify-content:space-between;align-items:center;font-size:16px">
+      <span>🌐 Dil Seçimi</span>
+      <span class="modal-close" id="btn-close-lang-modal" role="button" aria-label="Kapat">✕</span>
+    </h3>
+    <div class="lang-grid">
+      <button class="btn lang-opt" data-lang="ru">🇷🇺 Русский</button>
+      <button class="btn lang-opt" data-lang="en">🇬🇧 English</button>
+      <button class="btn lang-opt" data-lang="tr">🇹🇷 Türkçe</button>
+      <button class="btn lang-opt" data-lang="uk">🇺🇦 Українська</button>
+      <button class="btn lang-opt" data-lang="de">🇩🇪 Deutsch</button>
+      <button class="btn lang-opt" data-lang="es">🇪🇸 Español</button>
+      <button class="btn lang-opt" data-lang="fr">🇫🇷 Français</button>
+      <button class="btn lang-opt" data-lang="ar">🇸🇦 العربية</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================
+     KÜRESEL YASAL UYARI & SÖZLEŞME MODALI (LEGAL ONBOARDING)
+     ======================================== -->
+<div id="legal-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Yasal Uyarı ve Şartlar">
+  <div class="modal-card" style="max-width:440px;border-top:2px solid var(--accent-gold);max-height:90vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-shrink:0">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:24px">⚖️</span>
+        <div>
+          <strong style="color:#fff;font-size:15px;display:block" id="legal-modal-title">Елена Хьюз · Yasal Sorumluluk</strong>
+          <small style="color:var(--text-muted);font-size:11px" id="legal-modal-sub">Global Regulatory &amp; Risk Disclosure</small>
+        </div>
+      </div>
+      <span class="badge" style="background:var(--accent-gold-dim);color:var(--accent-gold)">Institutional</span>
+    </div>
+
+    <div style="background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.08);border-radius:var(--radius-sm);padding:14px;overflow-y:auto;font-size:12px;line-height:1.65;color:var(--text-secondary);margin-bottom:14px;flex:1" id="legal-modal-body">
+      <!-- Dinamik Hukuki Metin (TR / RU / EN) -->
+    </div>
+
+    <div style="flex-shrink:0">
+      <label style="display:flex;align-items:flex-start;gap:10px;font-size:11.5px;color:var(--text-secondary);margin-bottom:14px;cursor:pointer">
+        <input type="checkbox" id="chk-legal-accept" style="margin-top:2px;accent-color:var(--accent-gold);width:16px;height:16px;cursor:pointer">
+        <span id="lbl-legal-chk">18 yaşından büyük olduğumu, sinyallerin yatırım tavsiyesi olmadığını ve tüm finansal sorumluluğun şahsıma ait olduğunu onaylıyorum.</span>
+      </label>
+
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <a href="privacy.html" class="btn" style="flex:1;padding:8px;font-size:11.5px;text-decoration:none" target="_blank">📜 Gizlilik Politikası</a>
+        <a href="terms.html" class="btn" style="flex:1;padding:8px;font-size:11.5px;text-decoration:none" target="_blank">⚖️ Kullanım Şartları</a>
+      </div>
+
+      <button class="btn btn-main" id="btn-accept-legal" style="width:100%;padding:13px;font-size:14px;font-weight:700" disabled>
+        🛡️ Onaylıyorum ve Terminale Giriş Yap
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= TOAST ================= -->
+<div id="toast-container" aria-live="polite"></div>
+
+<script type="module" src="app.js?v=44"></script>
+</body>
+</html>

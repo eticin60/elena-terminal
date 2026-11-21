@@ -806,17 +806,19 @@
         Seçilen varlığın anlık mum yapısını, destek/direnç mesafelerini ve olası formasyonlarını insan diliyle çözümler:
       </p>
 
-      <div style="display:flex;gap:8px;margin-bottom:12px">
-        <select id="inspect-symbol-select" class="pwd-input" style="flex:1;padding:9px;font-size:12px;font-weight:700">
-          <option value="BTCUSDT">BTC/USDT (Bitcoin)</option>
-          <option value="ETHUSDT">ETH/USDT (Ethereum)</option>
-          <option value="SOLUSDT">SOL/USDT (Solana)</option>
-          <option value="XRPUSDT">XRP/USDT (Ripple)</option>
-          <option value="PEPEUSDT">PEPE/USDT (Pepe)</option>
-          <option value="THYAO.IS">THYAO (BIST 100)</option>
-          <option value="NVDA">NVDA (NVIDIA)</option>
-        </select>
-        <button class="btn btn-main" id="btn-inspect-run" onclick="runMarketInspection()" style="padding:9px 16px;font-size:12px;font-weight:700">🔍 İncele</button>
+      <!-- Sinyal Defteri Liquid Glass Seçici -->
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <input type="text" id="inspect-symbol-input" class="pwd-input" value="BTCUSDT" placeholder="Sembol (BTC, THYAO, NVDA, SOL)..." style="flex:1;padding:10px 14px;font-size:12.5px;font-weight:700;text-transform:uppercase">
+        <button class="btn btn-main" id="btn-inspect-run" onclick="runMarketInspection()" style="padding:10px 18px;font-size:12.5px;font-weight:700">🔍 İncele</button>
+      </div>
+      <div id="inspect-quick-chips" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px;-webkit-overflow-scrolling:touch">
+        <button type="button" class="coin-chip active" onclick="setInspectSymbol('BTCUSDT', this)" style="padding:5px 10px;font-size:11px">BTC</button>
+        <button type="button" class="coin-chip" onclick="setInspectSymbol('ETHUSDT', this)" style="padding:5px 10px;font-size:11px">ETH</button>
+        <button type="button" class="coin-chip" onclick="setInspectSymbol('SOLUSDT', this)" style="padding:5px 10px;font-size:11px">SOL</button>
+        <button type="button" class="coin-chip" onclick="setInspectSymbol('THYAO', this)" style="padding:5px 10px;font-size:11px;color:#ef4444;font-weight:700">🇹🇷 THYAO</button>
+        <button type="button" class="coin-chip" onclick="setInspectSymbol('ASELS', this)" style="padding:5px 10px;font-size:11px;color:#ef4444;font-weight:700">🇹🇷 ASELS</button>
+        <button type="button" class="coin-chip" onclick="setInspectSymbol('NVDA', this)" style="padding:5px 10px;font-size:11px;color:#a3e635;font-weight:700">🟢 NVDA</button>
+        <button type="button" class="coin-chip" onclick="setInspectSymbol('GOLD', this)" style="padding:5px 10px;font-size:11px;color:#f3ba2f;font-weight:700">🥇 GOLD</button>
       </div>
 
       <div id="inspect-result-box" style="background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.08);border-radius:var(--radius-sm);padding:14px">
@@ -1139,14 +1141,22 @@
       <input type="text" id="manual-wallet-input" class="pwd-input" placeholder="0x... veya T..." style="font-size:13px;padding:12px">
     </div>
     <div class="pwd-field-block" style="margin-bottom:16px">
-      <label class="pwd-field-label" for="manual-wallet-chain">Ağ Seçimi</label>
-      <select id="manual-wallet-chain" class="pwd-input" style="padding:11px">
-        <option value="eip155:56">BNB Chain (BSC)</option>
-        <option value="eip155:1">Ethereum (ETH)</option>
-        <option value="tron">TRON (TRX)</option>
-        <option value="eip155:137">Polygon (MATIC)</option>
-        <option value="eip155:42161">Arbitrum One</option>
-      </select>
+      <label class="pwd-field-label" id="lbl-wallet-chain-select">Ağ Seçimi</label>
+      <input type="hidden" id="manual-wallet-chain" value="eip155:56">
+      <div id="chain-chip-picker" style="display:grid;grid-template-columns:repeat(2, 1fr);gap:8px;margin-top:4px">
+        <button type="button" class="btn chain-picker-btn active" data-chain="eip155:56" style="padding:10px 8px;font-size:12px;display:flex;align-items:center;gap:8px;border:1.5px solid var(--accent-gold);background:rgba(255,210,90,0.15);border-radius:12px">
+          <img src="assets/coins/bnb.svg" width="22" height="22" onerror="this.style.display='none'"> <b>BNB Chain</b>
+        </button>
+        <button type="button" class="btn chain-picker-btn" data-chain="tron" style="padding:10px 8px;font-size:12px;display:flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);border-radius:12px">
+          <img src="assets/coins/trx.svg" width="22" height="22" onerror="this.style.display='none'"> <b>TRON (TRX)</b>
+        </button>
+        <button type="button" class="btn chain-picker-btn" data-chain="eip155:1" style="padding:10px 8px;font-size:12px;display:flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);border-radius:12px">
+          <img src="assets/coins/eth.svg" width="22" height="22" onerror="this.style.display='none'"> <b>Ethereum</b>
+        </button>
+        <button type="button" class="btn chain-picker-btn" data-chain="eip155:137" style="padding:10px 8px;font-size:12px;display:flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);border-radius:12px">
+          <img src="assets/coins/avax.svg" width="22" height="22" onerror="this.style.display='none'"> <b>Polygon</b>
+        </button>
+      </div>
     </div>
     <button class="btn btn-main" id="btn-save-manual-wallet" style="width:100%;padding:13px;font-size:14px">
       Bağlan ve Devam Et

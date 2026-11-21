@@ -1,4 +1,31 @@
 
+// Custom Chain Picker Button Click Logic
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".chain-picker-btn");
+  if (btn) {
+    document.querySelectorAll(".chain-picker-btn").forEach(b => {
+      b.classList.remove("active");
+      b.style.border = "1px solid rgba(255,255,255,0.1)";
+      b.style.background = "rgba(255,255,255,0.04)";
+    });
+    btn.classList.add("active");
+    btn.style.border = "1.5px solid var(--accent-gold)";
+    btn.style.background = "rgba(255,210,90,0.15)";
+    const chain = btn.getAttribute("data-chain");
+    const hidden = document.getElementById("manual-wallet-chain");
+    if (hidden) hidden.value = chain;
+  }
+});
+
+window.setInspectSymbol = function(sym, btn) {
+  const inp = document.getElementById("inspect-symbol-input");
+  if (inp) inp.value = sym;
+  document.querySelectorAll("#inspect-quick-chips .coin-chip").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  window.runMarketInspection?.();
+};
+
+
 // ========================================================
 // EVRENSEL LOGO GETİRİCİ (KRİPTO + BIST 100 + DÜNYA HİSSELERE)
 // ========================================================
@@ -46,8 +73,8 @@ window.getAssetLogoUrl = function(sym) {
 // SİNYAL DEFTERİ: CANLI PİYASA OKUYUCU & FORMASYON MOTORU
 // ========================================================
 window.runMarketInspection = async function() {
-  const select = document.getElementById("inspect-symbol-select");
-  const sym = select ? select.value : "BTCUSDT";
+  const inp = document.getElementById("inspect-symbol-input");
+  const sym = (inp ? inp.value : "BTCUSDT").trim().toUpperCase();
   const commEl = document.getElementById("inspect-commentary");
   const badgeEl = document.getElementById("inspect-state-badge");
   const supEl = document.getElementById("inspect-sup");
@@ -381,6 +408,49 @@ function applyLanguage(lang) {
   if ($("#i18n-manual-lock-desc")) $("#i18n-manual-lock-desc").textContent = isTr ? "Manuel işlem açabilmek için Borsa sekmesinden borsa API Key bağlamalısınız." : (isRu ? "Для открытия сделок подключите API Key в разделе Биржа." : "Connect exchange API Key to place manual trades.");
   if ($("#guide-main-title")) $("#guide-main-title").textContent = isTr ? "Elena Terminal · Kullanım Kılavuzu" : (isRu ? "Терминал Елена · Руководство" : "Elena Terminal · User Guide");
   if ($("#i18n-top-sub")) $("#i18n-top-sub").textContent = isRu ? "Крипто Сигналы" : "Crypto Signals";
+
+  // 📚 Rehber & Tüm Kartlar Dinamik Çevirisi (TR, RU, EN)
+  if (isRu) {
+    if ($("#guide-main-title")) $("#guide-main-title").textContent = "Терминал Елена · Руководство пользователя";
+    if ($("#guide-main-desc")) $("#guide-main-desc").textContent = "Елена Хьюз — количественный алгоритмический движок, круглосуточно сканирующий рынок для поиска высокоточных сделок с контролем риска.";
+    if ($("#lbl-wallet-chain-select")) $("#lbl-wallet-chain-select").textContent = "Выбор сети блокчейна";
+    if ($("#fg-badge-live")) $("#fg-badge-live").textContent = "ПРЯМОЙ ЭФИР";
+    if ($("#fg-desc-text")) $("#fg-desc-text").textContent = "Индекс отражает общее психологическое состояние и страх/жадность участников крипторынка.";
+    if ($("#board-winrate")) $("#board-winrate").parentElement.querySelector(".l").textContent = "Общий винрейт";
+    if ($("#board-total-r")) $("#board-total-r").parentElement.querySelector(".l").textContent = "Совокупный профит";
+    if ($("#paper-bal")) $("#paper-bal").parentElement.querySelector(".l").textContent = "Демо баланс";
+    if ($("#paper-pnl")) $("#paper-pnl").parentElement.querySelector(".l").textContent = "Чистый PnL";
+    if ($("#btn-paper-buy")) $("#btn-paper-buy").textContent = "🟢 Демо Лонг";
+    if ($("#btn-paper-sell")) $("#btn-paper-sell").textContent = "🔴 Демо Шорт";
+    if ($("#btn-inspect-run")) $("#btn-inspect-run").textContent = "🔍 Анализ";
+  } else if (!isTr) {
+    if ($("#guide-main-title")) $("#guide-main-title").textContent = "Elena Terminal · User Guide";
+    if ($("#guide-main-desc")) $("#guide-main-desc").textContent = "Elena Hughes is an algorithmic engine scanning market 24/7 for high-probability trade setups with built-in risk management.";
+    if ($("#lbl-wallet-chain-select")) $("#lbl-wallet-chain-select").textContent = "Blockchain Network";
+    if ($("#fg-badge-live")) $("#fg-badge-live").textContent = "LIVE DATA";
+    if ($("#fg-desc-text")) $("#fg-desc-text").textContent = "Displays overall cryptocurrency market sentiment and Fear & Greed score.";
+    if ($("#board-winrate")) $("#board-winrate").parentElement.querySelector(".l").textContent = "Overall Win Rate";
+    if ($("#board-total-r")) $("#board-total-r").parentElement.querySelector(".l").textContent = "Cumulative Profit";
+    if ($("#paper-bal")) $("#paper-bal").parentElement.querySelector(".l").textContent = "Paper Balance";
+    if ($("#paper-pnl")) $("#paper-pnl").parentElement.querySelector(".l").textContent = "Net PnL";
+    if ($("#btn-paper-buy")) $("#btn-paper-buy").textContent = "🟢 Paper Long";
+    if ($("#btn-paper-sell")) $("#btn-paper-sell").textContent = "🔴 Paper Short";
+    if ($("#btn-inspect-run")) $("#btn-inspect-run").textContent = "🔍 Inspect";
+  } else {
+    if ($("#guide-main-title")) $("#guide-main-title").textContent = "Elena Terminal · Kullanım Kılavuzu";
+    if ($("#guide-main-desc")) $("#guide-main-desc").textContent = "Elena Hughes, Binance piyasa verilerini 7/24 matematiksel modellerle tarayarak yüksek olasılıklı alım-satım fırsatları üreten kurumsal bir analiz motorudur.";
+    if ($("#lbl-wallet-chain-select")) $("#lbl-wallet-chain-select").textContent = "Ağ Seçimi";
+    if ($("#fg-badge-live")) $("#fg-badge-live").textContent = "CANLI VERİ";
+    if ($("#fg-desc-text")) $("#fg-desc-text").textContent = "Kripto para piyasasının genel yatırımcı psikolojisini ve duyarlılık skorunu gösterir.";
+    if ($("#board-winrate")) $("#board-winrate").parentElement.querySelector(".l").textContent = "Genel Başarı Oranı";
+    if ($("#board-total-r")) $("#board-total-r").parentElement.querySelector(".l").textContent = "Net Kümülatif Kâr";
+    if ($("#paper-bal")) $("#paper-bal").parentElement.querySelector(".l").textContent = "Sanal Kasa";
+    if ($("#paper-pnl")) $("#paper-pnl").parentElement.querySelector(".l").textContent = "Net Kâr";
+    if ($("#btn-paper-buy")) $("#btn-paper-buy").textContent = "🟢 Sanal Long Aç";
+    if ($("#btn-paper-sell")) $("#btn-paper-sell").textContent = "🔴 Sanal Short Aç";
+    if ($("#btn-inspect-run")) $("#btn-inspect-run").textContent = "🔍 İncele";
+  }
+
 
   if ($("#i18n-landing-sub"))   $("#i18n-landing-sub").textContent   = dict.landing_sub;
   if ($("#i18n-btn-connect"))   $("#i18n-btn-connect").textContent   = dict.btn_connect;
@@ -1548,50 +1618,61 @@ let currentTvInterval = "60";
 
 function setTradingViewSymbol(rawSymbol, interval = null) {
   if (!rawSymbol) return;
-  rawSymbol = rawSymbol.trim().toUpperCase();
+  rawSymbol = rawSymbol.trim().toUpperCase().replace(".IS", "").replace("BINANCE:", "").replace("BIST:", "");
 
-  // Akıllı Varlık Eşleştirme (Emtia, Forex, Endeks, Hisse ve Kripto)
-  let formatted = rawSymbol;
+  let formatted = "";
+
+  // 1. 🇹🇷 BIST 100 Hisseleri (Öncelikli Eşleştirme)
+  const BIST_STOCKS = [
+    "THYAO", "THY", "ASELS", "GARAN", "EREGL", "TUPRS", "KCHOL", "BIMAS", "AKBNK", "SISE", "SAHOL",
+    "YKBNK", "ISCTR", "KRDMD", "FROTO", "TOASO", "PETKM", "PGSUS", "HEKTS", "SASA", "ENKAI",
+    "TCELL", "KOZAL", "GUBRF", "ARCLK", "ASTOR", "KONTR", "ALARK", "OYAKC"
+  ];
+  if (BIST_STOCKS.includes(rawSymbol)) {
+    formatted = "BIST:" + (rawSymbol === "THY" ? "THYAO" : rawSymbol);
+  }
+
+  // 2. 🥇 Emtialar
   const COMMODITIES = {
     "GOLD": "TVC:GOLD", "ALTIN": "TVC:GOLD", "XAUUSD": "OANDA:XAUUSD", "XAU": "OANDA:XAUUSD",
     "SILVER": "TVC:SILVER", "GUMUS": "TVC:SILVER", "XAGUSD": "OANDA:XAGUSD",
     "BRENT": "TVC:UKOIL", "PETROL": "TVC:USOIL", "OIL": "TVC:USOIL", "CRUDE": "TVC:USOIL",
     "NATGAS": "TVC:NATGAS", "COPPER": "CAPITALCOM:COPPER"
   };
+  if (!formatted && COMMODITIES[rawSymbol]) {
+    formatted = COMMODITIES[rawSymbol];
+  }
+
+  // 3. 💶 Forex
   const FOREX = {
     "EURUSD": "FX:EURUSD", "GBPUSD": "FX:GBPUSD", "USDJPY": "FX:USDJPY",
     "USDTRY": "FX:USDTRY", "EURTRY": "FX:EURTRY", "DXY": "INDEX:DXY"
   };
+  if (!formatted && FOREX[rawSymbol]) {
+    formatted = FOREX[rawSymbol];
+  }
+
+  // 4. 📊 Endeksler
   const INDICES = {
     "SPX": "SP:SPX", "SP500": "SP:SPX", "NASDAQ": "NASDAQ:NDX", "NDX": "NASDAQ:NDX",
     "BIST": "BIST:XU100", "BIST100": "BIST:XU100", "XU100": "BIST:XU100"
   };
-  // 🇹🇷 BIST 100 Akıllı Yönlendirme (THYAO -> BIST:THYAO)
-  const BIST_STOCKS = [
-    "THYAO", "ASELS", "GARAN", "EREGL", "TUPRS", "KCHOL", "BIMAS", "AKBNK", "SISE", "SAHOL",
-    "YKBNK", "ISCTR", "KRDMD", "FROTO", "TOASO", "PETKM", "PGSUS", "HEKTS", "SASA", "ENKAI",
-    "TCELL", "KOZAL", "GUBRF", "ARCLK", "ASTOR", "KONTR", "ALARK", "OYAKC"
-  ];
-  const cleanSym = rawSymbol.replace(".IS", "");
-  if (BIST_STOCKS.includes(cleanSym)) {
-    formatted = "BIST:" + cleanSym;
+  if (!formatted && INDICES[rawSymbol]) {
+    formatted = INDICES[rawSymbol];
   }
 
-  if (COMMODITIES[rawSymbol]) {
-    formatted = COMMODITIES[rawSymbol];
-  } else if (FOREX[rawSymbol]) {
-    formatted = FOREX[rawSymbol];
-  } else if (INDICES[rawSymbol]) {
-    formatted = INDICES[rawSymbol];
-  } else if (!formatted.includes(":")) {
-    // Kripto veya standart hisse senedi formatı
-    if (formatted.endsWith("USDT") || formatted.endsWith("BUSD") || formatted.endsWith("PERP")) {
-      formatted = "BINANCE:" + formatted;
-    } else if (["AAPL", "TSLA", "NVDA", "AMZN", "MSFT", "GOOGL", "META"].includes(formatted)) {
-      formatted = "NASDAQ:" + formatted;
+  // 5. 🇺🇸 ABD Devleri
+  const US_STOCKS = ["AAPL", "TSLA", "NVDA", "AMZN", "MSFT", "GOOGL", "META"];
+  if (!formatted && US_STOCKS.includes(rawSymbol)) {
+    formatted = "NASDAQ:" + rawSymbol;
+  }
+
+  // 6. 🪙 Kripto Fallback (Eğer hiçbirine uymadıysa Binance Crypto)
+  if (!formatted) {
+    if (rawSymbol.endsWith("USDT") || rawSymbol.endsWith("BUSD") || rawSymbol.endsWith("PERP")) {
+      formatted = "BINANCE:" + rawSymbol;
     } else {
-      // Varsayılan olarak Binance kripto çiftine veya doğrudan sembole bağla
-      formatted = "BINANCE:" + formatted + "USDT";
+      formatted = "BINANCE:" + rawSymbol + "USDT";
     }
   }
 

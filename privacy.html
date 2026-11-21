@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Елена Хьюз · Privacy Policy</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="style.css">
+<style>
+  .legal-container { max-width: 680px; margin: 0 auto; padding: 20px 16px 80px; }
+  .legal-card { background: var(--glass-card); border: 1px solid var(--glass-card-border); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 20px; backdrop-filter: blur(24px); box-shadow: var(--shadow-card); }
+  .legal-card h2 { font-size: 16px; color: var(--accent-gold); margin-top: 0; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .legal-card p, .legal-card li { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+  .legal-card ul { padding-left: 20px; margin-bottom: 14px; }
+  .lang-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+  .lang-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: 0.2s; }
+  .lang-btn.active { background: var(--accent-gold-dim); border-color: var(--accent-gold); color: var(--accent-gold); font-weight: 700; }
+  .badge-tag { background: rgba(0,255,163,0.12); color: var(--accent-green); border: 1px solid rgba(0,255,163,0.3); padding: 3px 8px; border-radius: 20px; font-size: 11px; }
+</style>
+</head>
+<body>
+
+<div class="legal-container">
+
+  <!-- Top Bar -->
+  <div class="top-bar" style="margin-bottom:16px">
+    <div class="top-brand">
+      <div class="top-flag-badge">🛡️</div>
+      <div>
+        <div class="top-title">Елена Хьюз · Legal</div>
+        <div class="top-subtitle">Institutional Privacy Policy</div>
+      </div>
+    </div>
+    <a href="index.html" class="btn" style="padding:6px 12px;font-size:12px;text-decoration:none">← Terminal</a>
+  </div>
+
+  <!-- Language Switcher -->
+  <div class="lang-bar" id="lang-bar">
+    <button class="lang-btn active" data-lang="en">🇬🇧 English</button>
+    <button class="lang-btn" data-lang="ru">🇷🇺 Русский</button>
+    <button class="lang-btn" data-lang="tr">🇹🇷 Türkçe</button>
+    <button class="lang-btn" data-lang="uk">🇺🇦 Українська</button>
+    <button class="lang-btn" data-lang="de">🇩🇪 Deutsch</button>
+    <button class="lang-btn" data-lang="es">🇪🇸 Español</button>
+    <button class="lang-btn" data-lang="fr">🇫🇷 Français</button>
+    <button class="lang-btn" data-lang="ar">🇸🇦 العربية</button>
+  </div>
+
+  <div id="content-area">
+    <!-- Populated dynamically by JS according to selected language -->
+  </div>
+
+  <div style="text-align:center;margin-top:24px;font-size:11px;color:var(--text-muted)">
+    Official Verification: Telegram Mini App &amp; Quantitative Engine · Last Updated: November 2026
+  </div>
+
+</div>
+
+<script>
+const POLICIES = {
+  en: {
+    title: "Global Privacy Policy & Data Protection",
+    updated: "Effective Date: November 2026",
+    sections: [
+      {
+        h: "1. Institutional Commitment & Scope",
+        p: "Елена Хьюз (the \"Platform\", \"we\", \"our\") operates as an automated quantitative crypto-analytics terminal and Telegram Mini App. We are strictly committed to user privacy, data minimization, and adherence to international data protection standards including the European General Data Protection Regulation (GDPR)."
+      },
+      {
+        h: "2. Absolute Non-Custodial Architecture",
+        p: "The Platform is 100% non-custodial. We NEVER request, hold, or transmit private keys, seed phrases, or custodial custody of digital assets. Web3 wallet integrations (via WalletConnect v2) operate strictly in read-only mode to retrieve public balances."
+      },
+      {
+        h: "3. Information We Collect and Process",
+        p: "To deliver real-time technical signals and user preferences, we collect only minimal telemetric data:",
+        ul: [
+          "Telegram Identifier: Numerical chat ID and public handle (used solely to deliver chosen alerts).",
+          "Terminal Preferences: Selected cryptocurrency pairs, timeframes, and leverage caps.",
+          "Exchange API Keys: Optional user-supplied trade execution keys (stored with strict isolation, withdrawal permissions strictly disallowed).",
+          "Public Wallet Address: Read-only blockchain address when connected."
+        ]
+      },
+      {
+        h: "4. Zero Third-Party Monetization",
+        p: "We do NOT sell, rent, or monetize personal user data to advertisers, data brokers, or third-party institutions. All telemetry is utilized solely to power signal distribution and terminal logic."
+      },
+      {
+        h: "5. User Control & Absolute Right to Deletion",
+        p: "Every user retains permanent control over their stored data. You may execute the <code>/delete</code> command inside the Telegram bot or click \"🗑 Verilerimi Sil\" within the Mini App to immediately purge all profile records, API credentials, and preferences from our database."
+      }
+    ]
+  },
+  ru: {
+    title: "Политика конфиденциальности и защита данных",
+    updated: "Дата вступления в силу: Ноябрь 2026",
+    sections: [
+      {
+        h: "1. Институциональные обязательства",
+        p: "«Елена Хьюз» — квантовый криптоаналитический терминал и Telegram Mini App. Мы строго придерживаемся принципов минимизации данных и международных стандартов защиты информации (включая GDPR)."
+      },
+      {
+        h: "2. Полная некастодиальность (Non-Custodial)",
+        p: "Сервис на 100% некастодиален. Мы НИКОГДА не запрашиваем и не храним приватные ключи или seed-фразы. Подключение кошельков через WalletConnect работает исключительно в режиме чтения балансов."
+      },
+      {
+        h: "3. Собираемые данные",
+        p: "Для доставки сигналов и аналитики обрабатываются минимально необходимые данные:",
+        ul: [
+          "Telegram ID и никнейм — исключительно для отправки уведомлений.",
+          "Пользовательские настройки — выбранные монеты, таймфреймы, индикаторы.",
+          "API ключи бирж — исключительно для авторизованных пользователем ордеров (права на вывод средств запрещены).",
+          "Публичный адрес кошелька — только для отображения баланса."
+        ]
+      },
+      {
+        h: "4. Никакой продажи данных третьим лицам",
+        p: "Мы не передаем и не продаем данные рекламодателям или брокерам. Данные используются исключительно для функционирования терминала."
+      },
+      {
+        h: "5. Право на полное удаление",
+        p: "Каждый пользователь может в любой момент удалить всю свою историю и настройки командой <code>/delete</code> в боте или кнопкой «Удалить мои данные» в терминале."
+      }
+    ]
+  },
+  tr: {
+    title: "Küresel Gizlilik Politikası ve Veri Güvenliği",
+    updated: "Yürürlük Tarihi: Kasım 2026",
+    sections: [
+      {
+        h: "1. Kurumsal Taahhüt ve Kapsam",
+        p: "«Елена Хьюз · Crypto Signals» kantitatif kripto analiz terminali ve Telegram Mini App platformu olarak kullanıcı mahremiyetine ve KVKK/GDPR uluslararası veri koruma standartlarına tam uyum sağlamayı taahhüt eder."
+      },
+      {
+        h: "2. Kesinlikle Non-Custodial (Salt Okunur)",
+        p: "Sistem %100 gözetimsizdir (non-custodial). Özel anahtarınız (private key) veya kurtarma kelimeleriniz ASLA istenmez, iletilmez ve saklanmaz. Web3 cüzdan bağlantıları sadece genel adresi salt okunur okur."
+      },
+      {
+        h: "3. İşlenen Veriler",
+        p: "Sinyal ve borsa bildirimlerinin iletilmesi için yalnızca minimum düzeyde veri işlenir:",
+        ul: [
+          "Telegram Chat ID ve Kullanıcı Adı: Sinyal ve alarmların hedeflenmesi için.",
+          "Kullanıcı Tercihleri: Favori coinler, periyotlar, kaldıraç sınırları.",
+          "Borsa API Anahtarları: Kullanıcının kendi rızasıyla kaydettiği işlem anahtarları (Çekim yetkisi kesinlikle yasaktır).",
+          "Genel Cüzdan Adresi: Bakiye görüntüleme amacıyla salt okunur."
+        ]
+      },
+      {
+        h: "4. Üçüncü Taraflarla Veri Paylaşımı Yoktur",
+        p: "Verileriniz hiçbir reklam ağı, veri simsarı veya ticari kuruluşa satılmaz, devredilmez."
+      },
+      {
+        h: "5. Anında Silme ve Unutulma Hakkı",
+        p: "Telegram botunda <code>/delete</code> komutunu girerek veya Mini App içindeki '🗑 Verilerimi Sil' butonuna basarak tüm verilerinizi veritabanımızdan kalıcı olarak silebilirsiniz."
+      }
+    ]
+  }
+};
+
+// Fallback to English for other languages
+['uk','de','es','fr','ar'].forEach(l => {
+  if (!POLICIES[l]) POLICIES[l] = POLICIES.en;
+});
+
+function renderPolicy(lang) {
+  const data = POLICIES[lang] || POLICIES.en;
+  const area = document.getElementById("content-area");
+  let html = `
+    <div class="legal-card" style="border-top:2px solid var(--accent-gold)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span class="badge-tag">GDPR &amp; WebApp Verified</span>
+        <span style="font-size:11px;color:var(--text-muted)">${data.updated}</span>
+      </div>
+      <h1 style="font-size:20px;font-weight:800;color:#fff;margin:0 0 10px">${data.title}</h1>
+      <p style="color:var(--text-secondary);font-size:13px;line-height:1.6">Official Privacy Policy for Telegram Bot &amp; WebApp Terminal</p>
+    </div>
+  `;
+
+  data.sections.forEach(s => {
+    html += `
+      <div class="legal-card">
+        <h2>${s.h}</h2>
+        <p>${s.p}</p>
+        ${s.ul ? `<ul>${s.ul.map(item => `<li>${item}</li>`).join('')}</ul>` : ''}
+      </div>
+    `;
+  });
+
+  area.innerHTML = html;
+}
+
+document.querySelectorAll(".lang-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    renderPolicy(btn.dataset.lang);
+  });
+});
+
+const defaultLang = localStorage.getItem("elena_lang") || "en";
+const activeBtn = document.querySelector(`.lang-btn[data-lang="${defaultLang}"]`) || document.querySelector('.lang-btn[data-lang="en"]');
+if (activeBtn) activeBtn.click(); else renderPolicy("en");
+</script>
+
+</body>
+</html>

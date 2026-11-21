@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Елена Хьюз · Terms of Service & Risk Disclosure</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="style.css">
+<style>
+  .legal-container { max-width: 680px; margin: 0 auto; padding: 20px 16px 80px; }
+  .legal-card { background: var(--glass-card); border: 1px solid var(--glass-card-border); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 20px; backdrop-filter: blur(24px); box-shadow: var(--shadow-card); }
+  .legal-card h2 { font-size: 16px; color: var(--accent-gold); margin-top: 0; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .legal-card p, .legal-card li { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+  .legal-card ul { padding-left: 20px; margin-bottom: 14px; }
+  .lang-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+  .lang-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: 0.2s; }
+  .lang-btn.active { background: var(--accent-gold-dim); border-color: var(--accent-gold); color: var(--accent-gold); font-weight: 700; }
+  .warn-badge { background: rgba(255,77,77,0.15); color: var(--accent-red); border: 1px solid rgba(255,77,77,0.3); padding: 3px 8px; border-radius: 20px; font-size: 11px; }
+</style>
+</head>
+<body>
+
+<div class="legal-container">
+
+  <!-- Top Bar -->
+  <div class="top-bar" style="margin-bottom:16px">
+    <div class="top-brand">
+      <div class="top-flag-badge">⚖️</div>
+      <div>
+        <div class="top-title">Елена Хьюз · Legal</div>
+        <div class="top-subtitle">Terms of Service &amp; Risk Disclosure</div>
+      </div>
+    </div>
+    <a href="index.html" class="btn" style="padding:6px 12px;font-size:12px;text-decoration:none">← Terminal</a>
+  </div>
+
+  <!-- Language Switcher -->
+  <div class="lang-bar" id="lang-bar">
+    <button class="lang-btn active" data-lang="en">🇬🇧 English</button>
+    <button class="lang-btn" data-lang="ru">🇷🇺 Русский</button>
+    <button class="lang-btn" data-lang="tr">🇹🇷 Türkçe</button>
+    <button class="lang-btn" data-lang="uk">🇺🇦 Українська</button>
+    <button class="lang-btn" data-lang="de">🇩🇪 Deutsch</button>
+    <button class="lang-btn" data-lang="es">🇪🇸 Español</button>
+    <button class="lang-btn" data-lang="fr">🇫🇷 Français</button>
+    <button class="lang-btn" data-lang="ar">🇸🇦 العربية</button>
+  </div>
+
+  <div id="content-area"></div>
+
+  <div style="text-align:center;margin-top:24px;font-size:11px;color:var(--text-muted)">
+    Institutional Quantitative Terminal · Global Regulatory Disclaimer · Last Updated: November 2026
+  </div>
+
+</div>
+
+<script>
+const TERMS = {
+  en: {
+    title: "Institutional Terms of Service & High-Risk Warning",
+    updated: "Updated: November 2026 · Global Compliance",
+    sections: [
+      {
+        h: "1. No Financial Advice or Investment Solicitation",
+        p: "All automated signals, technical indicator combinations (MavilimW, Supertrend, EMA, RSI, MACD, ADX), multi-timeframe assessments, and price levels displayed by this Platform are strictly algorithmic mathematical calculations for informational and educational purposes only. NONE of our communications constitute investment, financial, tax, or legal advice."
+      },
+      {
+        h: "2. Extreme Volatility & Leverage Warning",
+        p: "Trading cryptocurrencies, spot instruments, and derivative futures contracts carries an inherently high level of risk and may result in the substantial or complete loss of invested capital. Leverage magnifies both potential gains and losses. Never trade with capital you cannot afford to lose."
+      },
+      {
+        h: "3. Absolute Limitation of Liability",
+        p: "The Platform, its developers, operators, and affiliates shall in no event be held liable for any direct, indirect, incidental, or consequential damages resulting from trade executions, exchange outages, slippage, latency, API disconnection, liquidation, or user error."
+      },
+      {
+        h: "4. Eligibility and Age Representation",
+        p: "By using this platform or executing the bot, you certify that you are at least eighteen (18) years of age (or the legal age of majority in your jurisdiction) and that digital asset trading is permissible under the laws applicable to you."
+      },
+      {
+        h: "5. Non-Custodial Architecture",
+        p: "The Platform is completely non-custodial. No deposit accounts are held by us. All trades executed via API keys or decentralized wallets are settled directly on external exchanges or blockchain smart contracts."
+      }
+    ]
+  },
+  ru: {
+    title: "Условия обслуживания и предупреждение о рисках",
+    updated: "Ноябрь 2026 · Международный стандарт",
+    sections: [
+      {
+        h: "1. Отказ от инвестиционных рекомендаций",
+        p: "Все автоматические сигналы, индикаторы (Supertrend, MavilimW, RSI, MACD, EMA) и графики носят исключительно информационный и аналитический характер. Сервис НЕ предоставляет инвестиционных советов и не дает гарантий доходности."
+      },
+      {
+        h: "2. Предупреждение о высоких рисках торговли с плечом",
+        p: "Торговля криптовалютами на споте и фьючерсах сопряжена с высоким уровнем риска и может привести к полной потере средств. Кредитное плечо увеличивает риск ликвидации. Не торгуйте на заемные или критически важные средства."
+      },
+      {
+        h: "3. Ограничение ответственности",
+        p: "Администрация и разработчики платформы не несут ответственности за результаты ваших торговых решений, технические сбои бирж, проскальзывание цен или задержки в сети."
+      },
+      {
+        h: "4. Возрастные и правовые ограничения",
+        p: "Используя сервис, вы подтверждаете, что вам исполнилось 18 лет и деятельность с цифровыми активами не запрещена законами вашей юрисдикции."
+      },
+      {
+        h: "5. Некастодиальность",
+        p: "Платформа не принимает и не хранит клиентские депозиты. Все операции происходят напрямую на ваших биржевых аккаунтах или в некастодиальных кошельках."
+      }
+    ]
+  },
+  tr: {
+    title: "Kullanım Koşulları ve Yüksek Risk Bildirimi",
+    updated: "Kasım 2026 · Küresel Uyum Standardı",
+    sections: [
+      {
+        h: "1. Yatırım Tavsiyesi Niteliğinde Değildir",
+        p: "Platform tarafından üretilen tüm teknik sinyaller, indikatör analizleri (MavilimW, Supertrend, EMA, RSI, MACD) ve hesaplamalar tamamen matematiksel algoritmik modellere dayanmaktadır. Kesinlikle yatırım, finansal, hukuki veya mali tavsiye DEĞİLDİR."
+      },
+      {
+        h: "2. Kripto Varlık ve Kaldıraç Risk Uyarısı",
+        p: "Kripto varlık piyasaları ve özellikle vadeli (Futures) kaldıraçlı işlemler yüksek derecede volatilite içerir ve sermayenizin tamamının kaybedilmesine yol açabilir. Asla kaybetmeyi göze alamayacağınız miktarlarla işlem yapmayınız."
+      },
+      {
+        h: "3. Sorumluluğun Sınırlandırılması",
+        p: "Kullanıcının aldığı alım-satım kararlarından, borsa API gecikmelerinden, likidasyonlardan veya piyasa hareketlerinden doğan hiçbir doğrudan veya dolaylı maddi zarardan platformumuz veya geliştiriciler sorumlu tutulamaz."
+      },
+      {
+        h: "4. 18 Yaş Sınırı ve Hukuki Ehliyet",
+        p: "Botu ve terminali kullanan her kullanıcı, en az 18 yaşında olduğunu ve kendi ülkesindeki mevzuata uygun hareket ettiğini beyan ve taahhüt eder."
+      },
+      {
+        h: "5. Non-Custodial (Gözetimsiz) Yapı",
+        p: "Sistem fon emaneti almaz, cüzdanınızdaki varlıklara el süremez. Tüm emirler kullanıcının borsa API'si veya Web3 cüzdanı üzerinden kullanıcı kontrolünde çalışır."
+      }
+    ]
+  }
+};
+
+['uk','de','es','fr','ar'].forEach(l => {
+  if (!TERMS[l]) TERMS[l] = TERMS.en;
+});
+
+function renderTerms(lang) {
+  const data = TERMS[lang] || TERMS.en;
+  const area = document.getElementById("content-area");
+  let html = `
+    <div class="legal-card" style="border-top:2px solid var(--accent-red)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span class="warn-badge">High Risk Market Warning</span>
+        <span style="font-size:11px;color:var(--text-muted)">${data.updated}</span>
+      </div>
+      <h1 style="font-size:20px;font-weight:800;color:#fff;margin:0 0 10px">${data.title}</h1>
+      <p style="color:var(--text-secondary);font-size:13px;line-height:1.6">Official Terms of Service for Telegram Mini App &amp; Trading Engine</p>
+    </div>
+  `;
+
+  data.sections.forEach(s => {
+    html += `
+      <div class="legal-card">
+        <h2>${s.h}</h2>
+        <p>${s.p}</p>
+      </div>
+    `;
+  });
+
+  area.innerHTML = html;
+}
+
+document.querySelectorAll(".lang-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    renderTerms(btn.dataset.lang);
+  });
+});
+
+const defaultLang = localStorage.getItem("elena_lang") || "en";
+const activeBtn = document.querySelector(`.lang-btn[data-lang="${defaultLang}"]`) || document.querySelector('.lang-btn[data-lang="en"]');
+if (activeBtn) activeBtn.click(); else renderTerms("en");
+</script>
+
+</body>
+</html>

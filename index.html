@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Елена Хьюз · Crypto Signals</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=44">
 </head>
 <body>
 
@@ -794,48 +794,184 @@
       </div>
     </div>
 
-    <!-- 🧠 Canlı Teknik Analiz & Formasyon Okuyucu (Sinyal Defteri Motoru) -->
-    <div class="card" style="border-top:2px solid var(--accent-gold);background:linear-gradient(135deg, rgba(22,33,62,0.75) 0%, rgba(12,18,36,0.9) 100%)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <h2 style="margin:0;font-size:14px;display:flex;align-items:center;gap:6px">
-          <span>🧠 Canlı Piyasa Okuma &amp; Destek/Direnç Analizi</span>
-        </h2>
-        <span class="badge" style="background:var(--accent-gold-dim);color:var(--accent-gold)">Sinyal Defteri Pro</span>
-      </div>
-      <p style="font-size:12px;color:var(--text-muted);margin:0 0 10px;line-height:1.5">
-        Seçilen varlığın anlık mum yapısını, destek/direnç mesafelerini ve olası formasyonlarını insan diliyle çözümler:
-      </p>
-
-      <!-- Sinyal Defteri Liquid Glass Seçici -->
-      <div style="display:flex;gap:8px;margin-bottom:8px">
-        <input type="text" id="inspect-symbol-input" class="pwd-input" value="BTCUSDT" placeholder="Sembol (BTC, THYAO, NVDA, SOL)..." style="flex:1;padding:10px 14px;font-size:12.5px;font-weight:700;text-transform:uppercase">
-        <button class="btn btn-main" id="btn-inspect-run" onclick="runMarketInspection()" style="padding:10px 18px;font-size:12.5px;font-weight:700">🔍 İncele</button>
-      </div>
-      <div id="inspect-quick-chips" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px;-webkit-overflow-scrolling:touch">
-        <button type="button" class="coin-chip active" onclick="setInspectSymbol('BTCUSDT', this)" style="padding:5px 10px;font-size:11px">BTC</button>
-        <button type="button" class="coin-chip" onclick="setInspectSymbol('ETHUSDT', this)" style="padding:5px 10px;font-size:11px">ETH</button>
-        <button type="button" class="coin-chip" onclick="setInspectSymbol('SOLUSDT', this)" style="padding:5px 10px;font-size:11px">SOL</button>
-        <button type="button" class="coin-chip" onclick="setInspectSymbol('THYAO', this)" style="padding:5px 10px;font-size:11px;color:#ef4444;font-weight:700">🇹🇷 THYAO</button>
-        <button type="button" class="coin-chip" onclick="setInspectSymbol('ASELS', this)" style="padding:5px 10px;font-size:11px;color:#ef4444;font-weight:700">🇹🇷 ASELS</button>
-        <button type="button" class="coin-chip" onclick="setInspectSymbol('NVDA', this)" style="padding:5px 10px;font-size:11px;color:#a3e635;font-weight:700">🟢 NVDA</button>
-        <button type="button" class="coin-chip" onclick="setInspectSymbol('GOLD', this)" style="padding:5px 10px;font-size:11px;color:#f3ba2f;font-weight:700">🥇 GOLD</button>
+    <!-- 🧠 Canlı Piyasa Okuma & Destek/Direnç Analizi (Sinyal Defteri Pro) -->
+    <div class="card" style="border-top:2px solid var(--accent-gold);background:linear-gradient(135deg, rgba(22,33,62,0.85) 0%, rgba(10,16,30,0.95) 100%);padding:14px">
+      
+      <!-- Üst İmza -->
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;letter-spacing:0.02em">
+        Onurcan Demir ürünüdür
       </div>
 
-      <div id="inspect-result-box" style="background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.08);border-radius:var(--radius-sm);padding:14px">
+      <!-- Coin Seçici Chipleri (Birebir Görsel) -->
+      <div id="inspect-coin-chips" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px;-webkit-overflow-scrolling:touch">
+        <button type="button" class="coin-chip coin-chip-coin active" onclick="setInspectSymbol('BTCUSDT', this)">BTC</button>
+        <button type="button" class="coin-chip coin-chip-coin" onclick="setInspectSymbol('ETHUSDT', this)">ETH</button>
+        <button type="button" class="coin-chip coin-chip-coin" onclick="setInspectSymbol('SOLUSDT', this)">SOL</button>
+        <button type="button" class="coin-chip coin-chip-coin" onclick="setInspectSymbol('XRPUSDT', this)">XRP</button>
+        <button type="button" class="coin-chip coin-chip-coin" onclick="setInspectSymbol('THYAO', this)" style="color:#ef4444">🇹🇷 THYAO</button>
+        <button type="button" class="coin-chip coin-chip-coin" onclick="setInspectSymbol('ASELS', this)" style="color:#ef4444">🇹🇷 ASELS</button>
+        <button type="button" class="coin-chip coin-chip-coin" onclick="setInspectSymbol('NVDA', this)" style="color:#a3e635">🟢 NVDA</button>
+        <button type="button" class="coin-chip coin-chip-coin" onclick="setInspectSymbol('GOLD', this)" style="color:#fbbf24">🥇 GOLD</button>
+      </div>
+
+      <!-- Zaman Dilimi Chipleri -->
+      <div id="inspect-tf-chips" style="display:flex;gap:5px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px">
+        <button type="button" class="coin-chip coin-chip-tf" onclick="setInspectTf('1m', this)">1d</button>
+        <button type="button" class="coin-chip coin-chip-tf active" onclick="setInspectTf('5m', this)">5d</button>
+        <button type="button" class="coin-chip coin-chip-tf" onclick="setInspectTf('15m', this)">15d</button>
+        <button type="button" class="coin-chip coin-chip-tf" onclick="setInspectTf('1h', this)">1s</button>
+        <button type="button" class="coin-chip coin-chip-tf" onclick="setInspectTf('4h', this)">4s</button>
+        <button type="button" class="coin-chip coin-chip-tf" onclick="setInspectTf('1d', this)">1g</button>
+      </div>
+
+      <!-- İndikatör Seçicileri (Çoklu Aç/Kapa) -->
+      <div id="inspect-ind-chips" style="display:flex;gap:5px;overflow-x:auto;padding-bottom:8px;margin-bottom:12px">
+        <button type="button" class="coin-chip-ind active" data-ind="ema" onclick="toggleInspectIndicator('ema', this)">EMA 9/21</button>
+        <button type="button" class="coin-chip-ind active" data-ind="bollinger" onclick="toggleInspectIndicator('bollinger', this)">Bollinger</button>
+        <button type="button" class="coin-chip-ind active" data-ind="dd" onclick="toggleInspectIndicator('dd', this)">D/D Seviyeleri</button>
+        <button type="button" class="coin-chip-ind" data-ind="vwap" onclick="toggleInspectIndicator('vwap', this)">VWAP</button>
+        <button type="button" class="coin-chip-ind" data-ind="fib" onclick="toggleInspectIndicator('fib', this)">Fibonacci</button>
+        <button type="button" class="coin-chip-ind" data-ind="macd" onclick="toggleInspectIndicator('macd', this)">MACD</button>
+        <button type="button" class="coin-chip-ind" data-ind="stoch" onclick="toggleInspectIndicator('stoch', this)">StochRSI</button>
+        <button type="button" class="coin-chip-ind" data-ind="atr" onclick="toggleInspectIndicator('atr', this)">ATR</button>
+        <button type="button" class="coin-chip-ind" data-ind="adx" onclick="toggleInspectIndicator('adx', this)">ADX</button>
+      </div>
+
+      <!-- Canlı Varlık Fiyat & Değişim Başlığı -->
+      <div style="margin-bottom:12px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span id="inspect-pair-label" style="font-size:12px;font-weight:700;color:var(--text-secondary)">BTC/USDT · PERP ⭐</span>
+          <span id="inspect-change-badge" style="font-size:11px;padding:2px 8px;border-radius:6px;background:rgba(239,68,68,0.18);color:#ef4444;font-weight:700">▼ 3.84% (24s)</span>
+        </div>
+        <div id="inspect-big-price" style="font-size:28px;font-weight:900;color:#fff;letter-spacing:-0.5px;margin-bottom:4px">$59,315.8</div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);flex-wrap:wrap;gap:4px">
+          <div>Yüksek: <span id="inspect-high-val" style="color:#fff">$62,179.5</span> · Düşük: <span id="inspect-low-val" style="color:#fff">$55,130.0</span> · Hacim: <span id="inspect-vol-val" style="color:#fff">63.1K</span></div>
+          <div>Son güncelleme: <span id="inspect-time-val">16:11:20</span></div>
+        </div>
+      </div>
+
+      <!-- 1. KART: FİYAT · MUM + EMA9/21 + BOLLINGER + D/D (Canvas) -->
+      <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.04em">FİYAT · MUM + EMA9/21 + BOLLINGER + D/D</span>
+        </div>
+        <div style="display:flex;gap:10px;font-size:10px;color:var(--text-muted);margin-bottom:8px;flex-wrap:wrap">
+          <span style="color:#00ffa3">— EMA 9</span>
+          <span style="color:#fbbf24">— EMA 21</span>
+          <span style="color:#38bdf8">— Bollinger</span>
+          <span style="color:#22d3ee">— Destek</span>
+          <span style="color:#f87171">— Direnç</span>
+        </div>
+        <div style="position:relative;width:100%;height:220px">
+          <canvas id="inspect-candle-canvas" width="600" height="220" style="width:100%;height:100%;display:block;border-radius:6px"></canvas>
+          <div id="inspect-chart-loading" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(10,16,30,0.85);color:var(--text-muted);font-size:12px">Grafik yükleniyor…</div>
+        </div>
+      </div>
+
+      <!-- 2. KART: HACİM (Canvas) -->
+      <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px;letter-spacing:0.04em">HACİM</div>
+        <div style="width:100%;height:70px">
+          <canvas id="inspect-vol-canvas" width="600" height="70" style="width:100%;height:100%;display:block;border-radius:6px"></canvas>
+        </div>
+      </div>
+
+      <!-- 3. KART: RSI (14) (Canvas) -->
+      <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.04em">RSI (14)</span>
+          <span id="inspect-rsi-val-badge" style="font-size:11px;font-weight:700;color:#fbbf24">79.8</span>
+        </div>
+        <div style="width:100%;height:75px">
+          <canvas id="inspect-rsi-canvas" width="600" height="75" style="width:100%;height:100%;display:block;border-radius:6px"></canvas>
+        </div>
+      </div>
+
+      <!-- 4. KART: DESTEK / DİRENÇ SEVİYELERİ -->
+      <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:10px;letter-spacing:0.04em">DESTEK / DİRENÇ SEVİYELERİ</div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <span style="font-size:12px;font-weight:700;color:var(--text-muted)">PİYASA DURUMU:</span>
-          <span id="inspect-state-badge" style="font-size:11px;padding:3px 9px;border-radius:10px;background:rgba(0,255,163,0.18);color:var(--accent-green);font-weight:700">KONSOLİDASYON / DENGELİ</span>
+          <span style="font-size:12px;color:var(--text-muted)">GÜNCEL FİYAT</span>
+          <strong id="inspect-dd-current" style="font-size:14px;color:#fff">$59,297.7</strong>
         </div>
-        <p id="inspect-commentary" style="font-size:12px;line-height:1.65;color:var(--text-secondary);margin:0 0 10px">
-          Varlık verileri analiz ediliyor. 'İncele' butonuna basarak canlı destek/direnç ve mum okumasını alabilirsiniz.
-        </p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06);font-size:11.5px">
-          <div>🛟 <b>Ana Destek:</b> <span id="inspect-sup" style="color:var(--accent-green)">Hesaplanıyor…</span></div>
-          <div>🧱 <b>Ana Direnç:</b> <span id="inspect-res" style="color:var(--accent-red)">Hesaplanıyor…</span></div>
-          <div>📏 <b>Bollinger %B:</b> <span id="inspect-bb" style="color:#a5d6ff">0.52 (Normal)</span></div>
-          <div>📐 <b>Formasyon:</b> <span id="inspect-pat" style="color:var(--accent-gold)">Yatay Konsolidasyon</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:12px;color:#38bdf8;font-weight:700">ANA DESTEK</span>
+          <div style="text-align:right">
+            <strong id="inspect-dd-sup" style="font-size:14px;color:#38bdf8">$57,848.9</strong>
+            <div id="inspect-dd-sup-sub" style="font-size:10.5px;color:var(--text-muted)">-2.44% uzaklıkta · 2 temas</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;color:#f87171;font-weight:700">ANA DİRENÇ</span>
+          <div style="text-align:right">
+            <strong id="inspect-dd-res" style="font-size:14px;color:#f87171">$60,850.0</strong>
+            <div id="inspect-dd-res-sub" style="font-size:10.5px;color:var(--text-muted)">+2.62% uzaklıkta · 3 temas</div>
+          </div>
         </div>
       </div>
+
+      <!-- 5. KART: FORMASYON TARAMASI -->
+      <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:8px;letter-spacing:0.04em">
+          FORMASYON TARAMASI <small style="opacity:0.6">(deneysel · kural tabanlı)</small>
+        </div>
+        <div id="inspect-pat-result" style="font-size:12px;color:var(--text-secondary);line-height:1.5">
+          Şu an belirgin bir formasyon tespit edilmedi
+        </div>
+      </div>
+
+      <!-- 6. KART: TEKNİK OKUMA (EMA TREND + RSI) -->
+      <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:10px;letter-spacing:0.04em">TEKNİK OKUMA</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.05);border-radius:8px;padding:10px">
+            <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">EMA TREND</div>
+            <div id="inspect-ema-trend-val" style="font-size:13px;font-weight:800;color:var(--accent-green)">YÜKSELİŞ</div>
+          </div>
+          <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.05);border-radius:8px;padding:10px">
+            <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">RSI (14)</div>
+            <div id="inspect-rsi-box-val" style="font-size:13px;font-weight:800;color:var(--accent-red)">79.8 · AŞIRI ALIM</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. KART: DİKKAT (Sarı Rozetli Kart) -->
+      <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,210,90,0.25);border-radius:10px;padding:12px;margin-bottom:10px">
+        <span class="badge" style="background:var(--accent-gold);color:#0d1322;font-weight:800;font-size:11px;margin-bottom:8px;display:inline-block">DİKKAT</span>
+        <div id="inspect-dikkat-text" style="font-size:12px;color:var(--text-secondary);line-height:1.6">
+          5d grafikte EMA9, EMA21'in üzerinde — kısa vadeli momentum yukarı yönlü. RSI 79.8 ile aşırı alımda. Bu okumalar birlikte kaba bir yön fikri veriyor; tek başına giriş sinyali olarak kullanma.
+        </div>
+      </div>
+
+      <!-- 8. KART: YENİ BAŞLAYAN AÇIKLAMASI · SADE DİLDE -->
+      <div style="background:rgba(10,16,30,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.04em">YENİ BAŞLAYAN AÇIKLAMASI · SADE DİLDE</span>
+        </div>
+        <span id="inspect-plain-state-badge" class="badge" style="background:rgba(255,255,255,0.08);color:var(--text-secondary);font-size:11px;margin-bottom:10px;display:inline-block">
+          YATAY / KONSOLİDASYON
+        </span>
+        <div id="inspect-plain-narrative" style="font-size:12px;color:var(--text-secondary);line-height:1.65;margin-bottom:12px">
+          Fiyat son mumlarda büyük bir yön değişikliği göstermiyor, yatay/konsolidasyon bölgesinde hareket ediyor. Bu genelde piyasanın bir sonraki büyük hareket için yön aradığı bir dönemdir.<br><br>
+          RSI 80 ile "aşırı alım" bölgesinde — fiyat kısa vadede hızlı yükselmiş demektir, bu da bir geri çekilme ihtimalini artırır (garanti etmez).<br><br>
+          Unutma: bu açıklamalar geçmiş fiyat hareketine dayalı genel eğilimlerdir, ne olacağını kesin söylemez. Piyasa her an bu beklentilerin dışına çıkabilir.
+        </div>
+        <button type="button" class="btn" onclick="window.toggleInspectGlossary?.()" style="padding:8px 14px;font-size:11.5px;width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1)">
+          📖 Terimler sözlüğünü göster
+        </button>
+        <div id="inspect-glossary-box" style="display:none;margin-top:12px;padding:12px;background:rgba(0,0,0,0.35);border-radius:8px;font-size:11.5px;line-height:1.65;color:var(--text-muted)">
+          <p><strong style="color:#fff">EMA (Üstel Hareketli Ortalama):</strong> Son fiyatlara daha fazla ağırlık veren hareketli ortalama. EMA 9, EMA 21'i yukarı keserse yükseliş sinyali kabul edilir.</p>
+          <p><strong style="color:#fff">RSI (Göreceli Güç Endeksi):</strong> 0-100 arası salınır. 70 üstü aşırı alım (fiyat şişkin), 30 altı aşırı satım (fiyat ucuzlamış) bölgesidir.</p>
+          <p><strong style="color:#fff">Bollinger Bantları:</strong> Fiyatın standart sapmasını ölçer. Fiyat bantların dışına çıktığında banda doğru geri dönme eğilimindedir.</p>
+          <p><strong style="color:#fff">Destek &amp; Direnç:</strong> Destek alıcıların beklediği taban seviye, direnç satıcıların yoğunlaştığı tavan seviyedir.</p>
+        </div>
+      </div>
+
+      <!-- 9. YASAL SORUMLULUK VE LİKİDASYON UYARISI -->
+      <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:12px;font-size:11px;color:#fca5a5;line-height:1.6">
+        ⚠ Kaldıraçlı futures işlemlerde likidasyon riski vardır. Buradaki tüm göstergeler geçmiş veriye uygulanan matematiksel kurallardır — garanti sinyal değildir. Kendi analizini yap, stop-loss kullan.
+      </div>
+
     </div>
 
     <!-- Demo Paper Trading -->
@@ -925,31 +1061,15 @@
           <span>📈 Canlı Mum Grafiği</span>
           <span id="tv-active-badge" style="font-size:11px;padding:2px 7px;border-radius:10px;background:rgba(56,189,248,0.15);color:#38bdf8;font-weight:700">BTCUSDT</span>
         </h2>
-        <div style="display:flex;gap:6px;align-items:center">
-          <select id="tv-interval-select" class="pwd-input" style="width:72px;padding:6px;font-size:11px">
-            <option value="15">15 dk</option>
-            <option value="60" selected>1s</option>
-            <option value="240">4s</option>
-            <option value="D">1 Gün</option>
-          </select>
-          <select id="tv-symbol-select" class="pwd-input" style="width:115px;padding:6px;font-size:11px">
-            <option value="BINANCE:BTCUSDT">BTC/USDT</option>
-            <option value="BINANCE:ETHUSDT">ETH/USDT</option>
-            <option value="BINANCE:SOLUSDT">SOL/USDT</option>
-            <option value="BINANCE:BNBUSDT">BNB/USDT</option>
-            <option value="BINANCE:XRPUSDT">XRP/USDT</option>
-            <option value="BINANCE:DOGEUSDT">DOGE/USDT</option>
-            <option value="BINANCE:ADAUSDT">ADA/USDT</option>
-            <option value="BINANCE:AVAXUSDT">AVAX/USDT</option>
-            <option value="BINANCE:LINKUSDT">LINK/USDT</option>
-            <option value="BINANCE:SUIUSDT">SUI/USDT</option>
-            <option value="BINANCE:PEPEUSDT">PEPE/USDT</option>
-            <option value="BINANCE:NEARUSDT">NEAR/USDT</option>
-            <option value="BINANCE:APTUSDT">APT/USDT</option>
-            <option value="BINANCE:ARBUSDT">ARB/USDT</option>
-            <option value="BINANCE:OPUSDT">OP/USDT</option>
-            <option value="BINANCE:SHIBUSDT">SHIB/USDT</option>
-          </select>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          <div id="tv-interval-chips" style="display:flex;gap:4px">
+            <button type="button" class="coin-chip coin-chip-tf" onclick="window.setTvInterval?.('15', this)">15d</button>
+            <button type="button" class="coin-chip coin-chip-tf active" onclick="window.setTvInterval?.('60', this)">1s</button>
+            <button type="button" class="coin-chip coin-chip-tf" onclick="window.setTvInterval?.('240', this)">4s</button>
+            <button type="button" class="coin-chip coin-chip-tf" onclick="window.setTvInterval?.('D', this)">1g</button>
+          </div>
+          <input type="hidden" id="tv-interval-select" value="60">
+          <input type="hidden" id="tv-symbol-select" value="BINANCE:BTCUSDT">
         </div>
       </div>
 
@@ -1084,14 +1204,15 @@
     <!-- Sessiz Saatler -->
     <div class="card">
       <h2>🌙 Sessiz Saatler &amp; Saat Dilimi</h2>
-      <div class="row">
+      <div class="row" style="flex-direction:column;align-items:flex-start;gap:8px">
         <span class="label">Sessiz Saat Aralığı</span>
-        <select id="sel-quiet-hours" class="pwd-input" style="width:175px;padding:8px;font-size:12.5px">
-          <option value="0">Kapalı (Her zaman sesli)</option>
-          <option value="22">22:00 – 08:00</option>
-          <option value="23">23:00 – 07:00</option>
-          <option value="0">00:00 – 08:00</option>
-        </select>
+        <div id="quiet-hours-chips" style="display:flex;gap:6px;flex-wrap:wrap">
+          <button type="button" class="coin-chip active" onclick="window.setQuietHours?.('0', this)">Kapalı</button>
+          <button type="button" class="coin-chip" onclick="window.setQuietHours?.('22', this)">22:00 – 08:00</button>
+          <button type="button" class="coin-chip" onclick="window.setQuietHours?.('23', this)">23:00 – 07:00</button>
+          <button type="button" class="coin-chip" onclick="window.setQuietHours?.('midnight', this)">00:00 – 08:00</button>
+        </div>
+        <input type="hidden" id="sel-quiet-hours" value="0">
       </div>
       <div class="row">
         <span class="label">Saat Dilimi (UTC)</span>
@@ -1227,6 +1348,6 @@
 <!-- ================= TOAST ================= -->
 <div id="toast-container" aria-live="polite"></div>
 
-<script type="module" src="app.js"></script>
+<script type="module" src="app.js?v=44"></script>
 </body>
 </html>

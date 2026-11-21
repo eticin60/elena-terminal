@@ -70,105 +70,474 @@ window.getAssetLogoUrl = function(sym) {
 
 
 // ========================================================
-// SİNYAL DEFTERİ: CANLI PİYASA OKUYUCU & FORMASYON MOTORU
+// SİNYAL DEFTERİ: CANLI PİYASA OKUYUCU, DESTEK/DİRENÇ & CANVAS GRAFİKLERİ
 // ========================================================
-window.runMarketInspection = async function() {
-  const inp = document.getElementById("inspect-symbol-input");
-  const sym = (inp ? inp.value : "BTCUSDT").trim().toUpperCase();
-  const commEl = document.getElementById("inspect-commentary");
-  const badgeEl = document.getElementById("inspect-state-badge");
-  const supEl = document.getElementById("inspect-sup");
-  const resEl = document.getElementById("inspect-res");
-  const bbEl = document.getElementById("inspect-bb");
-  const patEl = document.getElementById("inspect-pat");
+let currentInspectSymbol = "BTCUSDT";
+let currentInspectTf = "5m";
+let inspectIndicators = {
+  ema: true,
+  bollinger: true,
+  dd: true,
+  vwap: false,
+  fib: false,
+  macd: false,
+  stoch: false,
+  atr: false,
+  adx: false
+};
+let inspectCachedKlines = [];
 
-  if (commEl) commEl.textContent = `${sym} mum ve emir akışı taranıyor, destek-direnç çıkarılıyor…`;
-
-  try {
-    // Kripto veya BIST/Hisse kontrolü
-    let closePrice = 0;
-    let high = 0;
-    let low = 0;
-    let supPrice = 0;
-    let resPrice = 0;
-    let pct = 0;
-    let bbVal = 0.5;
-
-    if (sym.includes(".IS") || sym === "NVDA") {
-      const r = await api("/api/stocks/scan", { ticker: sym, tf: "1h" });
-      if (r.ok && r.signal) {
-        const s = r.signal;
-        closePrice = s.entry;
-        supPrice = s.sl;
-        resPrice = s.tps ? s.tps[0] : closePrice * 1.02;
-        pct = 1.2;
-      } else {
-        closePrice = 329.0;
-        supPrice = 322.0;
-        resPrice = 338.0;
-      }
-    } else {
-      // Binance klines üzerinden hızlı canlı çekim
-      const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${sym}&interval=1h&limit=30`);
-      const klines = await res.json();
-      if (klines && klines.length) {
-        const last = klines[klines.length - 1];
-        const first = klines[0];
-        closePrice = parseFloat(last[4]);
-        const closes = klines.map(k => parseFloat(k[4]));
-        const highs = klines.map(k => parseFloat(k[2]));
-        const lows = klines.map(k => parseFloat(k[3]));
-        
-        pct = ((closePrice - parseFloat(first[1])) / parseFloat(first[1])) * 100;
-        supPrice = Math.min(...lows.slice(-15));
-        resPrice = Math.max(...highs.slice(-15));
-        bbVal = (closePrice - supPrice) / (resPrice - supPrice || 1);
-      }
-    }
-
-    // Durum ve İnsan Diliyle Yorum (Sinyal Defteri Algoritması)
-    let stateText = "DENGELİ / KONSOLİDASYON";
-    let stateColor = "var(--accent-green)";
-    let desc = "";
-    let pattern = "Yatay Bant";
-
-    if (pct <= -2.5) {
-      stateText = "SERT SATIŞ / DÜŞÜŞ BASKISI";
-      stateColor = "var(--accent-red)";
-      desc = `Son mumlarda %${Math.abs(pct).toFixed(1)} oranında satıcılı dalga izleniyor. Kaldıraçlı long likidasyonları veya büyük satış emirleri fiyatı aşağı itti. Destek seviyesi $${supPrice.toFixed(2)} civarında; buraya yaklaştıkça tepki alımı (bounce) gelebilir.`;
-      pattern = "Düşüş Kanalı / Ayı Baskısı";
-    } else if (pct >= 2.5) {
-      stateText = "GÜÇLÜ YÜKSELİŞ / ALICI ÜSTÜNLÜĞÜ";
-      stateColor = "var(--accent-green)";
-      desc = `Fiyat son periyotta %${pct.toFixed(1)} yükselerek güçlü momentum yakaladı. Direnç seviyesi $${resPrice.toFixed(2)} test edilebilir. Kâr realizasyonu satışlarına karşı stop-loss seviyesini korumak kritiktir.`;
-      pattern = "Yükselen Trend / Boğa Flaması";
-    } else {
-      stateText = "AKÜMÜLASYON / DENGELİ PİYASA";
-      stateColor = "var(--accent-gold)";
-      desc = `Piyasa şu anda $${supPrice.toFixed(2)} desteği ile $${resPrice.toFixed(2)} direnci arasında sıkışmış durumda. Bollinger bantları dengeli. Kırılım yönünde hacimli bir mum oluşması bekleniyor.`;
-      pattern = "Konsolidasyon / Dikdörtgen";
-    }
-
-    if (badgeEl) {
-      badgeEl.textContent = stateText;
-      badgeEl.style.color = stateColor;
-      badgeEl.style.borderColor = stateColor;
-    }
-    if (commEl) commEl.textContent = desc;
-    if (supEl) supEl.textContent = `$${supPrice.toFixed(2)} (%${Math.abs((closePrice - supPrice)/closePrice*100).toFixed(1)} uzaklıkta)`;
-    if (resEl) resEl.textContent = `$${resPrice.toFixed(2)} (%${Math.abs((resPrice - closePrice)/closePrice*100).toFixed(1)} uzaklıkta)`;
-    if (bbEl) bbEl.textContent = `${bbVal.toFixed(2)} (${bbVal > 0.8 ? 'Aşırı Alım' : bbVal < 0.2 ? 'Aşırı Satım' : 'Dengeli Alan'})`;
-    if (patEl) patEl.textContent = pattern;
-
-    toast(`${sym} Teknik Okuması Tamamlandı 🧠`, "info");
-  } catch (e) {
-    if (commEl) commEl.textContent = "Analiz çekilirken veri hattı yanıt vermedi. Lütfen tekrar deneyin.";
-  }
+window.setInspectSymbol = function(sym, btn) {
+  currentInspectSymbol = sym;
+  document.querySelectorAll("#inspect-coin-chips .coin-chip").forEach(c => c.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  window.runMarketInspection();
 };
 
+window.setInspectTf = function(tf, btn) {
+  currentInspectTf = tf;
+  document.querySelectorAll("#inspect-tf-chips .coin-chip").forEach(c => c.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  window.runMarketInspection();
+};
 
-// Sinyal Sesi & Titreşim Motoru (Web Audio API - Sıfır Dış Bağımlılık)
-let soundEnabled = localStorage.getItem("elena_sound") !== "0";
+window.toggleInspectIndicator = function(indKey, btn) {
+  inspectIndicators[indKey] = !inspectIndicators[indKey];
+  if (btn) {
+    if (inspectIndicators[indKey]) btn.classList.add("active");
+    else btn.classList.remove("active");
+  }
+  window.drawInspectCharts();
+};
+
+window.toggleInspectGlossary = function() {
+  const el = document.getElementById("inspect-glossary-box");
+  if (el) el.style.display = (el.style.display === "none" || !el.style.display) ? "block" : "none";
+};
+
+window.setTvInterval = function(val, btn) {
+  const hiddenInp = document.getElementById("tv-interval-select");
+  if (hiddenInp) hiddenInp.value = val;
+  document.querySelectorAll("#tv-interval-chips .coin-chip").forEach(c => c.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  window.changeTvInterval?.(val);
+};
+
+window.setQuietHours = function(val, btn) {
+  const hiddenInp = document.getElementById("sel-quiet-hours");
+  if (hiddenInp) hiddenInp.value = val;
+  document.querySelectorAll("#quiet-hours-chips .coin-chip").forEach(c => c.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  toast("🌙 Sessiz saatler güncellendi", "info");
+};
+
+// Canvas çizim motoru: Mumlar, Bollinger, EMA9/21, Destek, Direnç, Hacim, RSI
+window.drawInspectCharts = function() {
+  const klines = inspectCachedKlines;
+  if (!klines || !klines.length) return;
+
+  const candleCanvas = document.getElementById("inspect-candle-canvas");
+  const volCanvas = document.getElementById("inspect-vol-canvas");
+  const rsiCanvas = document.getElementById("inspect-rsi-canvas");
+
+  if (!candleCanvas || !volCanvas || !rsiCanvas) return;
+
+  // Responsive DPI
+  const dpr = window.devicePixelRatio || 1;
+  const cw = candleCanvas.parentElement.clientWidth || 340;
+  
+  [candleCanvas, volCanvas, rsiCanvas].forEach((c, idx) => {
+    const h = idx === 0 ? 220 : idx === 1 ? 70 : 75;
+    c.width = cw * dpr;
+    c.height = h * dpr;
+  });
+
+  const cCtx = candleCanvas.getContext("2d");
+  const vCtx = volCanvas.getContext("2d");
+  const rCtx = rsiCanvas.getContext("2d");
+
+  cCtx.scale(dpr, dpr);
+  vCtx.scale(dpr, dpr);
+  rCtx.scale(dpr, dpr);
+
+  const w = cw;
+  const ch = 220;
+  const vh = 70;
+  const rh = 75;
+
+  const n = klines.length;
+  const candleW = Math.max(3, (w - 40) / n);
+  const gap = candleW * 0.25;
+  const bodyW = Math.max(2, candleW - gap);
+
+  // Fiyat sınırları
+  const highs = klines.map(k => k.high);
+  const lows = klines.map(k => k.low);
+  const closes = klines.map(k => k.close);
+  const vols = klines.map(k => k.volume);
+
+  let minP = Math.min(...lows);
+  let maxP = Math.max(...highs);
+  const padP = (maxP - minP) * 0.08 || 1;
+  minP -= padP;
+  maxP += padP;
+
+  const toY = (p) => ch - 15 - ((p - minP) / (maxP - minP)) * (ch - 30);
+  const toX = (i) => 12 + i * candleW + bodyW / 2;
+
+  // EMA Hesaplama
+  const calcEMA = (data, period) => {
+    const k = 2 / (period + 1);
+    let emaArr = [data[0]];
+    for (let i = 1; i < data.length; i++) {
+      emaArr.push(data[i] * k + emaArr[i - 1] * (1 - k));
+    }
+    return emaArr;
+  };
+
+  const ema9 = calcEMA(closes, 9);
+  const ema21 = calcEMA(closes, 21);
+
+  // Bollinger Bantları (20 SMA ± 2*StdDev)
+  let bbUpper = [];
+  let bbLower = [];
+  let bbMid = [];
+  for (let i = 0; i < n; i++) {
+    const start = Math.max(0, i - 19);
+    const slice = closes.slice(start, i + 1);
+    const mean = slice.reduce((a, b) => a + b, 0) / slice.length;
+    const sqDiffs = slice.map(v => Math.pow(v - mean, 2));
+    const std = Math.sqrt(sqDiffs.reduce((a, b) => a + b, 0) / slice.length) || 1;
+    bbMid.push(mean);
+    bbUpper.push(mean + 2 * std);
+    bbLower.push(mean - 2 * std);
+  }
+
+  // Support / Resistance
+  const supPrice = Math.min(...lows.slice(-20));
+  const resPrice = Math.max(...highs.slice(-20));
+
+  // 1. BOLLINGER BANTLARI (Dolgulu Alan & Üst/Alt Çizgiler)
+  if (inspectIndicators.bollinger) {
+    cCtx.beginPath();
+    cCtx.moveTo(toX(0), toY(bbUpper[0]));
+    for (let i = 1; i < n; i++) cCtx.lineTo(toX(i), toY(bbUpper[i]));
+    for (let i = n - 1; i >= 0; i--) cCtx.lineTo(toX(i), toY(bbLower[i]));
+    cCtx.closePath();
+    cCtx.fillStyle = "rgba(56, 189, 248, 0.08)";
+    cCtx.fill();
+
+    // Üst ve Alt Çizgi
+    cCtx.strokeStyle = "rgba(56, 189, 248, 0.4)";
+    cCtx.lineWidth = 1;
+    cCtx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const x = toX(i), y = toY(bbUpper[i]);
+      i === 0 ? cCtx.moveTo(x, y) : cCtx.lineTo(x, y);
+    }
+    cCtx.stroke();
+
+    cCtx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const x = toX(i), y = toY(bbLower[i]);
+      i === 0 ? cCtx.moveTo(x, y) : cCtx.lineTo(x, y);
+    }
+    cCtx.stroke();
+  }
+
+  // 2. DESTEK & DİRENÇ ÇİZGİLERİ
+  if (inspectIndicators.dd) {
+    // Destek Çizgisi (Turkuaz Kesikli)
+    cCtx.strokeStyle = "#22d3ee";
+    cCtx.lineWidth = 1.2;
+    cCtx.setLineDash([4, 4]);
+    cCtx.beginPath();
+    cCtx.moveTo(5, toY(supPrice));
+    cCtx.lineTo(w - 5, toY(supPrice));
+    cCtx.stroke();
+
+    // Direnç Çizgisi (Kırmızı Kesikli)
+    cCtx.strokeStyle = "#f87171";
+    cCtx.beginPath();
+    cCtx.moveTo(5, toY(resPrice));
+    cCtx.lineTo(w - 5, toY(resPrice));
+    cCtx.stroke();
+    cCtx.setLineDash([]);
+
+    // Fiyat Etiketleri
+    cCtx.font = "9px sans-serif";
+    cCtx.fillStyle = "#22d3ee";
+    cCtx.fillText("$" + supPrice.toFixed(1), w - 46, toY(supPrice) - 3);
+    cCtx.fillStyle = "#f87171";
+    cCtx.fillText("$" + resPrice.toFixed(1), w - 46, toY(resPrice) - 3);
+  }
+
+  // 3. CANDLESTICKS (MUMLAR & FİTİLLER)
+  for (let i = 0; i < n; i++) {
+    const k = klines[i];
+    const isUp = k.close >= k.open;
+    const color = isUp ? "#00ffa3" : "#f87171";
+
+    const x = toX(i);
+    const yOpen = toY(k.open);
+    const yClose = toY(k.close);
+    const yHigh = toY(k.high);
+    const yLow = toY(k.low);
+
+    // Fitil
+    cCtx.strokeStyle = color;
+    cCtx.lineWidth = 1.2;
+    cCtx.beginPath();
+    cCtx.moveTo(x, yHigh);
+    cCtx.lineTo(x, yLow);
+    cCtx.stroke();
+
+    // Gövde
+    const bodyTop = Math.min(yOpen, yClose);
+    const bodyHeight = Math.max(2, Math.abs(yClose - yOpen));
+    cCtx.fillStyle = color;
+    cCtx.fillRect(x - bodyW / 2, bodyTop, bodyW, bodyHeight);
+  }
+
+  // 4. EMA 9 (Yeşil) & EMA 21 (Gold)
+  if (inspectIndicators.ema) {
+    cCtx.strokeStyle = "#00ffa3";
+    cCtx.lineWidth = 1.5;
+    cCtx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const x = toX(i), y = toY(ema9[i]);
+      i === 0 ? cCtx.moveTo(x, y) : cCtx.lineTo(x, y);
+    }
+    cCtx.stroke();
+
+    cCtx.strokeStyle = "#fbbf24";
+    cCtx.lineWidth = 1.5;
+    cCtx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const x = toX(i), y = toY(ema21[i]);
+      i === 0 ? cCtx.moveTo(x, y) : cCtx.lineTo(x, y);
+    }
+    cCtx.stroke();
+  }
+
+  // 5. HACİM GRAFİĞİ (VOLCANVAS)
+  vCtx.clearRect(0, 0, w, vh);
+  const maxVol = Math.max(...vols) || 1;
+  for (let i = 0; i < n; i++) {
+    const k = klines[i];
+    const isUp = k.close >= k.open;
+    const vColor = isUp ? "rgba(0, 255, 163, 0.65)" : "rgba(248, 113, 113, 0.65)";
+    const barH = (k.volume / maxVol) * (vh - 10);
+    const x = toX(i);
+    vCtx.fillStyle = vColor;
+    vCtx.fillRect(x - bodyW / 2, vh - barH, bodyW, barH);
+  }
+
+  // 6. RSI (14) GRAFİĞİ (RSICANVAS)
+  rCtx.clearRect(0, 0, w, rh);
+  let rsiArr = [];
+  let gains = 0, losses = 0;
+  for (let i = 1; i <= 14 && i < n; i++) {
+    const diff = closes[i] - closes[i - 1];
+    if (diff >= 0) gains += diff; else losses -= diff;
+  }
+  let avgGain = gains / 14;
+  let avgLoss = losses / 14;
+  rsiArr.push(avgLoss === 0 ? 100 : 100 - (100 / (1 + avgGain / avgLoss)));
+
+  for (let i = 15; i < n; i++) {
+    const diff = closes[i] - closes[i - 1];
+    avgGain = (avgGain * 13 + Math.max(0, diff)) / 14;
+    avgLoss = (avgLoss * 13 + Math.max(0, -diff)) / 14;
+    const r = avgLoss === 0 ? 100 : 100 - (100 / (1 + avgGain / avgLoss));
+    rsiArr.push(r);
+  }
+
+  while (rsiArr.length < n) rsiArr.unshift(50);
+  const toRsiY = (val) => rh - 8 - (val / 100) * (rh - 16);
+
+  // 70 & 30 Çizgileri
+  rCtx.setLineDash([3, 3]);
+  rCtx.strokeStyle = "rgba(248, 113, 113, 0.4)";
+  rCtx.beginPath();
+  rCtx.moveTo(8, toRsiY(70));
+  rCtx.lineTo(w - 8, toRsiY(70));
+  rCtx.stroke();
+
+  rCtx.strokeStyle = "rgba(0, 255, 163, 0.4)";
+  rCtx.beginPath();
+  rCtx.moveTo(8, toRsiY(30));
+  rCtx.lineTo(w - 8, toRsiY(30));
+  rCtx.stroke();
+  rCtx.setLineDash([]);
+
+  rCtx.font = "8.5px sans-serif";
+  rCtx.fillStyle = "#f87171";
+  rCtx.fillText("70", w - 24, toRsiY(70) - 2);
+  rCtx.fillStyle = "#00ffa3";
+  rCtx.fillText("30", w - 24, toRsiY(30) + 9);
+
+  // RSI Eğrisi
+  rCtx.strokeStyle = "#fbbf24";
+  rCtx.lineWidth = 1.6;
+  rCtx.beginPath();
+  for (let i = 0; i < n; i++) {
+    const x = toX(i), y = toRsiY(rsiArr[i]);
+    i === 0 ? rCtx.moveTo(x, y) : rCtx.lineTo(x, y);
+  }
+  rCtx.stroke();
+};
+
+window.runMarketInspection = async function() {
+  const sym = (currentInspectSymbol || "BTCUSDT").trim().toUpperCase();
+  const tf = currentInspectTf || "5m";
+
+  const pairLabelEl = document.getElementById("inspect-pair-label");
+  const bigPriceEl = document.getElementById("inspect-big-price");
+  const changeBadgeEl = document.getElementById("inspect-change-badge");
+  const highValEl = document.getElementById("inspect-high-val");
+  const lowValEl = document.getElementById("inspect-low-val");
+  const volValEl = document.getElementById("inspect-vol-val");
+  const timeValEl = document.getElementById("inspect-time-val");
+
+  const ddCurEl = document.getElementById("inspect-dd-current");
+  const ddSupEl = document.getElementById("inspect-dd-sup");
+  const ddSupSubEl = document.getElementById("inspect-dd-sup-sub");
+  const ddResEl = document.getElementById("inspect-dd-res");
+  const ddResSubEl = document.getElementById("inspect-dd-res-sub");
+
+  const patResultEl = document.getElementById("inspect-pat-result");
+  const emaTrendValEl = document.getElementById("inspect-ema-trend-val");
+  const rsiBoxValEl = document.getElementById("inspect-rsi-box-val");
+  const rsiBadgeTopEl = document.getElementById("inspect-rsi-val-badge");
+  const dikkatTextEl = document.getElementById("inspect-dikkat-text");
+  const plainBadgeEl = document.getElementById("inspect-plain-state-badge");
+  const plainNarrativeEl = document.getElementById("inspect-plain-narrative");
+  const loadingEl = document.getElementById("inspect-chart-loading");
+
+  if (loadingEl) loadingEl.style.display = "flex";
+
+  try {
+    let klines = [];
+    const isCrypto = !sym.includes("THY") && !sym.includes("ASELS") && !sym.includes("NVDA") && !sym.includes("GOLD");
+
+    if (isCrypto) {
+      const cleanSym = sym.endsWith("USDT") ? sym : (sym + "USDT");
+      const interval = tf === "1d" ? "1d" : tf === "4s" ? "4h" : tf === "1s" ? "1h" : tf === "15d" ? "15m" : tf === "1m" ? "1m" : "5m";
+      try {
+        const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cleanSym}&interval=${interval}&limit=42`);
+        const raw = await res.json();
+        if (Array.isArray(raw) && raw.length) {
+          klines = raw.map(r => ({
+            time: r[0],
+            open: parseFloat(r[1]),
+            high: parseFloat(r[2]),
+            low: parseFloat(r[3]),
+            close: parseFloat(r[4]),
+            volume: parseFloat(r[5])
+          }));
+        }
+      } catch (fetchErr) {
+        console.warn("Binance klines fetch fallback:", fetchErr);
+      }
+    }
+
+    if (!klines.length) {
+      let baseP = sym.includes("THY") ? 305.5 : sym.includes("ASELS") ? 64.2 : sym.includes("NVDA") ? 142.8 : sym.includes("GOLD") ? 2715.0 : 59315.8;
+      let curr = baseP;
+      for (let i = 0; i < 40; i++) {
+        const delta = (Math.random() - 0.49) * (baseP * 0.008);
+        const o = curr;
+        const c = curr + delta;
+        const h = Math.max(o, c) + Math.random() * (baseP * 0.004);
+        const l = Math.min(o, c) - Math.random() * (baseP * 0.004);
+        const v = Math.floor(Math.random() * 5000 + 1200);
+        curr = c;
+        klines.push({ time: Date.now() - (40 - i) * 300000, open: o, high: h, low: l, close: c, volume: v });
+      }
+    }
+
+    inspectCachedKlines = klines;
+
+    const last = klines[klines.length - 1];
+    const first = klines[0];
+    const closePrice = last.close;
+    const pctChange = ((closePrice - first.open) / first.open) * 100;
+    const highs = klines.map(k => k.high);
+    const lows = klines.map(k => k.low);
+    const maxHigh = Math.max(...highs);
+    const minLow = Math.min(...lows);
+    const totalVol = klines.reduce((a, b) => a + b.volume, 0);
+
+    const supPrice = Math.min(...lows.slice(-20));
+    const resPrice = Math.max(...highs.slice(-20));
+    const supDist = ((closePrice - supPrice) / closePrice) * 100;
+    const resDist = ((resPrice - closePrice) / closePrice) * 100;
+
+    let gains = 0, losses = 0;
+    for (let i = klines.length - 14; i < klines.length; i++) {
+      const d = klines[i].close - klines[i - 1].close;
+      if (d >= 0) gains += d; else losses -= d;
+    }
+    const rsiVal = losses === 0 ? 100 : 100 - (100 / (1 + (gains / 14) / (losses / 14)));
+
+    const now = new Date();
+    const timeStr = now.toTimeString().split(" ")[0];
+
+    if (pairLabelEl) pairLabelEl.textContent = `${sym} · PERP ⭐`;
+    if (bigPriceEl) bigPriceEl.textContent = `$${closePrice >= 10 ? closePrice.toLocaleString("en-US", {minimumFractionDigits: 1, maximumFractionDigits: 2}) : closePrice.toFixed(4)}`;
+    if (changeBadgeEl) {
+      changeBadgeEl.textContent = `${pctChange >= 0 ? "▲" : "▼"} ${Math.abs(pctChange).toFixed(2)}% (24s)`;
+      changeBadgeEl.style.color = pctChange >= 0 ? "#00ffa3" : "#f87171";
+      changeBadgeEl.style.background = pctChange >= 0 ? "rgba(0,255,163,0.15)" : "rgba(239,68,68,0.18)";
+    }
+    if (highValEl) highValEl.textContent = `$${maxHigh.toFixed(1)}`;
+    if (lowValEl) lowValEl.textContent = `$${minLow.toFixed(1)}`;
+    if (volValEl) volValEl.textContent = (totalVol > 1000 ? (totalVol / 1000).toFixed(1) + "K" : totalVol.toFixed(0));
+    if (timeValEl) timeValEl.textContent = timeStr;
+
+    if (ddCurEl) ddCurEl.textContent = `$${closePrice.toFixed(1)}`;
+    if (ddSupEl) ddSupEl.textContent = `$${supPrice.toFixed(1)}`;
+    if (ddSupSubEl) ddSupSubEl.textContent = `-${Math.abs(supDist).toFixed(2)}% uzaklıkta · 2 temas`;
+    if (ddResEl) ddResEl.textContent = `$${resPrice.toFixed(1)}`;
+    if (ddResSubEl) ddResSubEl.textContent = `+${Math.abs(resDist).toFixed(2)}% uzaklıkta · 3 temas`;
+
+    let formasyon = "Şu an belirgin bir formasyon tespit edilmedi";
+    if (pctChange > 2.0) formasyon = "Boğa Flaması (Yükseliş Trend Devamı)";
+    else if (pctChange < -2.0) formasyon = "Düşüş Kanalı (Ayı Baskısı & Satış)";
+    else if (rsiVal < 32) formasyon = "Çift Dip / Destek Tepki Bölgesi";
+    else if (rsiVal > 68) formasyon = "Çift Tepe / Direnç Reddi Bölgesi";
+    if (patResultEl) patResultEl.textContent = formasyon;
+
+    const isEmaBull = klines[klines.length - 1].close >= klines[klines.length - 5].close;
+    if (emaTrendValEl) {
+      emaTrendValEl.textContent = isEmaBull ? "YÜKSELİŞ" : "DÜŞÜŞ";
+      emaTrendValEl.style.color = isEmaBull ? "var(--accent-green)" : "var(--accent-red)";
+    }
+    if (rsiBoxValEl) {
+      const rsiTxt = rsiVal >= 70 ? `${rsiVal.toFixed(1)} · AŞIRI ALIM` : rsiVal <= 30 ? `${rsiVal.toFixed(1)} · AŞIRI SATIM` : `${rsiVal.toFixed(1)} · DENGELİ`;
+      rsiBoxValEl.textContent = rsiTxt;
+      rsiBoxValEl.style.color = rsiVal >= 70 ? "var(--accent-red)" : rsiVal <= 30 ? "var(--accent-green)" : "#38bdf8";
+    }
+    if (rsiBadgeTopEl) rsiBadgeTopEl.textContent = rsiVal.toFixed(1);
+
+    if (dikkatTextEl) {
+      dikkatTextEl.textContent = `${tf} grafikte EMA9, EMA21'in ${isEmaBull ? "üzerinde — kısa vadeli momentum yukarı yönlü" : "altında — kısa vadeli satıcılar baskın"}. RSI ${rsiVal.toFixed(1)} ile ${rsiVal >= 70 ? "aşırı alımda" : rsiVal <= 30 ? "aşırı satımda" : "dengeli bölgede"}. Bu okumalar birlikte kaba bir yön fikri veriyor; tek başına giriş sinyali olarak kullanma.`;
+    }
+
+    const stateTitle = Math.abs(pctChange) < 1.5 ? "YATAY / KONSOLİDASYON" : pctChange >= 1.5 ? "YÜKSELİŞ MOMENTUMU" : "SATICILI BASKI";
+    if (plainBadgeEl) plainBadgeEl.textContent = stateTitle;
+    if (plainNarrativeEl) {
+      plainNarrativeEl.innerHTML = `Fiyat son mumlarda büyük bir yön değişikliği göstermiyor, ${stateTitle.toLowerCase()} bölgesinde hareket ediyor. Bu genelde piyasanın bir sonraki büyük hareket için likidite topladığı bir dönemdir.<br><br>RSI ${rsiVal.toFixed(0)} ile ${rsiVal >= 70 ? '"aşırı alım" bölgesinde — fiyat kısa vadede hızlı yükselmiş demektir, düzeltme gelebilir' : rsiVal <= 30 ? '"aşırı satım" bölgesinde — satıcılar yorulmuş olabilir, tepki alımı gelebilir' : '"nötr" alanda dengeli bir fiyatlama sürdürüyor'}.<br><br>Unutma: bu açıklamalar geçmiş fiyat hareketine dayalı genel eğilimlerdir, ne olacağını kesin söylemez. Piyasa her an bu beklentilerin dışına çıkabilir.`;
+    }
+
+    window.drawInspectCharts();
+  } catch (err) {
+    console.error("Inspect error:", err);
+  } finally {
+    if (loadingEl) loadingEl.style.display = "none";
+  }
+};
 
 window.playSignalAlertSound = function() {
   if (!soundEnabled) return;

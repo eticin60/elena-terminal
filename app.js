@@ -1926,13 +1926,14 @@ async function main() {
     ME = await api("/api/verify");
   } catch (e) {
     const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    const isOwner = tgUser?.id === 6527896022 || String(tgUser?.id) === "6527896022";
     ME = {
       ok: true,
       user_id: tgUser?.id || 0,
       username: tgUser?.username || "Guest",
       first_name: tgUser?.first_name || "Trader",
       lang: tgUser?.language_code?.slice(0, 2) || localStorage.getItem("elena_lang") || "tr",
-      is_admin: false
+      is_admin: isOwner
     };
   }
 

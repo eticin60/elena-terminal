@@ -125,23 +125,23 @@
 
   <!-- ================= TABS ================= -->
   <nav class="tabs" role="tablist" aria-label="Sekme menüsü">
-    <div class="tab active" data-tab="wallet"    id="tab-btn-wallet"    role="tab" aria-selected="true">💼 <span id="tab-lbl-wallet">Cüzdan</span></div>
-    <div class="tab"        data-tab="auto"      id="tab-btn-auto"      role="tab">🤖 <span id="tab-lbl-auto">Oto-Bot</span></div>
+    <div class="tab active" data-tab="guide"     id="tab-btn-guide"     role="tab" aria-selected="true">📚 <span id="tab-lbl-guide">Rehber</span></div>
+    <div class="tab"        data-tab="markets"   id="tab-btn-markets"   role="tab">📊 <span id="tab-lbl-markets">Piyasa</span></div>
     <div class="tab"        data-tab="signals"   id="tab-btn-signals"   role="tab">📡 <span id="tab-lbl-signals">Sinyaller</span></div>
+    <div class="tab"        data-tab="wallet"    id="tab-btn-wallet"    role="tab">💼 <span id="tab-lbl-wallet">Cüzdan</span></div>
+    <div class="tab"        data-tab="exchange"  id="tab-btn-exchange"  role="tab">🔑 <span id="tab-lbl-exchange">Borsa</span></div>
+    <div class="tab"        data-tab="auto"      id="tab-btn-auto"      role="tab">🤖 <span id="tab-lbl-auto">Oto-Bot</span></div>
+    <div class="tab"        data-tab="manual"    id="tab-btn-manual"    role="tab">📈 <span id="tab-lbl-manual">Manuel</span></div>
     <div class="tab"        data-tab="coins"     id="tab-btn-coins"     role="tab">🪙 <span id="tab-lbl-coins">Coinler</span></div>
     <div class="tab"        data-tab="tools"     id="tab-btn-tools"     role="tab">🧮 <span id="tab-lbl-tools">Araçlar</span></div>
-    <div class="tab"        data-tab="markets"   id="tab-btn-markets"   role="tab">📊 <span id="tab-lbl-markets">Piyasa</span></div>
-    <div class="tab"        data-tab="exchange"  id="tab-btn-exchange"  role="tab">🔑 <span id="tab-lbl-exchange">Borsa</span></div>
-    <div class="tab"        data-tab="manual"    id="tab-btn-manual"    role="tab">📈 <span id="tab-lbl-manual">Manuel</span></div>
     <div class="tab"        data-tab="dashboard" id="tab-btn-dashboard" role="tab">📊 <span id="tab-lbl-dashboard">Pano</span></div>
     <div class="tab"        data-tab="settings"  id="tab-btn-settings"  role="tab">⚙️ <span id="tab-lbl-settings">Ayarlar</span></div>
-    <div class="tab"        data-tab="guide"     id="tab-btn-guide"     role="tab">📚 <span id="tab-lbl-guide">Rehber</span></div>
   </nav>
 
   <!-- ========================================
        CÜZDAN SEKMESİ
        ======================================== -->
-  <div id="page-wallet" class="page active" role="tabpanel">
+  <div id="page-wallet" class="page" role="tabpanel">
 
     <!-- Bağlı Cüzdan Bilgisi -->
     <div class="card" id="wallet-connected-info">
@@ -200,6 +200,20 @@
        OTO-BOT SEKMESİ
        ======================================== -->
   <div id="page-auto" class="page" role="tabpanel">
+
+    <!-- Borsa Bağlantı Uyarısı & Kilidi (API Key Olmadan İşlem Yapılamaz) -->
+    <div id="auto-api-warning" class="card" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);margin-bottom:14px">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <span style="font-size:24px">🔒</span>
+        <div style="flex:1">
+          <h3 style="margin:0 0 6px;font-size:14px;color:#fca5a5" id="i18n-auto-lock-title">Borsa API Bağlantısı Gerekli</h3>
+          <p style="margin:0 0 10px;font-size:12px;color:var(--text-muted);line-height:1.5" id="i18n-auto-lock-desc">
+            Otomatik botun sizin adınıza emir açıp kapatabilmesi için önce Borsa sekmesinden API Key ve Secret tanımlamalısınız.
+          </p>
+          <button class="btn btn-main" onclick="switchTab('exchange')" style="padding:6px 14px;font-size:12px;font-weight:700">🔑 Borsa API'sini Bağla</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Strateji Zaman Dilimi -->
     <div class="card">
@@ -369,6 +383,20 @@
        MANUEL TERMİNAL SEKMESİ
        ======================================== -->
   <div id="page-manual" class="page" role="tabpanel">
+
+    <!-- Borsa Bağlantı Uyarısı & Kilidi (API Key Olmadan Manuel İşlem Yapılamaz) -->
+    <div id="manual-api-warning" class="card" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);margin-bottom:14px">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <span style="font-size:24px">🔒</span>
+        <div style="flex:1">
+          <h3 style="margin:0 0 6px;font-size:14px;color:#fca5a5" id="i18n-manual-lock-title">Borsa API Bağlantısı Gerekli</h3>
+          <p style="margin:0 0 10px;font-size:12px;color:var(--text-muted);line-height:1.5" id="i18n-manual-lock-desc">
+            Manuel terminalden gerçek piyasa emri iletebilmek için önce Borsa sekmesinden API Key ve Secret bağlamalısınız.
+          </p>
+          <button class="btn btn-main" onclick="switchTab('exchange')" style="padding:6px 14px;font-size:12px;font-weight:700">🔑 Borsa API'sini Bağla</button>
+        </div>
+      </div>
+    </div>
     <div class="card">
       <h2>📈 Manuel Ticaret Terminali</h2>
       <p style="font-size:12px;color:var(--text-muted);margin:0 0 14px;line-height:1.6">
@@ -442,7 +470,7 @@
   <!-- ========================================
        REHBER SEKMESİ (KULLANIM KILAVUZU & STRATEJİ)
        ======================================== -->
-  <div id="page-guide" class="page" role="tabpanel">
+  <div id="page-guide" class="page active" role="tabpanel">
 
     <!-- Başlık Kartı -->
     <div class="card" style="border-top:2px solid var(--accent-gold)">
@@ -710,21 +738,23 @@
       <!-- İstediğin Coini/Pariteyi Arama & Açma Çubuğu -->
       <div style="display:flex;gap:6px;margin-bottom:10px">
         <div style="position:relative;flex:1">
-          <input type="text" id="tv-custom-symbol-input" class="pwd-input" placeholder="İstediğin coini yaz (örn: TIA, INJ, FTM, PENDLE, GOLD)..." style="width:100%;padding:7px 10px;font-size:12px;text-transform:uppercase" />
+          <input type="text" id="tv-custom-symbol-input" class="pwd-input" placeholder="İstediğin varlığı yaz (örn: GOLD, BRENT, EURUSD, NVDA, PEPE, BTC)..." style="width:100%;padding:7px 10px;font-size:12px;text-transform:uppercase" />
         </div>
         <button id="btn-tv-search" class="btn btn-main" style="padding:7px 14px;font-size:12px;white-space:nowrap;font-weight:700">🔍 Grafiği Aç</button>
       </div>
 
-      <!-- Hızlı Seçim Çipleri (Popüler Varlıklar) -->
+      <!-- Hızlı Seçim Çipleri (Popüler Kripto, Emtia ve Forex) -->
       <div id="tv-quick-chips" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px;-webkit-overflow-scrolling:touch">
         <button class="coin-chip active" data-sym="BTCUSDT" style="padding:4px 9px;font-size:11px">BTC</button>
         <button class="coin-chip" data-sym="ETHUSDT" style="padding:4px 9px;font-size:11px">ETH</button>
         <button class="coin-chip" data-sym="SOLUSDT" style="padding:4px 9px;font-size:11px">SOL</button>
+        <button class="coin-chip" data-sym="GOLD" style="padding:4px 9px;font-size:11px;color:#f3ba2f;font-weight:700">🥇 GOLD</button>
+        <button class="coin-chip" data-sym="BRENT" style="padding:4px 9px;font-size:11px;color:#38bdf8">🛢️ BRENT</button>
+        <button class="coin-chip" data-sym="EURUSD" style="padding:4px 9px;font-size:11px">💶 EUR/USD</button>
         <button class="coin-chip" data-sym="PEPEUSDT" style="padding:4px 9px;font-size:11px">PEPE</button>
         <button class="coin-chip" data-sym="SUIUSDT" style="padding:4px 9px;font-size:11px">SUI</button>
         <button class="coin-chip" data-sym="DOGEUSDT" style="padding:4px 9px;font-size:11px">DOGE</button>
         <button class="coin-chip" data-sym="XRPUSDT" style="padding:4px 9px;font-size:11px">XRP</button>
-        <button class="coin-chip" data-sym="AVAXUSDT" style="padding:4px 9px;font-size:11px">AVAX</button>
       </div>
 
       <div id="tv-chart-container" style="height:340px;width:100%;border-radius:var(--radius-sm);overflow:hidden;border:1px solid rgba(255,255,255,0.08);background:#060911"></div>

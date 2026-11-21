@@ -91,8 +91,8 @@ html, body {
 }
 
 body {
-  /* Status bar + safe area – top eleman boşluk garantisi */
-  padding-top: max(68px, env(safe-area-inset-top, 68px));
+  /* Status bar + safe area – top eleman boşluk garantisi (artırıldı) */
+  padding-top: max(84px, env(safe-area-inset-top, 84px));
   padding-bottom: max(110px, env(safe-area-inset-bottom, 110px));
   padding-left:  max(16px, env(safe-area-inset-left, 16px));
   padding-right: max(16px, env(safe-area-inset-right, 16px));
@@ -111,7 +111,7 @@ body {
   justify-content: space-between;
   /* body has padding-left/right 16px + max-width 540px centered — extend to full viewport width */
   margin: 0 -16px 20px;
-  padding: 12px 20px 12px;
+  padding: 16px 20px 14px;
   background: rgba(5,8,15,0.88);
   backdrop-filter: blur(28px) saturate(1.5);
   -webkit-backdrop-filter: blur(28px) saturate(1.5);

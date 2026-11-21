@@ -842,12 +842,59 @@ window.selectExchange = function(exch, btn) {
   if (okxRow) okxRow.style.display = exch === 'okx' ? 'block' : 'none';
 };
 
+let isExchangeConnected = false;
+
+async function checkExchangeApiStatus() {
+  try {
+    const r = await api("/api/exchange/status");
+    isExchangeConnected = !!(r && r.connected);
+  } catch (e) {
+    isExchangeConnected = false;
+  }
+
+  // Oto-bot ve Manuel sayfalardaki kilit uyarılarını ve buton durumlarını güncelle
+  const autoWarn = document.getElementById("auto-api-warning");
+  const manualWarn = document.getElementById("manual-api-warning");
+  const tEnabled = document.getElementById("t-enabled");
+  const btnLong = document.getElementById("btn-manual-long");
+  const btnShort = document.getElementById("btn-manual-short");
+
+  if (autoWarn) autoWarn.style.display = isExchangeConnected ? "none" : "block";
+  if (manualWarn) manualWarn.style.display = isExchangeConnected ? "none" : "block";
+
+  if (!isExchangeConnected) {
+    if (btnLong) {
+      btnLong.style.opacity = "0.45";
+      btnLong.style.cursor = "not-allowed";
+      btnLong.title = "Önce borsa API bağlamalısınız";
+    }
+    if (btnShort) {
+      btnShort.style.opacity = "0.45";
+      btnShort.style.cursor = "not-allowed";
+      btnShort.title = "Önce borsa API bağlamalısınız";
+    }
+  } else {
+    if (btnLong) {
+      btnLong.style.opacity = "1";
+      btnLong.style.cursor = "pointer";
+      btnLong.title = "";
+    }
+    if (btnShort) {
+      btnShort.style.opacity = "1";
+      btnShort.style.cursor = "pointer";
+      btnShort.title = "";
+    }
+  }
+}
+
 async function loadExchangeTab() {
   try {
     const r = await api("/api/exchange/status");
+    isExchangeConnected = !!(r && r.connected);
     if (r.connected && $('#f-api-key') && r.masked_key) {
       $('#f-api-key').placeholder = `Kayıtlı: ${r.masked_key}`;
     }
+    checkExchangeApiStatus();
   } catch (e) {}
 }
 
@@ -1076,6 +1123,7 @@ async function main() {
   renderAutoForm();
   await loadWallet();
   await checkPasswordStatus();
+  await checkExchangeApiStatus();
 }
 
 // ========================================================
@@ -1233,14 +1281,42 @@ let currentTvInterval = "60";
 function setTradingViewSymbol(rawSymbol, interval = null) {
   if (!rawSymbol) return;
   rawSymbol = rawSymbol.trim().toUpperCase();
-  // Temizle ve formatla: BINANCE:BTCUSDT veya genel arama
+
+  // Akıllı Varlık Eşleştirme (Emtia, Forex, Endeks, Hisse ve Kripto)
   let formatted = rawSymbol;
-  if (!formatted.includes(":")) {
-    if (!formatted.endsWith("USDT") && !formatted.endsWith("USD") && !formatted.endsWith("TRY") && !formatted.endsWith("BTC")) {
-      formatted += "USDT";
+  const COMMODITIES = {
+    "GOLD": "TVC:GOLD", "ALTIN": "TVC:GOLD", "XAUUSD": "OANDA:XAUUSD", "XAU": "OANDA:XAUUSD",
+    "SILVER": "TVC:SILVER", "GUMUS": "TVC:SILVER", "XAGUSD": "OANDA:XAGUSD",
+    "BRENT": "TVC:UKOIL", "PETROL": "TVC:USOIL", "OIL": "TVC:USOIL", "CRUDE": "TVC:USOIL",
+    "NATGAS": "TVC:NATGAS", "COPPER": "CAPITALCOM:COPPER"
+  };
+  const FOREX = {
+    "EURUSD": "FX:EURUSD", "GBPUSD": "FX:GBPUSD", "USDJPY": "FX:USDJPY",
+    "USDTRY": "FX:USDTRY", "EURTRY": "FX:EURTRY", "DXY": "INDEX:DXY"
+  };
+  const INDICES = {
+    "SPX": "SP:SPX", "SP500": "SP:SPX", "NASDAQ": "NASDAQ:NDX", "NDX": "NASDAQ:NDX",
+    "BIST": "BIST:XU100", "BIST100": "BIST:XU100", "XU100": "BIST:XU100"
+  };
+
+  if (COMMODITIES[rawSymbol]) {
+    formatted = COMMODITIES[rawSymbol];
+  } else if (FOREX[rawSymbol]) {
+    formatted = FOREX[rawSymbol];
+  } else if (INDICES[rawSymbol]) {
+    formatted = INDICES[rawSymbol];
+  } else if (!formatted.includes(":")) {
+    // Kripto veya standart hisse senedi formatı
+    if (formatted.endsWith("USDT") || formatted.endsWith("BUSD") || formatted.endsWith("PERP")) {
+      formatted = "BINANCE:" + formatted;
+    } else if (["AAPL", "TSLA", "NVDA", "AMZN", "MSFT", "GOOGL", "META"].includes(formatted)) {
+      formatted = "NASDAQ:" + formatted;
+    } else {
+      // Varsayılan olarak Binance kripto çiftine veya doğrudan sembole bağla
+      formatted = "BINANCE:" + formatted + "USDT";
     }
-    formatted = "BINANCE:" + formatted;
   }
+
   currentTvSymbol = formatted;
   if (interval) currentTvInterval = interval;
 

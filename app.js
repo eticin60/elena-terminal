@@ -477,7 +477,7 @@ window.runMarketInspection = async function() {
 
     if (isCrypto) {
       const cleanSym = sym.endsWith("USDT") ? sym : (sym + "USDT");
-      const interval = tf === "1d" ? "1d" : tf === "4s" ? "4h" : tf === "1s" ? "1h" : tf === "15d" ? "15m" : tf === "1m" ? "1m" : "5m";
+      const interval = { "1m": "1m", "5m": "5m", "15m": "15m", "1h": "1h", "4h": "4h", "1d": "1d" }[tf] || "5m";
       try {
         const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cleanSym}&interval=${interval}&limit=42`);
         const raw = await res.json();
@@ -1268,7 +1268,17 @@ async function startConnectFlow() {
     const isTron  = account.startsWith("tron") || address.startsWith("T");
     const chain   = isTron ? "tron" : (parts.length > 2 ? `${parts[0]}:${parts[1]}` : "eip155:1");
 
-    await api("/api/wallet/connect", { address, chain });
+    try {
+      await api("/api/wallet/connect", { address, chain });
+    } catch (apiErr) {
+      console.warn("API save warning, persisting locally:", apiErr);
+    }
+    localStorage.setItem("elena_wallet_local", JSON.stringify({
+      connected: true,
+      address,
+      chain,
+      connected_at: Math.floor(Date.now() / 1000)
+    }));
     toast("Cüzdan başarıyla bağlandı ✅", "success");
     await loadWallet();
 
@@ -1309,7 +1319,17 @@ document.getElementById("btn-save-manual-wallet")?.addEventListener("click", asy
   }
   try {
     const finalChain = isTron ? "tron" : chain;
-    await api("/api/wallet/connect", { address: addr, chain: finalChain });
+    try {
+      await api("/api/wallet/connect", { address: addr, chain: finalChain });
+    } catch (apiErr) {
+      console.warn("API save warning, persisting locally:", apiErr);
+    }
+    localStorage.setItem("elena_wallet_local", JSON.stringify({
+      connected: true,
+      address: addr,
+      chain: finalChain,
+      connected_at: Math.floor(Date.now() / 1000)
+    }));
     if (manualModal) manualModal.style.display = "none";
     toast("Cüzdan başarıyla bağlandı ✅", "success");
     await loadWallet();
@@ -1348,7 +1368,16 @@ function _appendToken(list, t) {
 }
 
 async function loadWallet() {
-  const r = await api("/api/wallet/status");
+  let r = null;
+  try {
+    r = await api("/api/wallet/status");
+  } catch (e) {
+    const local = localStorage.getItem("elena_wallet_local");
+    if (local) {
+      try { r = JSON.parse(local); } catch (_) {}
+    }
+  }
+  if (!r) r = { connected: false };
   if (r.connected) {
     WALLET = r;
     document.getElementById("landing-view").style.display = "none";
@@ -1492,7 +1521,10 @@ async function loadBalance() {
 
 document.getElementById("btn-refresh-bal")?.addEventListener("click", loadBalance);
 document.getElementById("btn-disconnect-wallet")?.addEventListener("click", async () => {
-  await api("/api/wallet/disconnect");
+  try {
+    await api("/api/wallet/disconnect");
+  } catch (_) {}
+  localStorage.removeItem("elena_wallet_local");
   WALLET = null;
   toast("Cüzdan bağlantısı kesildi", "info");
   await loadWallet();
@@ -2632,3 +2664,47 @@ document.getElementById("btn-delete-all-data")?.addEventListener("click", async 
 });
 
 main();
+
+// ========================================================
+// SİNYAL DEFTERİ: OTOMATİK CANLI FİYAT YENİLEME (her 15 saniyede)
+// ========================================================
+let _inspectAutoTimer = null;
+
+function startInspectAutoRefresh() {
+  if (_inspectAutoTimer) clearInterval(_inspectAutoTimer);
+  _inspectAutoTimer = setInterval(async () => {
+    // Sadece Sinyal Defteri sekmesi aktifken güncelle
+    const proSection = document.getElementById("sinyal-defteri-pro-card");
+    if (!proSection) return;
+    // Kartın display:none olmadığını kontrol et (tab gizliyse skip)
+    const style = window.getComputedStyle(proSection);
+    if (style.display === "none") return;
+
+    // Sadece anlık fiyat güncelle (tam runMarketInspection çok ağır — 15sn'de bir hızlı tick)
+    const sym = (currentInspectSymbol || "BTCUSDT").trim().toUpperCase();
+    const tf = currentInspectTf || "5m";
+    const isCrypto = !["THYAO", "ASELS", "NVDA", "GOLD"].includes(sym.replace("USDT",""));
+    if (!isCrypto) return;
+    try {
+      const cleanSym = sym.endsWith("USDT") ? sym : sym + "USDT";
+      const interval = { "1m": "1m", "5m": "5m", "15m": "15m", "1h": "1h", "4h": "4h", "1d": "1d" }[tf] || "5m";
+      const res = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${cleanSym}`);
+      const d = await res.json();
+      if (!d || d.code) return;
+      const price = parseFloat(d.lastPrice);
+      const pct = parseFloat(d.priceChangePercent);
+      const bigPriceEl = document.getElementById("inspect-big-price");
+      const changeBadgeEl = document.getElementById("inspect-change-badge");
+      const timeValEl = document.getElementById("inspect-time-val");
+      if (bigPriceEl) bigPriceEl.textContent = `$${price >= 10 ? price.toLocaleString("en-US", {minimumFractionDigits: 1, maximumFractionDigits: 2}) : price.toFixed(4)}`;
+      if (changeBadgeEl) {
+        changeBadgeEl.textContent = `${pct >= 0 ? "▲" : "▼"} ${Math.abs(pct).toFixed(2)}% (24s)`;
+        changeBadgeEl.style.color = pct >= 0 ? "#00ffa3" : "#f87171";
+        changeBadgeEl.style.background = pct >= 0 ? "rgba(0,255,163,0.15)" : "rgba(239,68,68,0.18)";
+      }
+      if (timeValEl) timeValEl.textContent = new Date().toTimeString().split(" ")[0];
+    } catch (_) {}
+  }, 15000);
+}
+
+startInspectAutoRefresh();

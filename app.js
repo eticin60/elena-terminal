@@ -1371,14 +1371,65 @@ document.querySelectorAll(".sig-filter-btn").forEach(btn => {
 document.getElementById("btn-signals-refresh")?.addEventListener("click", loadSignalsTab);
 
 async function loadDashboard() {
+  const dashBox = document.getElementById("dash-signals");
+  const winRateEl = document.getElementById("board-winrate");
+  const totalREl = document.getElementById("board-total-r");
+
   try {
     const r = await api('/api/user/stats');
     if ($('#d-total')) $('#d-total').textContent = r.total_signals ?? 0;
     if ($('#d-open')) $('#d-open').textContent = r.open_signals ?? 0;
     if ($('#d-win')) $('#d-win').textContent = r.wins ?? 0;
     if ($('#d-lose')) $('#d-lose').textContent = r.losses ?? 0;
-  } catch (e) {}
+
+    // Canlı Skorbord (Leaderboard) Güncellemesi
+    if (winRateEl && r.win_rate != null) winRateEl.textContent = `${r.win_rate}%`;
+    if (totalREl && r.total_r != null) totalREl.textContent = `${r.total_r >= 0 ? '+' : ''}${r.total_r}R`;
+
+    // Canlı Son İşlemler (Recent Trades) Render Et
+    if (dashBox) {
+      dashBox.innerHTML = "";
+      const rec = r.recent || [];
+      if (!rec.length) {
+        dashBox.innerHTML = `<div class="empty">Henüz kaydedilmiş işlem geçmişi yok</div>`;
+        return;
+      }
+
+      rec.forEach(s => {
+        const row = document.createElement("div");
+        row.style.cssText = "display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:12.5px;cursor:pointer";
+        const clean = s.symbol.replace("USDT", "");
+        const logo = window.getAssetLogoUrl(clean);
+        const isLong = s.side === "LONG" || s.side === "BUY";
+        const isWin = s.r_result > 0;
+        const isClosed = s.status === "closed";
+        const statusBadge = isClosed 
+          ? (isWin ? `<span style="color:var(--accent-green);font-weight:700">+${s.r_result}R ✅</span>` : `<span style="color:var(--accent-red);font-weight:700">${s.r_result}R 🛑</span>`)
+          : `<span style="color:var(--accent-gold);font-weight:700">AÇIK ⏳</span>`;
+
+        row.innerHTML = `
+          <div style="display:flex;align-items:center;gap:10px">
+            <img src="${logo}" width="24" height="24" style="border-radius:50%;object-fit:cover" onerror="this.src='assets/brand/logo.png'">
+            <div>
+              <div style="font-weight:700;color:#fff">${clean} <small style="color:${isLong ? 'var(--accent-green)' : 'var(--accent-red)'}">${s.side}</small></div>
+              <small style="color:var(--text-muted);font-size:11px">⏱ ${s.tf} · Giriş: ${s.entry || '—'}</small>
+            </div>
+          </div>
+          <div>${statusBadge}</div>
+        `;
+        row.onclick = () => setTradingViewSymbol(s.symbol);
+        dashBox.appendChild(row);
+      });
+    }
+  } catch (e) {
+    if (dashBox) dashBox.innerHTML = `<div class="empty">Veriler senkronize ediliyor…</div>`;
+  }
 }
+
+document.getElementById("btn-dash-refresh")?.addEventListener("click", () => {
+  loadDashboard();
+  toast("Pano verileri yenilendi 🔄", "info");
+});
 
 // ========================================================
 // ANA BAŞLATICI (MAIN)

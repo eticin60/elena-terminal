@@ -1124,6 +1124,19 @@ async function main() {
   await loadWallet();
   await checkPasswordStatus();
   await checkExchangeApiStatus();
+
+  // İlk açılışta Fear & Greed verisini çek ve widget'ı hazırla
+  fetch("https://api.alternative.me/fng/?limit=1")
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.data && data.data[0]) {
+        updateFearGreedUI({
+          value: data.data[0].value,
+          classification: data.data[0].value_classification
+        });
+      }
+    })
+    .catch(() => {});
 }
 
 // ========================================================
@@ -1436,6 +1449,63 @@ document.getElementById("btn-paper-sell")?.addEventListener("click", () => {
   if (hist) hist.innerHTML = `<div>Son işlem: ETH/USDT Short | Kâr: +${pnlChange.toFixed(2)}$</div>`;
 });
 
+// ========================================================
+// FEAR & GREED WIDGET GÜNCELLEMESİ
+// ========================================================
+function updateFearGreedUI(fng) {
+  if (!fng || !fng.value) return;
+  const val = parseInt(fng.value) || 50;
+  const valEl = document.getElementById("fg-index-val");
+  const lblEl = document.getElementById("fg-index-label");
+  const barEl = document.getElementById("fg-bar");
+  const circleEl = document.getElementById("fg-circle-bar");
+
+  if (valEl) valEl.textContent = val;
+
+  let labelTr = "Nötr";
+  let color = "var(--accent-gold)";
+  if (val <= 25) {
+    labelTr = "Aşırı Korku 🥶";
+    color = "var(--accent-red)";
+  } else if (val <= 45) {
+    labelTr = "Korku 😨";
+    color = "#f87171";
+  } else if (val <= 55) {
+    labelTr = "Nötr 😐";
+    color = "var(--accent-gold)";
+  } else if (val <= 75) {
+    labelTr = "Açgözlülük 🤑";
+    color = "#4ade80";
+  } else {
+    labelTr = "Aşırı Açgözlülük 🚀";
+    color = "var(--accent-green)";
+  }
+
+  // Çoklu dil çevirisi
+  const lang = currentLang || "tr";
+  if (lang === "ru") {
+    if (val <= 25) labelTr = "Чрезвычайный страх 🥶";
+    else if (val <= 45) labelTr = "Страх 😨";
+    else if (val <= 55) labelTr = "Нейтрально 😐";
+    else if (val <= 75) labelTr = "Жадность 🤑";
+    else labelTr = "Экстремальная жадность 🚀";
+  } else if (lang === "en") {
+    labelTr = fng.classification || (val > 55 ? "Greed" : (val < 45 ? "Fear" : "Neutral"));
+  }
+
+  if (lblEl) {
+    lblEl.textContent = labelTr;
+    lblEl.style.color = color;
+  }
+  if (barEl) {
+    barEl.style.width = Math.max(5, Math.min(100, val)) + "%";
+  }
+  if (circleEl) {
+    circleEl.style.strokeDasharray = `${val}, 100`;
+    circleEl.style.stroke = color;
+  }
+}
+
 async function loadMarketsTab() {
   renderTradingViewChart(document.getElementById("tv-symbol-select")?.value || "BINANCE:BTCUSDT");
   updatePaperUI();
@@ -1447,8 +1517,25 @@ async function loadMarketsTab() {
   if (lossBox) lossBox.innerHTML = `<div style="color:var(--text-muted);font-size:12px">Yükleniyor…</div>`;
 
   try {
+    // Doğrudan veya tünel API'si üzerinden FNG verisini al
+    fetch("https://api.alternative.me/fng/?limit=1")
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.data && data.data[0]) {
+          updateFearGreedUI({
+            value: data.data[0].value,
+            classification: data.data[0].value_classification
+          });
+        }
+      })
+      .catch(() => {});
+
     const r = await api("/api/markets/live");
     if (!r.ok) return;
+
+    if (r.fng) {
+      updateFearGreedUI(r.fng);
+    }
 
     if (volBox) {
       volBox.innerHTML = "";

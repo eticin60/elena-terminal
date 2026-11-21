@@ -1010,11 +1010,19 @@ async function loadDashboard() {
 // ANA BAŞLATICI (MAIN)
 // ========================================================
 async function main() {
+  // Telegram WebApp initData varsa doğrula; yoksa da (Main App / doğrudan açılış) terminali aç
   try {
     ME = await api("/api/verify");
   } catch (e) {
-    document.body.innerHTML = '<div style="padding:40px;text-align:center;color:#fff">Lütfen bot menüsünden açın.</div>';
-    return;
+    const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    ME = {
+      ok: true,
+      user_id: tgUser?.id || 0,
+      username: tgUser?.username || "Guest",
+      first_name: tgUser?.first_name || "Trader",
+      lang: tgUser?.language_code?.slice(0, 2) || localStorage.getItem("elena_lang") || "tr",
+      is_admin: false
+    };
   }
 
   // Dil ayarla: Botta seçilen dil önceliklidir (ME.lang), yoksa cihaz/tarayıcı dili veya kayıtlı tercih

@@ -683,18 +683,59 @@
         <p style="font-size:11.5px;color:var(--text-muted);margin:0 0 10px;line-height:1.4">
           Dünya devlerini ve emtiaları canlı izleyin, TradingView'de tek tıkla analiz edin:
         </p>
-        <div id="global-stocks-chips" style="display:flex;flex-wrap:wrap;gap:6px">
-          <button class="coin-chip" onclick="openGlobalSymbol('NVDA')" style="padding:6px 10px;font-size:11px">🟢 NVDA (Nvidia)</button>
-          <button class="coin-chip" onclick="openGlobalSymbol('AAPL')" style="padding:6px 10px;font-size:11px">🍎 AAPL (Apple)</button>
-          <button class="coin-chip" onclick="openGlobalSymbol('TSLA')" style="padding:6px 10px;font-size:11px">⚡ TSLA (Tesla)</button>
-          <button class="coin-chip" onclick="openGlobalSymbol('MSFT')" style="padding:6px 10px;font-size:11px">💻 MSFT (Microsoft)</button>
-          <button class="coin-chip" onclick="openGlobalSymbol('AMZN')" style="padding:6px 10px;font-size:11px">📦 AMZN (Amazon)</button>
-          <button class="coin-chip" onclick="openGlobalSymbol('GOLD')" style="padding:6px 10px;font-size:11px;color:#f3ba2f;font-weight:700">🥇 ONS ALTIN</button>
-          <button class="coin-chip" onclick="openGlobalSymbol('SILVER')" style="padding:6px 10px;font-size:11px;color:#cbd5e1;font-weight:700">🥈 GÜMÜŞ</button>
-          <button class="coin-chip" onclick="openGlobalSymbol('BRENT')" style="padding:6px 10px;font-size:11px;color:#38bdf8">🛢️ BRENT PETROL</button>
-          <button class="coin-chip" onclick="openGlobalSymbol('SPX')" style="padding:6px 10px;font-size:11px;color:#38bdf8">📊 S&amp;P 500</button>
-          <button class="coin-chip" onclick="openGlobalSymbol('NDX')" style="padding:6px 10px;font-size:11px">📈 NASDAQ 100</button>
-          <button class="coin-chip" onclick="openGlobalSymbol('THYAO')" style="padding:6px 10px;font-size:11px;color:#ef4444">🇹🇷 THYAO (BIST)</button>
+        <div id="global-stocks-chips" style="display:flex;flex-wrap:wrap;gap:7px">
+          <!-- BIST 100 Lokomotifleri -->
+          <button class="coin-chip" onclick="openGlobalSymbol('THYAO')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/THYAO.IS.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>THYAO</b> <small style="color:var(--text-muted);font-size:10px">BIST</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('ASELS')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/ASELS.IS.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>ASELS</b> <small style="color:var(--text-muted);font-size:10px">BIST</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('GARAN')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/GARAN.IS.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>GARAN</b> <small style="color:var(--text-muted);font-size:10px">BIST</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('EREGL')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/EREGL.IS.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>EREGL</b> <small style="color:var(--text-muted);font-size:10px">BIST</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('TUPRS')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/TUPRS.IS.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>TUPRS</b> <small style="color:var(--text-muted);font-size:10px">BIST</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('KCHOL')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/KCHOL.IS.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>KCHOL</b> <small style="color:var(--text-muted);font-size:10px">BIST</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('BIMAS')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/BIMAS.IS.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>BIMAS</b> <small style="color:var(--text-muted);font-size:10px">BIST</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('AKBNK')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/AKBNK.IS.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>AKBNK</b> <small style="color:var(--text-muted);font-size:10px">BIST</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('SISE')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/SISE.IS.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>SISE</b> <small style="color:var(--text-muted);font-size:10px">BIST</small>
+          </button>
+
+          <!-- 🇺🇸 Global Devler -->
+          <button class="coin-chip" onclick="openGlobalSymbol('NVDA')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/NVDA.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>NVDA</b> <small style="color:var(--text-muted);font-size:10px">US</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('AAPL')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/AAPL.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>AAPL</b> <small style="color:var(--text-muted);font-size:10px">US</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('TSLA')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/TSLA.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>TSLA</b> <small style="color:var(--text-muted);font-size:10px">US</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('MSFT')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/MSFT.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>MSFT</b> <small style="color:var(--text-muted);font-size:10px">US</small>
+          </button>
+          <button class="coin-chip" onclick="openGlobalSymbol('AMZN')" style="padding:6px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:6px">
+            <img src="https://financialmodelingprep.com/image-stock/AMZN.png" width="16" height="16" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none'"> <b>AMZN</b> <small style="color:var(--text-muted);font-size:10px">US</small>
+          </button>
+
+          <!-- 🥇 Emtialar & Endeksler -->
+          <button class="coin-chip" onclick="openGlobalSymbol('GOLD')" style="padding:6px 10px;font-size:11.5px;color:#f3ba2f;font-weight:700">🥇 ONS ALTIN</button>
+          <button class="coin-chip" onclick="openGlobalSymbol('SILVER')" style="padding:6px 10px;font-size:11.5px;color:#cbd5e1;font-weight:700">🥈 GÜMÜŞ</button>
+          <button class="coin-chip" onclick="openGlobalSymbol('BRENT')" style="padding:6px 10px;font-size:11.5px;color:#38bdf8">🛢️ BRENT PETROL</button>
+          <button class="coin-chip" onclick="openGlobalSymbol('SPX')" style="padding:6px 10px;font-size:11.5px;color:#38bdf8">📊 S&amp;P 500</button>
+          <button class="coin-chip" onclick="openGlobalSymbol('NDX')" style="padding:6px 10px;font-size:11.5px;color:#38bdf8">📈 NASDAQ</button>
         </div>
       </div>
 

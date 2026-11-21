@@ -1067,3 +1067,48 @@ tbody tr:hover td { background: rgba(255,255,255,0.025); }
 
 /* ── SELECTION ───────────────────────────────── */
 ::selection { background: rgba(255,210,90,0.25); }
+
+
+/* ── LIQUID GLASS SELECT & CUSTOM PICKERS ──────────────── */
+select, .pwd-input select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: rgba(16, 24, 48, 0.95);
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2338bdf8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-md);
+  padding: 12px 38px 12px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+select:focus, .pwd-input select:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+}
+select option {
+  background: #090e1a;
+  color: #fff;
+  padding: 14px;
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+/* ── LOCKED SECTION OVERLAY (OTO-BOT & MANUEL) ────────── */
+.locked-section {
+  position: relative;
+  pointer-events: none !important;
+  user-select: none !important;
+  opacity: 0.38 !important;
+  filter: grayscale(60%) blur(0.6px) !important;
+  transition: all 0.3s ease;
+}

@@ -1,5 +1,48 @@
 
 // ========================================================
+// EVRENSEL LOGO GETİRİCİ (KRİPTO + BIST 100 + DÜNYA HİSSELERE)
+// ========================================================
+window.getAssetLogoUrl = function(sym) {
+  if (!sym) return "assets/brand/logo.png";
+  sym = sym.trim().toUpperCase().replace("USDT", "").replace(".IS", "");
+  
+  // 🇹🇷 BIST 100 Hisseleri
+  const BIST_MAP = {
+    "THYAO": "https://financialmodelingprep.com/image-stock/THYAO.IS.png",
+    "ASELS": "https://financialmodelingprep.com/image-stock/ASELS.IS.png",
+    "GARAN": "https://financialmodelingprep.com/image-stock/GARAN.IS.png",
+    "EREGL": "https://financialmodelingprep.com/image-stock/EREGL.IS.png",
+    "TUPRS": "https://financialmodelingprep.com/image-stock/TUPRS.IS.png",
+    "KCHOL": "https://financialmodelingprep.com/image-stock/KCHOL.IS.png",
+    "BIMAS": "https://financialmodelingprep.com/image-stock/BIMAS.IS.png",
+    "AKBNK": "https://financialmodelingprep.com/image-stock/AKBNK.IS.png",
+    "SISE":  "https://financialmodelingprep.com/image-stock/SISE.IS.png",
+    "SAHOL": "https://financialmodelingprep.com/image-stock/SAHOL.IS.png"
+  };
+  if (BIST_MAP[sym]) return BIST_MAP[sym];
+
+  // 🇺🇸 Global Devler
+  const GLOBAL_MAP = {
+    "NVDA": "https://financialmodelingprep.com/image-stock/NVDA.png",
+    "AAPL": "https://financialmodelingprep.com/image-stock/AAPL.png",
+    "TSLA": "https://financialmodelingprep.com/image-stock/TSLA.png",
+    "MSFT": "https://financialmodelingprep.com/image-stock/MSFT.png",
+    "AMZN": "https://financialmodelingprep.com/image-stock/AMZN.png",
+    "GOOGL":"https://financialmodelingprep.com/image-stock/GOOGL.png",
+    "META": "https://financialmodelingprep.com/image-stock/META.png"
+  };
+  if (GLOBAL_MAP[sym]) return GLOBAL_MAP[sym];
+
+  // 🥇 Emtialar
+  if (sym === "GOLD" || sym === "XAU") return "https://assets.coincap.io/assets/icons/paxg@2x.png";
+  if (sym === "BRENT" || sym === "OIL") return "https://assets.coincap.io/assets/icons/wbtc@2x.png";
+
+  // 🪙 Kripto Paralar (CoinCap CDN / CryptoIcons CDN)
+  return `https://assets.coincap.io/assets/icons/${sym.toLowerCase()}@2x.png`;
+};
+
+
+// ========================================================
 // SİNYAL DEFTERİ: CANLI PİYASA OKUYUCU & FORMASYON MOTORU
 // ========================================================
 window.runMarketInspection = async function() {
@@ -327,6 +370,18 @@ function applyLanguage(lang) {
   const dict = I18N[lang];
 
   document.getElementById("current-lang-label").textContent = lang.toUpperCase();
+
+  // Genişletilmiş dinamik başlık ve kilit çevirileri
+  const isTr = lang === "tr";
+  const isRu = lang === "ru" || lang === "uk";
+  
+  if ($("#i18n-auto-lock-title")) $("#i18n-auto-lock-title").textContent = isTr ? "Borsa API Bağlantısı Gerekli" : (isRu ? "Требуется подключение биржевого API" : "Exchange API Connection Required");
+  if ($("#i18n-auto-lock-desc")) $("#i18n-auto-lock-desc").textContent = isTr ? "Otomatik botun sizin adınıza emir açıp kapatabilmesi için önce Borsa sekmesinden API Key ve Secret tanımlamalısınız." : (isRu ? "Для автоматической торговли подключите API Key в разделе Биржа." : "To enable auto-trading, connect your exchange API Key in Exchange tab.");
+  if ($("#i18n-manual-lock-title")) $("#i18n-manual-lock-title").textContent = isTr ? "Borsa API Bağlantısı Gerekli" : (isRu ? "Требуется подключение биржевого API" : "Exchange API Connection Required");
+  if ($("#i18n-manual-lock-desc")) $("#i18n-manual-lock-desc").textContent = isTr ? "Manuel işlem açabilmek için Borsa sekmesinden borsa API Key bağlamalısınız." : (isRu ? "Для открытия сделок подключите API Key в разделе Биржа." : "Connect exchange API Key to place manual trades.");
+  if ($("#guide-main-title")) $("#guide-main-title").textContent = isTr ? "Elena Terminal · Kullanım Kılavuzu" : (isRu ? "Терминал Елена · Руководство" : "Elena Terminal · User Guide");
+  if ($("#i18n-top-sub")) $("#i18n-top-sub").textContent = isRu ? "Крипто Сигналы" : "Crypto Signals";
+
   if ($("#i18n-landing-sub"))   $("#i18n-landing-sub").textContent   = dict.landing_sub;
   if ($("#i18n-btn-connect"))   $("#i18n-btn-connect").textContent   = dict.btn_connect;
   if ($("#i18n-btn-manual-addr")) $("#i18n-btn-manual-addr").textContent = dict.btn_manual_addr;
@@ -460,15 +515,13 @@ const COIN_LOGOS = {
 function coinLogo(sym, size) {
   size = size || 24;
   var base = sym.replace(/USDT$|BUSD$|PERP$/,"").toUpperCase();
-  var src  = COIN_LOGOS[base];
-  if (src) {
-    var img = document.createElement("img");
-    img.src = src; img.width = size; img.height = size;
-    img.style.cssText = "border-radius:50%;object-fit:contain;vertical-align:middle;flex-shrink:0;background:rgba(255,255,255,0.06);padding:2px";
-    img.onerror = function(){ this.replaceWith(coinBadge(base, size)); };
-    return img;
-  }
-  return coinBadge(base, size);
+  var src  = COIN_LOGOS[base] || (window.getAssetLogoUrl ? window.getAssetLogoUrl(base) : null);
+  var img = document.createElement("img");
+  img.src = src || `https://assets.coincap.io/assets/icons/${base.toLowerCase()}@2x.png`;
+  img.width = size; img.height = size;
+  img.style.cssText = "border-radius:50%;object-fit:contain;vertical-align:middle;flex-shrink:0;background:rgba(255,255,255,0.06);padding:1px";
+  img.onerror = function(){ this.replaceWith(coinBadge(base, size)); };
+  return img;
 }
 
 function coinBadge(sym, size) {
@@ -1029,18 +1082,38 @@ async function checkExchangeApiStatus() {
   if (autoWarn) autoWarn.style.display = isExchangeConnected ? "none" : "block";
   if (manualWarn) manualWarn.style.display = isExchangeConnected ? "none" : "block";
 
+  // Tüm form alanlarını ve butonları kilitli yap
+  const autoPage = document.getElementById("page-auto");
+  const manualPage = document.getElementById("page-manual");
+
   if (!isExchangeConnected) {
+    document.querySelectorAll("#page-auto .card:not(#auto-api-warning), #page-manual .card:not(#manual-api-warning)").forEach(c => {
+      c.classList.add("locked-section");
+    });
     if (btnLong) {
-      btnLong.style.opacity = "0.45";
+      btnLong.style.opacity = "0.35";
       btnLong.style.cursor = "not-allowed";
-      btnLong.title = "Önce borsa API bağlamalısınız";
+      btnLong.disabled = true;
     }
     if (btnShort) {
-      btnShort.style.opacity = "0.45";
+      btnShort.style.opacity = "0.35";
       btnShort.style.cursor = "not-allowed";
-      btnShort.title = "Önce borsa API bağlamalısınız";
+      btnShort.disabled = true;
     }
   } else {
+    document.querySelectorAll("#page-auto .card, #page-manual .card").forEach(c => {
+      c.classList.remove("locked-section");
+    });
+    if (btnLong) {
+      btnLong.style.opacity = "1";
+      btnLong.style.cursor = "pointer";
+      btnLong.disabled = false;
+    }
+    if (btnShort) {
+      btnShort.style.opacity = "1";
+      btnShort.style.cursor = "pointer";
+      btnShort.disabled = false;
+    }
     if (btnLong) {
       btnLong.style.opacity = "1";
       btnLong.style.cursor = "pointer";
@@ -1358,7 +1431,9 @@ function renderCoinsGrid(pool, userCoins, search = "") {
     const chip = document.createElement("button");
     chip.className = `coin-chip ${isSelected ? 'sel' : ''}`;
     chip.style.cssText = `padding:8px 12px;font-size:12px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;${isSelected ? 'background:rgba(0,255,163,0.18);border-color:var(--accent-green);color:var(--accent-green)' : 'background:rgba(255,255,255,0.06)'}`;
-    chip.innerHTML = `${isSelected ? '✅' : '➕'} <strong>${s.replace('USDT', '')}</strong>`;
+    const clean = s.replace('USDT', '');
+    const logoUrl = window.getAssetLogoUrl(clean);
+    chip.innerHTML = `<img src="${logoUrl}" width="16" height="16" style="border-radius:50%;object-fit:cover;vertical-align:middle" onerror="this.src='assets/brand/logo.png'"> <strong>${clean}</strong> ${isSelected ? '✅' : ''}`;
     chip.onclick = async () => {
       const res = await api("/api/user/toggle_coin", { symbol: s });
       if (res.ok) {
@@ -1491,6 +1566,16 @@ function setTradingViewSymbol(rawSymbol, interval = null) {
     "SPX": "SP:SPX", "SP500": "SP:SPX", "NASDAQ": "NASDAQ:NDX", "NDX": "NASDAQ:NDX",
     "BIST": "BIST:XU100", "BIST100": "BIST:XU100", "XU100": "BIST:XU100"
   };
+  // 🇹🇷 BIST 100 Akıllı Yönlendirme (THYAO -> BIST:THYAO)
+  const BIST_STOCKS = [
+    "THYAO", "ASELS", "GARAN", "EREGL", "TUPRS", "KCHOL", "BIMAS", "AKBNK", "SISE", "SAHOL",
+    "YKBNK", "ISCTR", "KRDMD", "FROTO", "TOASO", "PETKM", "PGSUS", "HEKTS", "SASA", "ENKAI",
+    "TCELL", "KOZAL", "GUBRF", "ARCLK", "ASTOR", "KONTR", "ALARK", "OYAKC"
+  ];
+  const cleanSym = rawSymbol.replace(".IS", "");
+  if (BIST_STOCKS.includes(cleanSym)) {
+    formatted = "BIST:" + cleanSym;
+  }
 
   if (COMMODITIES[rawSymbol]) {
     formatted = COMMODITIES[rawSymbol];

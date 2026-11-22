@@ -1976,10 +1976,12 @@ async function main() {
   applyLanguage(activeLang);
   checkLegalAgreement(activeLang);
 
-  // Yönetici ise Landing ve Menü butonlarını göster
+  // Yönetici ise Landing, Menü ve Ayarlar butonlarını göster
   if (ME.is_admin) {
     const landAdmin = document.getElementById("landing-admin-btn");
     if (landAdmin) landAdmin.style.display = "inline-flex";
+    const setAdmin = document.getElementById("settings-admin-card");
+    if (setAdmin) setAdmin.style.display = "block";
   }
 
   try {

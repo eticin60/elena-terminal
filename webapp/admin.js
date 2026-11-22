@@ -538,7 +538,25 @@ async function load() {
   try {
     s = await api("/api/admin/stats");
   } catch (e) {
-    return deny("📡 Termux Canlı Veritabanı Tüneli Bekleniyor. Yönetim panelinin üye verilerini okuyabilmesi için Termux'ta bot ve cloudflared tünelinin açık olduğundan emin olun.");
+    // API'ye o an erişilemiyorsa bile paneli engelleme! Boş/varsayılan panel açılır ve üstte tünel bağlama kutusu görünür
+    console.warn("api admin stats error:", e);
+    s = {
+      total_users: "—",
+      active_users: "—",
+      wallets_connected: "—",
+      signals_24h: "—",
+      open_signals: "—",
+      alerts: "—",
+      by_lang: {}
+    };
+    const deniedBox = document.getElementById("denied");
+    if (deniedBox) {
+      deniedBox.style.display = "block";
+      const txt = document.getElementById("denied-text");
+      if (txt) txt.textContent = "📡 Canlı Termux tüneli bağlanamadı. Aşağıdan tünel adresinizi eşleyebilirsiniz:";
+      const tBox = document.getElementById("tunnel-connect-box");
+      if (tBox) tBox.style.display = "block";
+    }
   }
 
   document.getElementById("content").style.display = "block";

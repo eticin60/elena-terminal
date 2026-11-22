@@ -23,11 +23,11 @@ pkg install -y cloudflared 2>/dev/null || true
 echo "🐍 [3/5] Python kutuphaneleri kontrol ediliyor..."
 pip install --upgrade python-telegram-bot aiohttp httpx
 
-# 4. Elena Bot v44 Paketini Indir ve Cikar
+# 4. Elena Bot v45 Paketini Indir ve Cikar
 echo "📥 [4/5] Elena Bot dosyalari indiriliyor..."
 mkdir -p "$HOME/elena-bot"
 cd "$HOME"
-curl -fSL --connect-timeout 10 --max-time 60 "https://github.com/eticin60/elena-terminal/raw/main/elena-bot-v44.zip" -o elena-bot.zip
+curl -fSL --connect-timeout 10 --max-time 60 "https://github.com/eticin60/elena-terminal/raw/main/elena-bot-v45.zip" -o elena-bot.zip
 unzip -o -q elena-bot.zip -d elena-bot/
 rm -f elena-bot.zip
 

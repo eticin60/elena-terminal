@@ -563,9 +563,24 @@ async function load() {
 
 function deny(msg) {
   const el = document.getElementById("denied");
+  const txt = document.getElementById("denied-text") || el;
   if (el) {
-    if (msg) el.textContent = msg;
+    if (msg) txt.textContent = msg;
     el.style.display = "block";
+    const box = document.getElementById("tunnel-connect-box");
+    if (box) {
+      box.style.display = "block";
+      const inp = document.getElementById("manual-tunnel-input");
+      if (inp) inp.value = localStorage.getItem("elena_api_base") || "";
+      document.getElementById("btn-save-tunnel")?.addEventListener("click", () => {
+        let v = (inp.value || "").trim().replace(/\/+$/, "");
+        if (v && !v.startsWith("http")) v = "https://" + v;
+        if (v) {
+          localStorage.setItem("elena_api_base", v);
+          location.reload();
+        }
+      });
+    }
   }
   document.getElementById("content").style.display = "none";
 }

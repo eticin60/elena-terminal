@@ -707,85 +707,121 @@ async function loadUsers(page = 0) {
     }
     r.users.forEach(u => {
       const tr = document.createElement("tr");
-      tr.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
+      tr.style.borderBottom = "1px solid rgba(255,255,255,0.06)";
       const banBtn = u.banned
         ? `<button class="btn btn-ghost" style="padding:4px 8px;font-size:11px" onclick="unbanUser(${u.chat_id})">🔓 Kaldır</button>`
         : `<button class="btn btn-danger" style="padding:4px 8px;font-size:11px" onclick="openBanModal(${u.chat_id},'${u.name || ''}')">🚫 Ban</button>`;
 
       const coinsDisplay = (u.coins && u.coins.length) 
-        ? u.coins.map(c => `<span style="background:rgba(255,255,255,0.08);padding:2px 5px;border-radius:4px;font-size:10px;margin-right:2px">${c}</span>`).join("")
-        : '<span style="color:var(--text-muted);font-size:10px">Tümü</span>';
+        ? u.coins.slice(0, 10).map(c => `<span style="background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:4px;font-size:10px;margin-right:2px;display:inline-block;margin-bottom:2px">${c.replace('USDT','')}</span>`).join("") + (u.coins.length > 10 ? ` <small style="color:var(--accent-gold)">+${u.coins.length - 10}</small>` : '')
+        : '<span style="color:var(--text-muted);font-size:10px">Varsayılan Tümü</span>';
+
+      const tfsDisplay = (u.tfs && u.tfs.length)
+        ? u.tfs.map(tf => `<span style="background:rgba(56,189,248,0.15);color:#38bdf8;padding:1px 4px;border-radius:4px;font-size:9.5px;margin-right:2px">${tf}</span>`).join("")
+        : '<span style="color:var(--text-muted);font-size:10px">Tüm TF</span>';
 
       const apiBadge = u.has_api 
-        ? '<span style="color:var(--accent-green);font-size:10px;font-weight:700">🔑 API Var</span>' 
-        : '<span style="color:var(--text-muted);font-size:10px">API Yok</span>';
+        ? `<div style="color:var(--accent-green);font-size:10.5px;font-weight:700">🔑 ${u.api_exchange?.toUpperCase() || 'API'} (${u.api_mode || 'FUTURES'})</div>` 
+        : '<div style="color:var(--text-muted);font-size:10.5px">Borsa API: Yok</div>';
+
+      const walletDisplay = u.wallet_addr
+        ? `<div style="font-size:10.5px;color:#a5d6ff;font-family:monospace">💼 ${u.wallet_addr.slice(0,6)}...${u.wallet_addr.slice(-4)} <span class="badge" style="padding:1px 4px;font-size:9px">${u.wallet_chain || 'WEB3'}</span></div>`
+        : '<div style="color:var(--text-muted);font-size:10.5px">Cüzdan: Bağlı Değil</div>';
+
+      const pwdBadge = u.has_wallet_pwd
+        ? '<span style="color:var(--accent-gold);font-size:10px">🔐 Şifre: Var</span>'
+        : '<span style="color:var(--text-muted);font-size:10px">🔐 Şifre: Yok</span>';
 
       tr.innerHTML = `
         <td style="padding:10px">
           <strong>${u.chat_id}</strong>
-          <div style="font-size:10px;color:var(--text-muted)">${u.created_ago || ''} · ${apiBadge}</div>
+          <div style="font-size:10px;color:var(--text-muted)">${u.created_ago || 'Bugün'} · Dil: <b style="color:#fff">${(u.lang || 'tr').toUpperCase()}</b></div>
+          <div style="font-size:10px;margin-top:2px">${u.active ? '<span style="color:var(--accent-green)">● Aktif</span>' : '<span style="color:var(--text-muted)">○ Pasif</span>'}</div>
         </td>
         <td style="padding:10px">
           <div><strong>${u.name || '-'}</strong> ${u.username ? `<small style="color:var(--text-muted)">(@${u.username})</small>` : ''}</div>
           <div style="font-size:11px;color:#a5d6ff;margin-top:2px">
-            ⚙️ ${u.market?.toUpperCase()} · ${u.max_lev}x · ${u.strong_only ? '⭐ Güçlü' : '⚡ Tümü'} · ${u.tz}
+            ⚙️ ${u.market?.toUpperCase()} · ${u.max_lev}x · ${u.strong_only ? '⭐ Sadece Güçlü' : '⚡ Tümü'} · ${u.tz}
           </div>
-          <div style="margin-top:3px">${coinsDisplay} ${u.coins_count > 8 ? `<small style="color:var(--text-muted)">+${u.coins_count - 8}</small>` : ''}</div>
         </td>
-        <td style="padding:10px">${LANG_NAME[u.lang] || u.lang}</td>
-        <td style="padding:10px" class="${u.active ? 'green' : 'muted'}">${u.active ? 'Aktif' : 'Pasif'}</td>
-        <td style="padding:10px">${banBtn}</td>
+        <td style="padding:10px;max-width:220px">
+          <div style="margin-bottom:4px">${coinsDisplay}</div>
+          <div>${tfsDisplay}</div>
+        </td>
+        <td style="padding:10px">
+          ${walletDisplay}
+          ${apiBadge}
+          <div>${pwdBadge}</div>
+        </td>
+        <td style="padding:10px">
+          ${banBtn}
+        </td>
       `;
       tbody.appendChild(tr);
     });
-    document.getElementById("users-info").textContent = `${r.total} kullanıcı · Sayfa ${page + 1}/${Math.ceil(r.total / 20) || 1}`;
-    document.getElementById("btn-users-prev").disabled = page === 0;
-    document.getElementById("btn-users-next").disabled = (page + 1) * 20 >= r.total;
+
+    const info = document.getElementById("users-info");
+    if (info) {
+      info.textContent = `Toplam ${r.total} kullanıcı · Sayfa ${page + 1}`;
+    }
   } catch (e) {
     tbody.innerHTML = `<tr><td colspan="5" class="empty" style="color:var(--accent-red)">Hata: ${e.message}</td></tr>`;
   }
 }
 
-document.getElementById("btn-users-prev")?.addEventListener("click", () => {
-  if (userPage > 0) loadUsers(userPage - 1);
-});
-document.getElementById("btn-users-next")?.addEventListener("click", () => {
-  loadUsers(userPage + 1);
-});
-
-async function unbanUser(chatId) {
-  await api("/api/admin/ban", { target_chat_id: chatId, action: "unban" });
-  toast("Ban kaldırıldı", "success");
-  loadUsers(userPage);
-}
-
-// --- Sinyal Listesi
 async function loadSignals() {
   const tbody = document.getElementById("signals-tbody");
   if (!tbody) return;
-  tbody.innerHTML = '<tr><td colspan="5" class="empty">Yükleniyor…</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="11" class="empty">Yükleniyor…</td></tr>';
   try {
     const r = await api("/api/admin/signals");
     tbody.innerHTML = "";
     if (!r.signals || !r.signals.length) {
-      tbody.innerHTML = '<tr><td colspan="5" class="empty">Henüz sinyal bulunmuyor</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="11" class="empty">Henüz sinyal bulunmuyor</td></tr>';
       return;
     }
     r.signals.forEach(s => {
       const tr = document.createElement("tr");
       tr.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
-      const icon = s.side === "LONG" || s.side === "BUY" ? "🟢" : "🔴";
+      const isLong = s.side === "LONG" || s.side === "BUY";
+      const icon = isLong ? "🟢" : "🔴";
+      const isClosed = s.status === "closed";
+      const isWin = s.r_result > 0;
+      
+      let statusBadge = "";
+      if (!isClosed) {
+        statusBadge = '<span class="badge green">AÇIK ⏳</span>';
+      } else if (s.reason === "tp3" || s.tp_hit >= 3) {
+        statusBadge = '<span class="badge green">🎯 TP3</span>';
+      } else if (s.reason === "tp2" || s.tp_hit === 2) {
+        statusBadge = '<span class="badge green">🎯 TP2</span>';
+      } else if (s.reason === "tp1" || s.tp_hit === 1) {
+        statusBadge = '<span class="badge green">🎯 TP1</span>';
+      } else if (s.reason === "be" || s.reason === "breakeven") {
+        statusBadge = '<span class="badge gold">🛡️ Breakeven</span>';
+      } else {
+        statusBadge = '<span class="badge red">🛑 Stop</span>';
+      }
+
+      const tp23Str = (s.tp2 ? s.tp2 : '—') + ' / ' + (s.tp3 ? s.tp3 : '—');
+
       tr.innerHTML = `
-        <td style="padding:10px"><strong>${s.symbol}</strong></td>
-        <td style="padding:10px"><span class="badge">${s.tf}</span></td>
-        <td style="padding:10px">${icon} ${s.side}</td>
-        <td style="padding:10px">${s.entry?.toFixed(4) || '—'}</td>
-        <td style="padding:10px"><span class="badge ${s.status === 'open' ? 'green' : ''}">${s.status.toUpperCase()}</span></td>
+        <td style="padding:8px 10px;font-size:11px;color:var(--text-muted);white-space:nowrap">${s.date || '—'}</td>
+        <td style="padding:8px 10px"><strong>${s.symbol}</strong></td>
+        <td style="padding:8px 10px"><span class="badge">${s.tf}</span></td>
+        <td style="padding:8px 10px;font-weight:700;color:${isLong ? 'var(--accent-green)' : 'var(--accent-red)'}">${icon} ${s.side}</td>
+        <td style="padding:8px 10px;font-family:monospace">${s.entry?.toFixed(4) || '—'}</td>
+        <td style="padding:8px 10px;font-family:monospace;color:#ff7878">${s.sl?.toFixed(4) || '—'}</td>
+        <td style="padding:8px 10px;font-family:monospace;color:var(--accent-green)">${s.tp1?.toFixed(4) || '—'}</td>
+        <td style="padding:8px 10px;font-size:11px;font-family:monospace;color:#4ade80">${tp23Str}</td>
+        <td style="padding:8px 10px;font-family:monospace;color:#38bdf8">${s.exit_price ? s.exit_price.toFixed(4) : '—'}</td>
+        <td style="padding:8px 10px;font-weight:700;color:${s.r_result >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'}">${s.r_result >= 0 ? '+' : ''}${s.r_result.toFixed(2)}R</td>
+        <td style="padding:8px 10px">${statusBadge}</td>
       `;
       tbody.appendChild(tr);
     });
   } catch (e) {
-    tbody.innerHTML = `<tr><td colspan="5" class="empty" style="color:var(--accent-red)">Hata: ${e.message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="11" class="empty" style="color:var(--accent-red)">Hata: ${e.message}</td></tr>`;
   }
 }
 

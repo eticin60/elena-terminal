@@ -88,15 +88,15 @@ async function api(path, body = {}) {
   } catch (netErr) {
     // Ağ hatası veya tünel ölmüşse, tüneli ntfy'den çekip 1 kez tekrar dene
     if (location.hostname.includes("github.io")) {
-      localStorage.removeItem("elena_api_base");
       const freshBase = await fetchLiveTunnelFromSync();
       if (freshBase) {
+        localStorage.setItem("elena_api_base", freshBase);
         baseUrl = freshBase;
         fullUrl = freshBase.replace(/\/$/, "") + path;
         r = await fetch(fullUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ initData, ...body })
+          body: JSON.stringify({ initData, admin_secret: adminSecret, ...body })
         });
       } else {
         throw netErr;
@@ -109,15 +109,15 @@ async function api(path, body = {}) {
   // Cloudflare 520-530 veya 404/502 hatalarında otomatik taze tünel dene
   if (!r.ok) {
     if ((r.status === 404 || r.status >= 500) && location.hostname.includes("github.io")) {
-      localStorage.removeItem("elena_api_base");
       const freshBase = await fetchLiveTunnelFromSync();
       if (freshBase && freshBase !== baseUrl) {
+        localStorage.setItem("elena_api_base", freshBase);
         baseUrl = freshBase;
         fullUrl = freshBase.replace(/\/$/, "") + path;
         const r2 = await fetch(fullUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ initData, ...body })
+          body: JSON.stringify({ initData, admin_secret: adminSecret, ...body })
         });
         if (r2.ok) return r2.json();
       }
@@ -683,9 +683,19 @@ async function load() {
     if (verified && typeof verified === "object") {
       me = { ...me, ...verified };
       if (isOwner) me.is_admin = true;
+      // If verified and admin: hide denied, show content
+      if (me.is_admin) {
+        const deniedBox = document.getElementById("denied");
+        if (deniedBox) deniedBox.style.display = "none";
+        if (contentEl) contentEl.style.display = "block";
+      } else {
+        deny("⛔ Bu panele erişim yetkiniz yok.");
+        return;
+      }
     }
   } catch (e) {
     console.warn("api verify warning in admin:", e);
+    // On verify failure: show tunnel connect box but keep content visible for admin
     const deniedBox = document.getElementById("denied");
     if (deniedBox) {
       deniedBox.style.display = "block";
@@ -696,6 +706,7 @@ async function load() {
       const inp = document.getElementById("manual-tunnel-input");
       if (inp) inp.value = localStorage.getItem("elena_api_base") || "";
     }
+    // Don't return - try to load stats anyway in case tunnel connects
   }
 
   // Kullanıcının Telegram diline göre ayarla
@@ -718,6 +729,9 @@ async function load() {
     const fetchedStats = await api("/api/admin/stats");
     if (fetchedStats && fetchedStats.ok !== false) {
       s = { ...s, ...fetchedStats };
+      // Stats loaded successfully - hide any error boxes
+      const deniedBox = document.getElementById("denied");
+      if (deniedBox) deniedBox.style.display = "none";
     }
   } catch (e) {
     console.warn("api admin stats error:", e);
@@ -737,6 +751,27 @@ async function load() {
   if (document.getElementById("s-sig24")) document.getElementById("s-sig24").textContent = s.signals_24h ?? 0;
   if (document.getElementById("s-open")) document.getElementById("s-open").textContent = s.open_signals ?? 0;
   if (document.getElementById("s-alerts")) document.getElementById("s-alerts").textContent = s.alerts ?? 0;
+  // New stat fields
+  if (document.getElementById("s-new7d")) document.getElementById("s-new7d").textContent = s.new_users_7d ?? 0;
+  if (document.getElementById("s-api")) document.getElementById("s-api").textContent = s.api_keys_count ?? 0;
+  if (document.getElementById("s-banned")) document.getElementById("s-banned").textContent = s.banned_count ?? 0;
+
+  // Top users card
+  if (s.top_users && s.top_users.length) {
+    const tuCard = document.getElementById("top-users-card");
+    const tuList = document.getElementById("top-users-list");
+    if (tuCard) tuCard.style.display = "block";
+    if (tuList) {
+      tuList.innerHTML = s.top_users.map(u => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+          <div>
+            <span style="font-size:13px;color:#fff;font-weight:600">${u.name || u.chat_id}</span>
+            <span style="font-size:10px;color:var(--text-muted);margin-left:6px">#${u.chat_id}</span>
+          </div>
+          <span style="font-size:10px;background:rgba(255,255,255,0.08);padding:2px 7px;border-radius:4px;color:var(--text-muted)">${u.lang || 'tr'}</span>
+        </div>`).join("");
+    }
+  }
 
   const box = document.getElementById("lang-list");
   if (box && s.by_lang) {
@@ -775,6 +810,151 @@ function deny(msg) {
 }
 
 document.getElementById("btn-refresh-summary")?.addEventListener("click", load);
+
+// ========= MANAGE TAB HANDLERS =========
+
+// Broadcast preview (send only to admin)
+document.getElementById("btn-broadcast-preview")?.addEventListener("click", async () => {
+  const msg = (document.getElementById("broadcast-text")?.value || "").trim();
+  if (!msg) return toast("Önce mesaj yazın", "error");
+  try {
+    await api("/api/admin/broadcast", { message: msg, preview_only: true });
+    toast("👁 Önizleme yalnızca yöneticiye gönderildi", "success");
+  } catch (e) { toast("Hata: " + e.message, "error"); }
+});
+
+// Close all open signals
+document.getElementById("btn-close-all-signals")?.addEventListener("click", async () => {
+  const res = document.getElementById("signal-manage-result");
+  try {
+    const r = await api("/api/admin/signals/close-all");
+    if (res) res.textContent = "✅ " + (r.closed || 0) + " açık sinyal kapatıldı";
+    toast("Açık sinyaller kapatıldı", "success");
+  } catch (e) {
+    if (res) res.textContent = "⛔ " + e.message;
+    toast("Hata: " + e.message, "error");
+  }
+});
+
+// Delete old signals (30 days)
+document.getElementById("btn-delete-old-signals")?.addEventListener("click", async () => {
+  const res = document.getElementById("signal-manage-result");
+  try {
+    const r = await api("/api/admin/signals/cleanup");
+    if (res) res.textContent = "✅ " + (r.deleted || 0) + " eski sinyal silindi";
+    toast("Eski sinyaller temizlendi", "success");
+  } catch (e) {
+    if (res) res.textContent = "⛔ " + e.message;
+    toast("Hata: " + e.message, "error");
+  }
+});
+
+// User lookup
+document.getElementById("btn-lookup-user")?.addEventListener("click", async () => {
+  const cid = parseInt(document.getElementById("admin-target-cid")?.value || "0");
+  if (!cid) return toast("Chat ID gerekli", "error");
+  const res = document.getElementById("admin-user-lookup-result");
+  if (res) res.innerHTML = "⏳ Aranıyor…";
+  try {
+    const r = await api("/api/admin/users", { page: 0, limit: 1000, filter_cid: cid });
+    const u = r.users?.find(u => u.chat_id == cid);
+    if (!u) {
+      if (res) res.innerHTML = "⚠️ Kullanıcı bulunamadı";
+      return;
+    }
+    if (res) res.innerHTML = `
+      <strong>${u.name}</strong> (#${u.chat_id})<br>
+      Dil: ${u.lang} &nbsp;|&nbsp; Market: ${u.market} &nbsp;|&nbsp; Aktif: ${u.active ? "✅" : "❌"}<br>
+      Coin: ${u.coins_count} &nbsp;|&nbsp; API: ${u.has_api ? "✅ " + u.api_exchange : "Yok"} &nbsp;|&nbsp; Web3: ${u.has_web3_rpc ? "✅" : "Yok"}<br>
+      Cüzdan: ${u.wallet_addr ? u.wallet_addr.slice(0,8) + "..." : "Bağlı Değil"}<br>
+      ${u.banned ? "🚫 <b style='color:red'>YASAKLI</b>" : ""}`;
+    document.getElementById("btn-send-msg-target")?.setAttribute("data-cid", cid);
+    document.getElementById("btn-ban-target")?.setAttribute("data-cid", cid);
+    document.getElementById("btn-unban-target")?.setAttribute("data-cid", cid);
+    document.getElementById("btn-delete-user-data")?.setAttribute("data-cid", cid);
+  } catch (e) {
+    if (res) res.innerHTML = "⛔ " + e.message;
+  }
+});
+
+// Ban user
+document.getElementById("btn-ban-target")?.addEventListener("click", async () => {
+  const cid = parseInt(document.getElementById("btn-ban-target")?.getAttribute("data-cid") || "0");
+  if (!cid) return toast("Önce kullanıcı arayın", "error");
+  if (!confirm("Kullanıcı #" + cid + " yasaklanacak. Emin misiniz?")) return;
+  try {
+    await api("/api/admin/ban", { target_cid: cid, banned: true });
+    toast("🚫 Kullanıcı yasaklandı", "success");
+  } catch (e) { toast("Hata: " + e.message, "error"); }
+});
+
+// Unban user
+document.getElementById("btn-unban-target")?.addEventListener("click", async () => {
+  const cid = parseInt(document.getElementById("btn-unban-target")?.getAttribute("data-cid") || "0");
+  if (!cid) return toast("Önce kullanıcı arayın", "error");
+  try {
+    await api("/api/admin/ban", { target_cid: cid, banned: false });
+    toast("🔓 Yasak kaldırıldı", "success");
+  } catch (e) { toast("Hata: " + e.message, "error"); }
+});
+
+// Send message to specific user
+document.getElementById("btn-send-msg-target")?.addEventListener("click", () => {
+  const msgBox = document.getElementById("admin-target-msg");
+  if (msgBox) {
+    msgBox.style.display = msgBox.style.display === "none" ? "block" : "none";
+    if (msgBox.style.display === "block") {
+      msgBox.placeholder = "Kullanıcı #" + (document.getElementById("btn-send-msg-target")?.getAttribute("data-cid") || "?") + " için mesaj…";
+      msgBox.onkeydown = async (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          const cid = parseInt(document.getElementById("btn-send-msg-target")?.getAttribute("data-cid") || "0");
+          const msg = msgBox.value.trim();
+          if (!cid || !msg) return;
+          try {
+            await api("/api/admin/broadcast", { message: msg, target_cid: cid });
+            toast("💬 Mesaj gönderildi", "success");
+            msgBox.value = "";
+            msgBox.style.display = "none";
+          } catch (e) { toast("Hata: " + e.message, "error"); }
+        }
+      };
+    }
+  }
+});
+
+// Export users JSON
+document.getElementById("btn-export-users")?.addEventListener("click", async () => {
+  const res = document.getElementById("system-tools-result");
+  if (res) res.textContent = "⏳ Veriler çekiliyor…";
+  try {
+    const r = await api("/api/admin/users", { page: 0, limit: 10000 });
+    const json = JSON.stringify(r.users || [], null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "elena-users-" + new Date().toISOString().split("T")[0] + ".json";
+    a.click();
+    URL.revokeObjectURL(url);
+    if (res) res.textContent = "✅ " + (r.users?.length || 0) + " kullanıcı indirildi";
+  } catch (e) {
+    if (res) res.textContent = "⛔ " + e.message;
+  }
+});
+
+// DB cleanup
+document.getElementById("btn-cleanup-db")?.addEventListener("click", async () => {
+  if (!confirm("Veritabanı bakımı yapılacak (eski loglar temizlenecek). Devam edilsin mi?")) return;
+  const res = document.getElementById("system-tools-result");
+  try {
+    const r = await api("/api/admin/signals/cleanup");
+    if (res) res.textContent = "✅ Temizlik tamamlandı: " + (r.deleted || 0) + " kayıt silindi";
+    toast("Veritabanı temizlendi", "success");
+  } catch (e) {
+    if (res) res.textContent = "⛔ " + e.message;
+  }
+});
 
 // --- Kullanıcı Listesi
 let userPage = 0;

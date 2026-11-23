@@ -872,7 +872,7 @@ const I18N = {
     btn_admin: "Yönetim Paneline Git",
     tab_wallet: "💼 Cüzdan", tab_auto: "🤖 Oto-Bot", tab_exchange: "🔑 Borsa",
     tab_manual: "📈 Manuel", tab_signals: "📡 Sinyaller", tab_guide: "📚 Rehber", tab_dashboard: "📊 Pano",
-    tab_coins: "🪙 Coinler", tab_tools: "🧮 Araçlar", tab_markets: "📊 Canlı Piyasa", tab_settings: "⚙️ Ayarlar",
+    tab_coins: "🌐 Küresel Piyasalar", tab_tools: "🧮 Araçlar", tab_markets: "📊 Canlı Piyasa", tab_settings: "⚙️ Ayarlar",
     lbl_pwd: "Şifre (Güvenlik Parolası)", lbl_extra_pwd: "Ek Şifre (İkincil / Passphrase)",
     pwd_saved: "✅ Tanımlandı", pwd_not_saved: "Kayıtlı Değil"
   },
@@ -889,7 +889,7 @@ const I18N = {
     btn_admin: "Перейти в панель управления",
     tab_wallet: "💼 Кошелек", tab_auto: "🤖 Авто-Бот", tab_exchange: "🔑 Биржа",
     tab_manual: "📈 Ручной", tab_signals: "📡 Сигналы", tab_guide: "📚 Инструкция", tab_dashboard: "📊 Панель",
-    tab_coins: "🪙 Монеты", tab_tools: "🧮 Инструменты", tab_markets: "📊 Живой рынок", tab_settings: "⚙️ Настройки",
+    tab_coins: "🌐 Глобальные рынки", tab_tools: "🧮 Инструменты", tab_markets: "📊 Живой рынок", tab_settings: "⚙️ Настройки",
     lbl_pwd: "Пароль (Безопасность)", lbl_extra_pwd: "Доп. Пароль (Passphrase)",
     pwd_saved: "✅ Сохранен", pwd_not_saved: "Не сохранен"
   },
@@ -906,7 +906,7 @@ const I18N = {
     btn_admin: "Go to Admin Panel",
     tab_wallet: "💼 Wallet", tab_auto: "🤖 Auto-Bot", tab_exchange: "🔑 Exchange",
     tab_manual: "📈 Manual", tab_signals: "📡 Signals", tab_guide: "📚 Guide", tab_dashboard: "📊 Dashboard",
-    tab_coins: "🪙 Coins", tab_tools: "🧮 Tools", tab_markets: "📊 Live Market", tab_settings: "⚙️ Settings",
+    tab_coins: "🌐 Global Markets", tab_tools: "🧮 Tools", tab_markets: "📊 Live Market", tab_settings: "⚙️ Settings",
     lbl_pwd: "Password (Security Pin)", lbl_extra_pwd: "Extra Password (Passphrase)",
     pwd_saved: "✅ Defined", pwd_not_saved: "Not Defined"
   },
@@ -923,7 +923,7 @@ const I18N = {
     btn_admin: "Панель керування",
     tab_wallet: "💼 Гаманець", tab_auto: "🤖 Авто-Бот", tab_exchange: "🔑 Біржа",
     tab_manual: "📈 Ручний", tab_signals: "📡 Сигнали", tab_guide: "📚 Довідка", tab_dashboard: "📊 Панель",
-    tab_coins: "🪙 Монети", tab_tools: "🧮 Інструменти", tab_markets: "📊 Живий ринок", tab_settings: "⚙️ Налаштування",
+    tab_coins: "🌐 Глобальні ринки", tab_tools: "🧮 Інструменти", tab_markets: "📊 Живий ринок", tab_settings: "⚙️ Налаштування",
     lbl_pwd: "Пароль безпеки", lbl_extra_pwd: "Додатковий пароль",
     pwd_saved: "✅ Збережено", pwd_not_saved: "Не налаштовано"
   },
@@ -940,7 +940,7 @@ const I18N = {
     btn_admin: "Zum Admin-Bereich",
     tab_wallet: "💼 Wallet", tab_auto: "🤖 Auto-Bot", tab_exchange: "🔑 Börse",
     tab_manual: "📈 Manuell", tab_signals: "📡 Signale", tab_guide: "📚 Anleitung", tab_dashboard: "📊 Dashboard",
-    tab_coins: "🪙 Coins", tab_tools: "🧮 Tools", tab_markets: "📊 Live-Markt", tab_settings: "⚙️ Einstellungen",
+    tab_coins: "🌐 Global Markets", tab_tools: "🧮 Tools", tab_markets: "📊 Live-Markt", tab_settings: "⚙️ Einstellungen",
     lbl_pwd: "Sicherheitspasswort", lbl_extra_pwd: "Zusatzpasswort (Passphrase)",
     pwd_saved: "✅ Gespeichert", pwd_not_saved: "Nicht gespeichert"
   },
@@ -957,7 +957,7 @@ const I18N = {
     btn_admin: "Ir al Panel de Administración",
     tab_wallet: "💼 Billetera", tab_auto: "🤖 Auto-Bot", tab_exchange: "🔑 Exchange",
     tab_manual: "📈 Manual", tab_signals: "📡 Señales", tab_guide: "📚 Guía", tab_dashboard: "📊 Panel",
-    tab_coins: "🪙 Monedas", tab_tools: "🧮 Herramientas", tab_markets: "📊 Mercado en vivo", tab_settings: "⚙️ Ajustes",
+    tab_coins: "🌐 Mercados Globales", tab_tools: "🧮 Herramientas", tab_markets: "📊 Mercado en vivo", tab_settings: "⚙️ Ajustes",
     lbl_pwd: "Clave de Seguridad", lbl_extra_pwd: "Clave Adicional (Passphrase)",
     pwd_saved: "✅ Guardado", pwd_not_saved: "No configurado"
   },
@@ -974,7 +974,7 @@ const I18N = {
     btn_admin: "Aller au Panneau d'Administration",
     tab_wallet: "💼 Portefeuille", tab_auto: "🤖 Auto-Bot", tab_exchange: "🔑 Bourse",
     tab_manual: "📈 Manuel", tab_signals: "📡 Signaux", tab_guide: "📚 Guide", tab_dashboard: "📊 Tableau",
-    tab_coins: "🪙 Cryptos", tab_tools: "🧮 Outils", tab_markets: "📊 Marché en direct", tab_settings: "⚙️ Paramètres",
+    tab_coins: "🌐 Marchés Mondiaux", tab_tools: "🧮 Outils", tab_markets: "📊 Marché en direct", tab_settings: "⚙️ Paramètres",
     lbl_pwd: "Mot de passe de sécurité", lbl_extra_pwd: "Mot de passe supplémentaire",
     pwd_saved: "✅ Enregistré", pwd_not_saved: "Non défini"
   },
@@ -991,7 +991,7 @@ const I18N = {
     btn_admin: "لوحة الإدارة",
     tab_wallet: "💼 المحفظة", tab_auto: "🤖 البوت الآلي", tab_exchange: "🔑 المنصة",
     tab_manual: "📈 يدوي", tab_signals: "📡 الإشارات", tab_guide: "📚 الدليل", tab_dashboard: "📊 اللوحة",
-    tab_coins: "🪙 العملات", tab_tools: "🧮 الأدوات", tab_markets: "📊 السوق المباشر", tab_settings: "⚙️ الإعدادات",
+    tab_coins: "🌐 الأسواق العالمية", tab_tools: "🧮 الأدوات", tab_markets: "📊 السوق المباشر", tab_settings: "⚙️ الإعدادات",
     lbl_pwd: "كلمة المرور الأمنية", lbl_extra_pwd: "كلمة المرور الإضافية",
     pwd_saved: "✅ معرّف", pwd_not_saved: "غير معرّف"
   }
@@ -1337,7 +1337,7 @@ function applyLanguage(lang) {
   setTab("#tab-lbl-exchange", dict.tab_exchange, "Borsa");
   setTab("#tab-lbl-manual",   dict.tab_manual,   "Manuel");
   setTab("#tab-lbl-signals",  dict.tab_signals,  "Sinyaller");
-  setTab("#tab-lbl-coins",    dict.tab_coins,    "Coinler");
+  setTab("#tab-lbl-coins",    dict.tab_coins,    "Piyasalar");
   setTab("#tab-lbl-tools",    dict.tab_tools,    "Araçlar");
   setTab("#tab-lbl-markets",  dict.tab_markets,  "Piyasa");
   setTab("#tab-lbl-settings", dict.tab_settings, "Ayarlar");

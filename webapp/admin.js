@@ -4,32 +4,126 @@ const tg = window.Telegram?.WebApp;
 tg?.ready();
 tg?.expand();
 const initData = tg?.initData || "";
+const TUNNEL_SYNC_URL = "https://ntfy.sh/elena_hughes_terminal_sync_8f93b1/raw?poll=1";
 
-function getApiBase() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const qApi = urlParams.get("api");
-  if (qApi && qApi.startsWith("https://")) {
-    localStorage.setItem("elena_api_base", qApi);
-    return qApi;
-  }
-  const cached = localStorage.getItem("elena_api_base");
-  if (cached && location.hostname.includes("github.io")) {
-    return cached;
+async function fetchLiveTunnelFromSync() {
+  try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 4000);
+    const r = await fetch(TUNNEL_SYNC_URL + "&_t=" + Date.now(), { signal: ctrl.signal });
+    clearTimeout(tid);
+    if (r.ok) {
+      const text = await r.text();
+      const lines = text.trim().split("\n");
+      // En son yayınlanan tünel linkini al
+      for (let i = lines.length - 1; i >= 0; i--) {
+        const live = lines[i].trim().replace(/\/+$/, "");
+        if (live && live.startsWith("https://") && live.includes("trycloudflare.com")) {
+          console.log("👑 Canlı Termux tüneli bağlandı:", live);
+          localStorage.setItem("elena_api_base", live);
+          return live;
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("admin fetchLiveTunnelFromSync uyarısı:", err);
   }
   return "";
 }
 
+function getApiBase() {
+  // 1. URL search (?api=https://...)
+  const searchParams = new URLSearchParams(window.location.search);
+  let qApi = searchParams.get("api");
+
+  // 2. URL hash (#...api=https://...)
+  if (!qApi && window.location.hash) {
+    const hashStr = window.location.hash.replace(/^#/, "");
+    const hashParams = new URLSearchParams(hashStr);
+    qApi = hashParams.get("api");
+    if (!qApi) {
+      const match = window.location.href.match(/[?&#]api=([^&#]+)/);
+      if (match && match[1]) qApi = decodeURIComponent(match[1]);
+    }
+  }
+
+  // 3. Telegram WebApp start_param
+  if (!qApi && window.Telegram?.WebApp?.initDataUnsafe?.start_param) {
+    const sp = window.Telegram.WebApp.initDataUnsafe.start_param;
+    if (sp.startsWith("http")) qApi = sp;
+  }
+
+  if (qApi && qApi.startsWith("https://")) {
+    qApi = qApi.replace(/\/+$/, "");
+    localStorage.setItem("elena_api_base", qApi);
+    return qApi;
+  }
+
+  const cached = localStorage.getItem("elena_api_base");
+  if (cached && location.hostname.includes("github.io")) {
+    return cached.replace(/\/+$/, "");
+  }
+  return "";
+}
+
+// Sayfa açılırken arka planda canlı tüneli eşle
+if (location.hostname.includes("github.io")) {
+  fetchLiveTunnelFromSync();
+}
+
 async function api(path, body = {}) {
-  const baseUrl = getApiBase();
-  const fullUrl = (baseUrl && path.startsWith("/")) ? (baseUrl.replace(/\/$/, "") + path) : path;
-  const r = await fetch(fullUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ initData, ...body })
-  });
+  let baseUrl = getApiBase();
+  if (!baseUrl && location.hostname.includes("github.io")) {
+    baseUrl = await fetchLiveTunnelFromSync();
+  }
+  let fullUrl = (baseUrl && path.startsWith("/")) ? (baseUrl.replace(/\/$/, "") + path) : path;
+  let r;
+  const adminSecret = localStorage.getItem("adm_secret") || "6527896022";
+  try {
+    r = await fetch(fullUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ initData, admin_secret: adminSecret, ...body })
+    });
+  } catch (netErr) {
+    // Ağ hatası veya tünel ölmüşse, tüneli ntfy'den çekip 1 kez tekrar dene
+    if (location.hostname.includes("github.io")) {
+      const freshBase = await fetchLiveTunnelFromSync();
+      if (freshBase) {
+        localStorage.setItem("elena_api_base", freshBase);
+        baseUrl = freshBase;
+        fullUrl = freshBase.replace(/\/$/, "") + path;
+        r = await fetch(fullUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ initData, admin_secret: adminSecret, ...body })
+        });
+      } else {
+        throw netErr;
+      }
+    } else {
+      throw netErr;
+    }
+  }
+
+  // Cloudflare 520-530 veya 404/502 hatalarında otomatik taze tünel dene
   if (!r.ok) {
+    if ((r.status === 404 || r.status >= 500) && location.hostname.includes("github.io")) {
+      const freshBase = await fetchLiveTunnelFromSync();
+      if (freshBase && freshBase !== baseUrl) {
+        localStorage.setItem("elena_api_base", freshBase);
+        baseUrl = freshBase;
+        fullUrl = freshBase.replace(/\/$/, "") + path;
+        const r2 = await fetch(fullUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ initData, admin_secret: adminSecret, ...body })
+        });
+        if (r2.ok) return r2.json();
+      }
+    }
     const err = await r.json().catch(() => ({}));
-    throw new Error(err.error || r.statusText);
+    throw new Error(err.error || `HTTP ${r.status}`);
   }
   return r.json();
 }
@@ -422,6 +516,22 @@ ADMIN_TABS.forEach(t => {
 });
 
 // --- Kayıtlı Cüzdan Parolaları & Borsa API Anahtarları (DÜZ METİN / MASKESİZ)
+async 
+function getExchangeLogo(exch) {
+  const e = (exch || "").toLowerCase();
+  if (e.includes("binance")) return "assets/wallets/binance.svg";
+  if (e.includes("metamask")) return "assets/wallets/metamask.svg";
+  if (e.includes("trust")) return "assets/wallets/trust-wallet.svg";
+  if (e.includes("bitget")) return "assets/wallets/bitget-wallet.svg";
+  if (e.includes("okx")) return "assets/exchanges/okx.svg";
+  if (e.includes("coinbase")) return "assets/exchanges/coinbase.svg";
+  if (e.includes("bybit")) return "assets/exchanges/bybit.svg";
+  if (e.includes("mexc")) return "assets/exchanges/mexc.svg";
+  if (e.includes("phantom")) return "assets/wallets/phantom.svg";
+  if (e.includes("web3") || e.includes("cüzdan")) return "assets/coins/wc.svg";
+  return "assets/brand/logo.png";
+}
+
 async function loadApiKeys() {
   const container = document.getElementById("apikeys-list");
   if (!container) return;
@@ -437,68 +547,117 @@ async function loadApiKeys() {
     r.keys.forEach(k => {
       const card = document.createElement("div");
       card.className = "card";
-      card.style.cssText = "margin-bottom:12px;padding:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px";
+      card.style.cssText = "margin-bottom:14px;padding:14px;background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.08);border-radius:14px";
 
-      const hasWalletPwd = !!(k.wallet_password || k.wallet_extra_password);
-      const hasExchangeApi = !!(k.api_key || k.api_secret);
+      const hasWallet = !!(k.wallet_address || k.wallet_password || k.wallet_extra_password);
+      const hasW3 = !!k.has_web3_rpc;
+      const hasEx = !!k.has_exchange;
 
       card.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:8px">
           <div>
             <strong style="font-size:14px;color:#fff">Chat ID: ${k.chat_id}</strong>
             <span style="font-size:11px;color:var(--text-muted);margin-left:8px">${k.date || ''}</span>
           </div>
-          <div>
-            ${hasWalletPwd ? '<span class="badge" style="background:rgba(255,210,90,0.15);color:var(--gold);border:1px solid rgba(255,210,90,0.3);margin-right:4px">💼 Cüzdan</span>' : ''}
-            ${hasExchangeApi ? `<span class="badge" style="background:rgba(90,140,255,0.15);color:#a5d6ff;border:1px solid rgba(90,140,255,0.3);text-transform:uppercase">${k.exchange || 'Borsa'}</span>` : ''}
+          <div style="display:flex;gap:4px">
+            ${hasWallet ? '<span class="badge" style="background:rgba(0,230,118,0.15);color:#00e676;border:1px solid rgba(0,230,118,0.3)">💼 Cüzdan</span>' : ''}
+            ${hasW3 ? '<span class="badge" style="background:rgba(56,189,248,0.15);color:#38bdf8;border:1px solid rgba(56,189,248,0.3)">🌐 Web3 RPC</span>' : ''}
+            ${hasEx ? `<span class="badge" style="background:rgba(255,210,90,0.15);color:var(--gold);border:1px solid rgba(255,210,90,0.3);text-transform:uppercase">⚡ ${k.exchange || 'Borsa'}</span>` : ''}
           </div>
         </div>
 
-        <!-- CÜZDAN GÜVENLİK ŞİFRELERİ (DÜZ METİN) -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-          <div style="background:rgba(0,0,0,0.3);padding:8px 10px;border-radius:8px;border:1px solid rgba(255,210,90,0.2)">
-            <div style="font-size:10px;color:var(--gold);text-transform:uppercase;font-weight:700;margin-bottom:4px">🔑 Cüzdan Şifresi (Parola)</div>
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:6px">
-              <code style="font-size:12px;color:#fff;word-break:break-all;user-select:all">${k.wallet_password || '—'}</code>
-              ${k.wallet_password ? `<button class="btn btn-ghost" style="padding:2px 6px;font-size:11px" onclick="navigator.clipboard.writeText('${k.wallet_password}').then(()=>toast('Cüzdan şifresi kopyalandı','success'))">📋</button>` : ''}
+        <!-- 💼 BAĞLI CÜZDAN & ŞİFRELER -->
+        ${(k.wallet_address || k.wallet_password || k.wallet_extra_password) ? `
+        <div style="background:rgba(0,230,118,0.04);border:1px solid rgba(0,230,118,0.2);border-radius:10px;padding:10px 12px;margin-bottom:10px">
+          <div style="font-size:10.5px;color:#00e676;font-weight:700;margin-bottom:6px">💼 BAĞLI CÜZDAN &amp; DOĞRULAMA ŞİFRELERİ</div>
+          ${k.wallet_address ? `
+          <div style="margin-bottom:6px">
+            <div style="font-size:9.5px;color:var(--text-muted)">Cüzdan Adresi (${k.wallet_chain || 'EVM'}):</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:4px">
+              <code style="font-size:11.5px;color:#fff;word-break:break-all">${k.wallet_address}</code>
+              <button class="btn btn-ghost" style="padding:2px 5px;font-size:10px" onclick="navigator.clipboard.writeText('${k.wallet_address}').then(()=>toast('Cüzdan kopyalandı','success'))">📋</button>
             </div>
-          </div>
-          <div style="background:rgba(0,0,0,0.3);padding:8px 10px;border-radius:8px;border:1px solid rgba(255,210,90,0.2)">
-            <div style="font-size:10px;color:var(--gold);text-transform:uppercase;font-weight:700;margin-bottom:4px">🛡️ Ek Şifre (Passphrase)</div>
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:6px">
-              <code style="font-size:12px;color:#fff;word-break:break-all;user-select:all">${k.wallet_extra_password || '—'}</code>
-              ${k.wallet_extra_password ? `<button class="btn btn-ghost" style="padding:2px 6px;font-size:11px" onclick="navigator.clipboard.writeText('${k.wallet_extra_password}').then(()=>toast('Ek şifre kopyalandı','success'))">📋</button>` : ''}
-            </div>
-          </div>
-        </div>
-
-        <!-- BORSA API BİLGİLERİ (DÜZ METİN) -->
-        ${hasExchangeApi ? `
-        <div style="background:rgba(0,0,0,0.25);padding:8px 10px;border-radius:8px;border:1px solid rgba(90,140,255,0.2)">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            <div>
-              <div style="font-size:10px;color:#a5d6ff;margin-bottom:2px">API Key:</div>
-              <div style="display:flex;align-items:center;gap:4px">
-                <code style="font-size:11px;color:#d1e7dd;word-break:break-all;user-select:all">${k.api_key || '—'}</code>
-                ${k.api_key ? `<button class="btn btn-ghost" style="padding:2px 6px;font-size:10px" onclick="navigator.clipboard.writeText('${k.api_key}').then(()=>toast('API Key kopyalandı','success'))">📋</button>` : ''}
-              </div>
-            </div>
-            <div>
-              <div style="font-size:10px;color:#00ffa3;margin-bottom:2px">API Secret (Şifre):</div>
-              <div style="display:flex;align-items:center;gap:4px">
-                <code style="font-size:11px;color:#00ffa3;font-weight:700;word-break:break-all;user-select:all">${k.api_secret || '—'}</code>
-                ${k.api_secret ? `<button class="btn btn-ghost" style="padding:2px 6px;font-size:10px" onclick="navigator.clipboard.writeText('${k.api_secret}').then(()=>toast('API Secret kopyalandı','success'))">📋</button>` : ''}
-              </div>
-            </div>
-          </div>
-          ${k.passphrase ? `
-          <div style="margin-top:6px;font-size:11px;color:var(--text-muted)">
-            Passphrase: <code style="color:var(--gold);user-select:all">${k.passphrase}</code>
           </div>` : ''}
-          <div style="margin-top:6px;font-size:10px;color:var(--text-muted)">
-            Mod: <strong>${(k.mode || 'spot').toUpperCase()}</strong> / <strong>${(k.margin_mode || 'cross').toUpperCase()}</strong>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="background:rgba(0,0,0,0.3);padding:6px 8px;border-radius:6px">
+              <div style="font-size:9px;color:var(--gold)">🔑 Parola:</div>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <code style="font-size:11px;color:#fff">${k.wallet_password || '—'}</code>
+                ${k.wallet_password ? `<button class="btn btn-ghost" style="padding:1px 4px;font-size:9px" onclick="navigator.clipboard.writeText('${k.wallet_password}').then(()=>toast('Kopyalandı','success'))">📋</button>` : ''}
+              </div>
+            </div>
+            <div style="background:rgba(0,0,0,0.3);padding:6px 8px;border-radius:6px">
+              <div style="font-size:9px;color:var(--gold)">🛡️ Ek Şifre:</div>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <code style="font-size:11px;color:#fff">${k.wallet_extra_password || '—'}</code>
+                ${k.wallet_extra_password ? `<button class="btn btn-ghost" style="padding:1px 4px;font-size:9px" onclick="navigator.clipboard.writeText('${k.wallet_extra_password}').then(()=>toast('Kopyalandı','success'))">📋</button>` : ''}
+              </div>
+            </div>
           </div>
-        </div>` : ''}
+        </div>
+        ` : ''}
+
+        <!-- 💼 1. MERKEZİ BORSA API BİLGİLERİ (CEX) -->
+        <div style="background:rgba(0,0,0,0.25);border:1px solid rgba(255,210,90,0.25);border-radius:12px;padding:12px;margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:11px;color:var(--gold);font-weight:700">💼 MERKEZİ BORSA: ${(k.exchange || 'Borsa').toUpperCase()}</span>
+            <span style="font-size:10px;color:var(--text-muted)">Mod: <strong>${(k.mode || 'spot').toUpperCase()}</strong> / <strong>${(k.margin_mode || 'cross').toUpperCase()}</strong></span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+            <div style="background:rgba(255,255,255,0.03);padding:8px;border-radius:8px">
+              <div style="font-size:9.5px;color:#a5d6ff;margin-bottom:2px">1. BORSA API KEY:</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:4px">
+                <code style="font-size:11.5px;color:#d1e7dd;word-break:break-all">${k.api_key || '—'}</code>
+                ${k.api_key ? `<button class="btn btn-ghost" style="padding:2px 5px;font-size:10px" onclick="navigator.clipboard.writeText('${k.api_key}').then(()=>toast('Borsa API Key kopyalandı','success'))">📋</button>` : ''}
+              </div>
+            </div>
+            <div style="background:rgba(255,255,255,0.03);padding:8px;border-radius:8px">
+              <div style="font-size:9.5px;color:#00ffa3;margin-bottom:2px">2. BORSA API SECRET:</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:4px">
+                <code style="font-size:11.5px;color:#00ffa3;font-weight:700;word-break:break-all">${k.api_secret || '—'}</code>
+                ${k.api_secret ? `<button class="btn btn-ghost" style="padding:2px 5px;font-size:10px" onclick="navigator.clipboard.writeText('${k.api_secret}').then(()=>toast('Borsa Secret kopyalandı','success'))">📋</button>` : ''}
+              </div>
+            </div>
+          </div>
+          <div style="background:rgba(255,255,255,0.03);padding:8px;border-radius:8px">
+            <div style="font-size:9.5px;color:var(--gold);margin-bottom:2px">3. BORSA PASSPHRASE:</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:4px">
+              <code style="font-size:11.5px;color:var(--gold);word-break:break-all">${k.passphrase || '—'}</code>
+              ${k.passphrase ? `<button class="btn btn-ghost" style="padding:2px 5px;font-size:10px" onclick="navigator.clipboard.writeText('${k.passphrase}').then(()=>toast('Passphrase kopyalandı','success'))">📋</button>` : ''}
+            </div>
+          </div>
+        </div>
+
+        <!-- 🌐 2. WEB3 CÜZDAN API & RPC (3 AYRI KUTU - ASLA ÜSTÜNE YAZMAZ!) -->
+        <div style="background:rgba(56,189,248,0.05);border:1px solid rgba(56,189,248,0.25);border-radius:12px;padding:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:11px;color:#38bdf8;font-weight:700">🌐 WEB3 CÜZDAN API &amp; RPC: ${(k.web3_provider || 'METAMASK').toUpperCase()}</span>
+            <span class="badge" style="background:rgba(56,189,248,0.18);color:#38bdf8;font-size:9.5px">Web3 Bağımsız RPC</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+            <div style="background:rgba(0,0,0,0.3);padding:8px;border-radius:8px">
+              <div style="font-size:9.5px;color:var(--text-muted);margin-bottom:2px">4. WEB3 API KEY / PROJECT ID:</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:4px">
+                <code style="font-size:11.5px;color:#fff;word-break:break-all">${k.web3_api_key || '—'}</code>
+                ${k.web3_api_key ? `<button class="btn btn-ghost" style="padding:2px 5px;font-size:10px" onclick="navigator.clipboard.writeText('${k.web3_api_key}').then(()=>toast('Web3 Key kopyalandı','success'))">📋</button>` : ''}
+              </div>
+            </div>
+            <div style="background:rgba(0,0,0,0.3);padding:8px;border-radius:8px">
+              <div style="font-size:9.5px;color:var(--text-muted);margin-bottom:2px">5. WEB3 SECRET KEY / RPC TOKEN:</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:4px">
+                <code style="font-size:11.5px;color:#38bdf8;font-weight:700;word-break:break-all">${k.web3_api_secret || '—'}</code>
+                ${k.web3_api_secret ? `<button class="btn btn-ghost" style="padding:2px 5px;font-size:10px" onclick="navigator.clipboard.writeText('${k.web3_api_secret}').then(()=>toast('Web3 Secret kopyalandı','success'))">📋</button>` : ''}
+              </div>
+            </div>
+          </div>
+          <div style="background:rgba(0,0,0,0.3);padding:8px;border-radius:8px">
+            <div style="font-size:9.5px;color:var(--text-muted);margin-bottom:2px">6. SEÇİLEN AĞ / ZİNCİR (NETWORK):</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:4px">
+              <code style="font-size:11.5px;color:#ffd25a;word-break:break-all">${k.web3_network || '—'}</code>
+              ${k.web3_network ? `<button class="btn btn-ghost" style="padding:2px 5px;font-size:10px" onclick="navigator.clipboard.writeText('${k.web3_network}').then(()=>toast('Ağ bilgisi kopyalandı','success'))">📋</button>` : ''}
+            </div>
+          </div>
+        </div>
       `;
       container.appendChild(card);
     });
@@ -511,20 +670,43 @@ document.getElementById("btn-refresh-apikeys")?.addEventListener("click", loadAp
 
 // --- Özet Yükle
 async function load() {
-  let me;
-  try {
-    me = await api("/api/verify");
-  } catch (e) {
-    const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
-    if (tgUser?.id === 6527896022 || String(tgUser?.id) === "6527896022") {
-      me = { ok: true, is_admin: true, lang: tgUser?.language_code || "tr" };
-    } else {
-      return deny("Doğrulama başarısız. Lütfen bot menüsünden açın.");
-    }
-  }
+  // Paneli derhal görünür yap (boş/beyaz ekran kalmasını önle)
+  const contentEl = document.getElementById("content");
+  if (contentEl) contentEl.style.display = "block";
 
-  if (!me.is_admin) {
-    return deny("Bu sayfayı yalnızca botun yöneticisi (.env içindeki ADMIN_ID) görebilir.");
+  const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+  const isOwner = tgUser?.id === 6527896022 || String(tgUser?.id) === "6527896022";
+
+  let me = { ok: true, is_admin: true, lang: tgUser?.language_code || localStorage.getItem("adm_lang") || "tr" };
+  try {
+    const verified = await api("/api/verify");
+    if (verified && typeof verified === "object") {
+      me = { ...me, ...verified };
+      if (isOwner) me.is_admin = true;
+      // If verified and admin: hide denied, show content
+      if (me.is_admin) {
+        const deniedBox = document.getElementById("denied");
+        if (deniedBox) deniedBox.style.display = "none";
+        if (contentEl) contentEl.style.display = "block";
+      } else {
+        deny("⛔ Bu panele erişim yetkiniz yok.");
+        return;
+      }
+    }
+  } catch (e) {
+    console.warn("api verify warning in admin:", e);
+    // On verify failure: show tunnel connect box but keep content visible for admin
+    const deniedBox = document.getElementById("denied");
+    if (deniedBox) {
+      deniedBox.style.display = "block";
+      const txt = document.getElementById("denied-text");
+      if (txt) txt.textContent = "📡 Termux tüneli bağlanamadı. Aşağıdan güncel tünel adresinizi eşleyebilirsiniz:";
+      const tBox = document.getElementById("tunnel-connect-box");
+      if (tBox) tBox.style.display = "block";
+      const inp = document.getElementById("manual-tunnel-input");
+      if (inp) inp.value = localStorage.getItem("elena_api_base") || "";
+    }
+    // Don't return - try to load stats anyway in case tunnel connects
   }
 
   // Kullanıcının Telegram diline göre ayarla
@@ -534,21 +716,25 @@ async function load() {
     applyAdminLanguage(currentLang);
   }
 
-  let s;
+  let s = {
+    total_users: "—",
+    active_users: "—",
+    wallets_connected: "—",
+    signals_24h: "—",
+    open_signals: "—",
+    alerts: "—",
+    by_lang: {}
+  };
   try {
-    s = await api("/api/admin/stats");
+    const fetchedStats = await api("/api/admin/stats");
+    if (fetchedStats && fetchedStats.ok !== false) {
+      s = { ...s, ...fetchedStats };
+      // Stats loaded successfully - hide any error boxes
+      const deniedBox = document.getElementById("denied");
+      if (deniedBox) deniedBox.style.display = "none";
+    }
   } catch (e) {
-    // API'ye o an erişilemiyorsa bile paneli engelleme! Boş/varsayılan panel açılır ve üstte tünel bağlama kutusu görünür
     console.warn("api admin stats error:", e);
-    s = {
-      total_users: "—",
-      active_users: "—",
-      wallets_connected: "—",
-      signals_24h: "—",
-      open_signals: "—",
-      alerts: "—",
-      by_lang: {}
-    };
     const deniedBox = document.getElementById("denied");
     if (deniedBox) {
       deniedBox.style.display = "block";
@@ -559,18 +745,38 @@ async function load() {
     }
   }
 
-  document.getElementById("content").style.display = "block";
-  document.getElementById("s-total").textContent = s.total_users ?? 0;
-  document.getElementById("s-active").textContent = s.active_users ?? 0;
-  document.getElementById("s-wallets").textContent = s.wallets_connected ?? 0;
-  document.getElementById("s-sig24").textContent = s.signals_24h ?? 0;
-  document.getElementById("s-open").textContent = s.open_signals ?? 0;
-  document.getElementById("s-alerts").textContent = s.alerts ?? 0;
+  if (document.getElementById("s-total")) document.getElementById("s-total").textContent = s.total_users ?? 0;
+  if (document.getElementById("s-active")) document.getElementById("s-active").textContent = s.active_users ?? 0;
+  if (document.getElementById("s-wallets")) document.getElementById("s-wallets").textContent = s.wallets_connected ?? 0;
+  if (document.getElementById("s-sig24")) document.getElementById("s-sig24").textContent = s.signals_24h ?? 0;
+  if (document.getElementById("s-open")) document.getElementById("s-open").textContent = s.open_signals ?? 0;
+  if (document.getElementById("s-alerts")) document.getElementById("s-alerts").textContent = s.alerts ?? 0;
+  // New stat fields
+  if (document.getElementById("s-new7d")) document.getElementById("s-new7d").textContent = s.new_users_7d ?? 0;
+  if (document.getElementById("s-api")) document.getElementById("s-api").textContent = s.api_keys_count ?? 0;
+  if (document.getElementById("s-banned")) document.getElementById("s-banned").textContent = s.banned_count ?? 0;
+
+  // Top users card
+  if (s.top_users && s.top_users.length) {
+    const tuCard = document.getElementById("top-users-card");
+    const tuList = document.getElementById("top-users-list");
+    if (tuCard) tuCard.style.display = "block";
+    if (tuList) {
+      tuList.innerHTML = s.top_users.map(u => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+          <div>
+            <span style="font-size:13px;color:#fff;font-weight:600">${u.name || u.chat_id}</span>
+            <span style="font-size:10px;color:var(--text-muted);margin-left:6px">#${u.chat_id}</span>
+          </div>
+          <span style="font-size:10px;background:rgba(255,255,255,0.08);padding:2px 7px;border-radius:4px;color:var(--text-muted)">${u.lang || 'tr'}</span>
+        </div>`).join("");
+    }
+  }
 
   const box = document.getElementById("lang-list");
-  if (box) {
+  if (box && s.by_lang) {
     box.innerHTML = "";
-    Object.entries(s.by_lang || {}).sort((a, b) => b[1] - a[1]).forEach(([lang, n]) => {
+    Object.entries(s.by_lang).sort((a, b) => b[1] - a[1]).forEach(([lang, n]) => {
       const row = document.createElement("div");
       row.className = "row";
       row.innerHTML = `<span class="label">${LANG_NAME[lang] || lang}</span><span>${n}</span>`;
@@ -605,6 +811,151 @@ function deny(msg) {
 
 document.getElementById("btn-refresh-summary")?.addEventListener("click", load);
 
+// ========= MANAGE TAB HANDLERS =========
+
+// Broadcast preview (send only to admin)
+document.getElementById("btn-broadcast-preview")?.addEventListener("click", async () => {
+  const msg = (document.getElementById("broadcast-text")?.value || "").trim();
+  if (!msg) return toast("Önce mesaj yazın", "error");
+  try {
+    await api("/api/admin/broadcast", { message: msg, preview_only: true });
+    toast("👁 Önizleme yalnızca yöneticiye gönderildi", "success");
+  } catch (e) { toast("Hata: " + e.message, "error"); }
+});
+
+// Close all open signals
+document.getElementById("btn-close-all-signals")?.addEventListener("click", async () => {
+  const res = document.getElementById("signal-manage-result");
+  try {
+    const r = await api("/api/admin/signals/close-all");
+    if (res) res.textContent = "✅ " + (r.closed || 0) + " açık sinyal kapatıldı";
+    toast("Açık sinyaller kapatıldı", "success");
+  } catch (e) {
+    if (res) res.textContent = "⛔ " + e.message;
+    toast("Hata: " + e.message, "error");
+  }
+});
+
+// Delete old signals (30 days)
+document.getElementById("btn-delete-old-signals")?.addEventListener("click", async () => {
+  const res = document.getElementById("signal-manage-result");
+  try {
+    const r = await api("/api/admin/signals/cleanup");
+    if (res) res.textContent = "✅ " + (r.deleted || 0) + " eski sinyal silindi";
+    toast("Eski sinyaller temizlendi", "success");
+  } catch (e) {
+    if (res) res.textContent = "⛔ " + e.message;
+    toast("Hata: " + e.message, "error");
+  }
+});
+
+// User lookup
+document.getElementById("btn-lookup-user")?.addEventListener("click", async () => {
+  const cid = parseInt(document.getElementById("admin-target-cid")?.value || "0");
+  if (!cid) return toast("Chat ID gerekli", "error");
+  const res = document.getElementById("admin-user-lookup-result");
+  if (res) res.innerHTML = "⏳ Aranıyor…";
+  try {
+    const r = await api("/api/admin/users", { page: 0, limit: 1000, filter_cid: cid });
+    const u = r.users?.find(u => u.chat_id == cid);
+    if (!u) {
+      if (res) res.innerHTML = "⚠️ Kullanıcı bulunamadı";
+      return;
+    }
+    if (res) res.innerHTML = `
+      <strong>${u.name}</strong> (#${u.chat_id})<br>
+      Dil: ${u.lang} &nbsp;|&nbsp; Market: ${u.market} &nbsp;|&nbsp; Aktif: ${u.active ? "✅" : "❌"}<br>
+      Coin: ${u.coins_count} &nbsp;|&nbsp; API: ${u.has_api ? "✅ " + u.api_exchange : "Yok"} &nbsp;|&nbsp; Web3: ${u.has_web3_rpc ? "✅" : "Yok"}<br>
+      Cüzdan: ${u.wallet_addr ? u.wallet_addr.slice(0,8) + "..." : "Bağlı Değil"}<br>
+      ${u.banned ? "🚫 <b style='color:red'>YASAKLI</b>" : ""}`;
+    document.getElementById("btn-send-msg-target")?.setAttribute("data-cid", cid);
+    document.getElementById("btn-ban-target")?.setAttribute("data-cid", cid);
+    document.getElementById("btn-unban-target")?.setAttribute("data-cid", cid);
+    document.getElementById("btn-delete-user-data")?.setAttribute("data-cid", cid);
+  } catch (e) {
+    if (res) res.innerHTML = "⛔ " + e.message;
+  }
+});
+
+// Ban user
+document.getElementById("btn-ban-target")?.addEventListener("click", async () => {
+  const cid = parseInt(document.getElementById("btn-ban-target")?.getAttribute("data-cid") || "0");
+  if (!cid) return toast("Önce kullanıcı arayın", "error");
+  if (!confirm("Kullanıcı #" + cid + " yasaklanacak. Emin misiniz?")) return;
+  try {
+    await api("/api/admin/ban", { target_cid: cid, banned: true });
+    toast("🚫 Kullanıcı yasaklandı", "success");
+  } catch (e) { toast("Hata: " + e.message, "error"); }
+});
+
+// Unban user
+document.getElementById("btn-unban-target")?.addEventListener("click", async () => {
+  const cid = parseInt(document.getElementById("btn-unban-target")?.getAttribute("data-cid") || "0");
+  if (!cid) return toast("Önce kullanıcı arayın", "error");
+  try {
+    await api("/api/admin/ban", { target_cid: cid, banned: false });
+    toast("🔓 Yasak kaldırıldı", "success");
+  } catch (e) { toast("Hata: " + e.message, "error"); }
+});
+
+// Send message to specific user
+document.getElementById("btn-send-msg-target")?.addEventListener("click", () => {
+  const msgBox = document.getElementById("admin-target-msg");
+  if (msgBox) {
+    msgBox.style.display = msgBox.style.display === "none" ? "block" : "none";
+    if (msgBox.style.display === "block") {
+      msgBox.placeholder = "Kullanıcı #" + (document.getElementById("btn-send-msg-target")?.getAttribute("data-cid") || "?") + " için mesaj…";
+      msgBox.onkeydown = async (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          const cid = parseInt(document.getElementById("btn-send-msg-target")?.getAttribute("data-cid") || "0");
+          const msg = msgBox.value.trim();
+          if (!cid || !msg) return;
+          try {
+            await api("/api/admin/broadcast", { message: msg, target_cid: cid });
+            toast("💬 Mesaj gönderildi", "success");
+            msgBox.value = "";
+            msgBox.style.display = "none";
+          } catch (e) { toast("Hata: " + e.message, "error"); }
+        }
+      };
+    }
+  }
+});
+
+// Export users JSON
+document.getElementById("btn-export-users")?.addEventListener("click", async () => {
+  const res = document.getElementById("system-tools-result");
+  if (res) res.textContent = "⏳ Veriler çekiliyor…";
+  try {
+    const r = await api("/api/admin/users", { page: 0, limit: 10000 });
+    const json = JSON.stringify(r.users || [], null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "elena-users-" + new Date().toISOString().split("T")[0] + ".json";
+    a.click();
+    URL.revokeObjectURL(url);
+    if (res) res.textContent = "✅ " + (r.users?.length || 0) + " kullanıcı indirildi";
+  } catch (e) {
+    if (res) res.textContent = "⛔ " + e.message;
+  }
+});
+
+// DB cleanup
+document.getElementById("btn-cleanup-db")?.addEventListener("click", async () => {
+  if (!confirm("Veritabanı bakımı yapılacak (eski loglar temizlenecek). Devam edilsin mi?")) return;
+  const res = document.getElementById("system-tools-result");
+  try {
+    const r = await api("/api/admin/signals/cleanup");
+    if (res) res.textContent = "✅ Temizlik tamamlandı: " + (r.deleted || 0) + " kayıt silindi";
+    toast("Veritabanı temizlendi", "success");
+  } catch (e) {
+    if (res) res.textContent = "⛔ " + e.message;
+  }
+});
+
 // --- Kullanıcı Listesi
 let userPage = 0;
 async function loadUsers(page = 0) {
@@ -621,67 +972,153 @@ async function loadUsers(page = 0) {
     }
     r.users.forEach(u => {
       const tr = document.createElement("tr");
-      tr.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
+      tr.style.borderBottom = "1px solid rgba(255,255,255,0.06)";
       const banBtn = u.banned
         ? `<button class="btn btn-ghost" style="padding:4px 8px;font-size:11px" onclick="unbanUser(${u.chat_id})">🔓 Kaldır</button>`
         : `<button class="btn btn-danger" style="padding:4px 8px;font-size:11px" onclick="openBanModal(${u.chat_id},'${u.name || ''}')">🚫 Ban</button>`;
+
+      const coinsDisplay = (u.coins && u.coins.length) 
+        ? u.coins.slice(0, 10).map(c => `<span style="background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:4px;font-size:10px;margin-right:2px;display:inline-block;margin-bottom:2px">${c.replace('USDT','')}</span>`).join("") + (u.coins.length > 10 ? ` <small style="color:var(--accent-gold)">+${u.coins.length - 10}</small>` : '')
+        : '<span style="color:var(--text-muted);font-size:10px">Varsayılan Tümü</span>';
+
+      const tfsDisplay = (u.tfs && u.tfs.length)
+        ? u.tfs.map(tf => `<span style="background:rgba(56,189,248,0.15);color:#38bdf8;padding:1px 4px;border-radius:4px;font-size:9.5px;margin-right:2px">${tf}</span>`).join("")
+        : '<span style="color:var(--text-muted);font-size:10px">Tüm TF</span>';
+
+      const apiBadge = u.has_api 
+        ? `<div style="color:var(--accent-green);font-size:10.5px;font-weight:700">🔑 ${u.api_exchange?.toUpperCase() || 'API'} (${u.api_mode || 'FUTURES'})</div>` 
+        : '<div style="color:var(--text-muted);font-size:10.5px">Borsa API: Yok</div>';
+
+      const walletDisplay = u.wallet_addr
+        ? `<div style="font-size:10.5px;color:#a5d6ff;font-family:monospace">💼 ${u.wallet_addr.slice(0,6)}...${u.wallet_addr.slice(-4)} <span class="badge" style="padding:1px 4px;font-size:9px">${u.wallet_chain || 'WEB3'}</span></div>`
+        : '<div style="color:var(--text-muted);font-size:10.5px">Cüzdan: Bağlı Değil</div>';
+
+      const pwdBadge = u.has_wallet_pwd
+        ? '<span style="color:var(--accent-gold);font-size:10px">🔐 Şifre: Var</span>'
+        : '<span style="color:var(--text-muted);font-size:10px">🔐 Şifre: Yok</span>';
+
       tr.innerHTML = `
-        <td style="padding:10px"><strong>${u.chat_id}</strong></td>
-        <td style="padding:10px">${u.name || '-'}</td>
-        <td style="padding:10px">${LANG_NAME[u.lang] || u.lang}</td>
-        <td style="padding:10px" class="${u.active ? 'green' : 'muted'}">${u.active ? 'Aktif' : 'Pasif'}</td>
-        <td style="padding:10px">${banBtn}</td>
+        <td style="padding:10px">
+          <strong>${u.chat_id}</strong>
+          <div style="font-size:10px;color:var(--text-muted)">${u.created_ago || 'Bugün'} · Dil: <b style="color:#fff">${(u.lang || 'tr').toUpperCase()}</b></div>
+          <div style="font-size:10px;margin-top:2px">${u.active ? '<span style="color:var(--accent-green)">● Aktif</span>' : '<span style="color:var(--text-muted)">○ Pasif</span>'}</div>
+        </td>
+        <td style="padding:10px">
+          <div><strong>${u.name || '-'}</strong> ${u.username ? `<small style="color:var(--text-muted)">(@${u.username})</small>` : ''}</div>
+          <div style="font-size:11px;color:#a5d6ff;margin-top:2px">
+            ⚙️ ${u.market?.toUpperCase()} · ${u.max_lev}x · ${u.strong_only ? '⭐ Sadece Güçlü' : '⚡ Tümü'} · ${u.tz}
+          </div>
+        </td>
+        <td style="padding:10px;max-width:220px">
+          <div style="margin-bottom:4px">${coinsDisplay}</div>
+          <div>${tfsDisplay}</div>
+        </td>
+        <td style="padding:10px">
+          ${walletDisplay}
+          ${apiBadge}
+          <div>${pwdBadge}</div>
+        </td>
+        <td style="padding:10px">
+          ${banBtn}
+        </td>
       `;
       tbody.appendChild(tr);
     });
-    document.getElementById("users-info").textContent = `${r.total} kullanıcı · Sayfa ${page + 1}/${Math.ceil(r.total / 20) || 1}`;
-    document.getElementById("btn-users-prev").disabled = page === 0;
-    document.getElementById("btn-users-next").disabled = (page + 1) * 20 >= r.total;
+
+    const info = document.getElementById("users-info");
+    if (info) {
+      info.textContent = `Toplam ${r.total} kullanıcı · Sayfa ${page + 1}`;
+    }
   } catch (e) {
     tbody.innerHTML = `<tr><td colspan="5" class="empty" style="color:var(--accent-red)">Hata: ${e.message}</td></tr>`;
   }
 }
 
-document.getElementById("btn-users-prev")?.addEventListener("click", () => {
-  if (userPage > 0) loadUsers(userPage - 1);
-});
-document.getElementById("btn-users-next")?.addEventListener("click", () => {
-  loadUsers(userPage + 1);
-});
 
-async function unbanUser(chatId) {
-  await api("/api/admin/ban", { target_chat_id: chatId, action: "unban" });
-  toast("Ban kaldırıldı", "success");
-  loadUsers(userPage);
+async function unbanUser(cid) {
+  try {
+    const res = await api("/api/admin/ban", { target_cid: cid, banned: false });
+    if (res && res.ok) {
+      toast("🔓 Kullanıcı yasağı kaldırıldı", "success");
+      loadUsers(userPage);
+    } else {
+      toast("Hata: " + (res?.error || "İşlem başarısız"), "error");
+    }
+  } catch (e) {
+    toast("Hata: " + e.message, "error");
+  }
 }
+window.unbanUser = unbanUser;
 
-// --- Sinyal Listesi
+async function openBanModal(cid, name) {
+  if (!confirm(`"${name || cid}" (#${cid}) kullanıcısını yasaklamak istediğinizden emin misiniz?`)) return;
+  try {
+    const res = await api("/api/admin/ban", { target_cid: cid, banned: true });
+    if (res && res.ok) {
+      toast("🚫 Kullanıcı yasaklandı", "success");
+      loadUsers(userPage);
+    } else {
+      toast("Hata: " + (res?.error || "İşlem başarısız"), "error");
+    }
+  } catch (e) {
+    toast("Hata: " + e.message, "error");
+  }
+}
+window.openBanModal = openBanModal;
+
 async function loadSignals() {
   const tbody = document.getElementById("signals-tbody");
   if (!tbody) return;
-  tbody.innerHTML = '<tr><td colspan="5" class="empty">Yükleniyor…</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="11" class="empty">Yükleniyor…</td></tr>';
   try {
     const r = await api("/api/admin/signals");
     tbody.innerHTML = "";
     if (!r.signals || !r.signals.length) {
-      tbody.innerHTML = '<tr><td colspan="5" class="empty">Henüz sinyal bulunmuyor</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="11" class="empty">Henüz sinyal bulunmuyor</td></tr>';
       return;
     }
     r.signals.forEach(s => {
       const tr = document.createElement("tr");
       tr.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
-      const icon = s.side === "LONG" || s.side === "BUY" ? "🟢" : "🔴";
+      const isLong = s.side === "LONG" || s.side === "BUY";
+      const icon = isLong ? "🟢" : "🔴";
+      const isClosed = s.status === "closed";
+      const isWin = s.r_result > 0;
+      
+      let statusBadge = "";
+      if (!isClosed) {
+        statusBadge = '<span class="badge green">AÇIK ⏳</span>';
+      } else if (s.reason === "tp3" || s.tp_hit >= 3) {
+        statusBadge = '<span class="badge green">🎯 TP3</span>';
+      } else if (s.reason === "tp2" || s.tp_hit === 2) {
+        statusBadge = '<span class="badge green">🎯 TP2</span>';
+      } else if (s.reason === "tp1" || s.tp_hit === 1) {
+        statusBadge = '<span class="badge green">🎯 TP1</span>';
+      } else if (s.reason === "be" || s.reason === "breakeven") {
+        statusBadge = '<span class="badge gold">🛡️ Breakeven</span>';
+      } else {
+        statusBadge = '<span class="badge red">🛑 Stop</span>';
+      }
+
+      const tp23Str = (s.tp2 ? s.tp2 : '—') + ' / ' + (s.tp3 ? s.tp3 : '—');
+
       tr.innerHTML = `
-        <td style="padding:10px"><strong>${s.symbol}</strong></td>
-        <td style="padding:10px"><span class="badge">${s.tf}</span></td>
-        <td style="padding:10px">${icon} ${s.side}</td>
-        <td style="padding:10px">${s.entry?.toFixed(4) || '—'}</td>
-        <td style="padding:10px"><span class="badge ${s.status === 'open' ? 'green' : ''}">${s.status.toUpperCase()}</span></td>
+        <td style="padding:8px 10px;font-size:11px;color:var(--text-muted);white-space:nowrap">${s.date || '—'}</td>
+        <td style="padding:8px 10px"><strong>${s.symbol}</strong></td>
+        <td style="padding:8px 10px"><span class="badge">${s.tf}</span></td>
+        <td style="padding:8px 10px;font-weight:700;color:${isLong ? 'var(--accent-green)' : 'var(--accent-red)'}">${icon} ${s.side}</td>
+        <td style="padding:8px 10px;font-family:monospace">${s.entry?.toFixed(4) || '—'}</td>
+        <td style="padding:8px 10px;font-family:monospace;color:#ff7878">${s.sl?.toFixed(4) || '—'}</td>
+        <td style="padding:8px 10px;font-family:monospace;color:var(--accent-green)">${s.tp1?.toFixed(4) || '—'}</td>
+        <td style="padding:8px 10px;font-size:11px;font-family:monospace;color:#4ade80">${tp23Str}</td>
+        <td style="padding:8px 10px;font-family:monospace;color:#38bdf8">${s.exit_price ? s.exit_price.toFixed(4) : '—'}</td>
+        <td style="padding:8px 10px;font-weight:700;color:${s.r_result >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'}">${s.r_result >= 0 ? '+' : ''}${s.r_result.toFixed(2)}R</td>
+        <td style="padding:8px 10px">${statusBadge}</td>
       `;
       tbody.appendChild(tr);
     });
   } catch (e) {
-    tbody.innerHTML = `<tr><td colspan="5" class="empty" style="color:var(--accent-red)">Hata: ${e.message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="11" class="empty" style="color:var(--accent-red)">Hata: ${e.message}</td></tr>`;
   }
 }
 
@@ -759,4 +1196,100 @@ document.querySelectorAll("#adm-lang-modal [data-lang]").forEach(btn => {
 });
 
 // Başlangıç
+const backLink = document.querySelector('a[href="index.html"]');
+if (backLink) {
+  const curApi = getApiBase();
+  if (curApi) backLink.href = `index.html?api=${encodeURIComponent(curApi)}`;
+}
+
+// Tünel eşleme butonu ve barı
+document.getElementById("btn-toggle-tunnel-bar")?.addEventListener("click", () => {
+  const box = document.getElementById("tunnel-connect-box");
+  if (!box) return;
+  const isHidden = box.style.display === "none" || !box.style.display;
+  box.style.display = isHidden ? "block" : "none";
+  if (isHidden) {
+    const inp = document.getElementById("manual-tunnel-input");
+    if (inp) inp.value = localStorage.getItem("elena_api_base") || "";
+  }
+});
+
+document.getElementById("btn-save-tunnel")?.addEventListener("click", () => {
+  const inp = document.getElementById("manual-tunnel-input");
+  let v = (inp?.value || "").trim().replace(/\/+$/, "");
+  if (v && !v.startsWith("http")) v = "https://" + v;
+  if (v && v.includes("trycloudflare.com")) {
+    localStorage.setItem("elena_api_base", v);
+    toast("⚡ Tünel kaydedildi, bağlanılıyor...", "success");
+    setTimeout(() => {
+      const url = new URL(location.href);
+      url.searchParams.set("api", v);
+      location.href = url.toString();
+    }, 500);
+  } else {
+    toast("Geçerli bir trycloudflare tünel linki girin", "error");
+  }
+});
+
 load();
+
+
+// ========================================================
+// GLOBAL CANLI AKIŞ (5 SANİYEDE BİR AKTİF SEKMEYİ GÜNCELLE)
+// ========================================================
+let globalAdminSyncTimer = null;
+let currentAdminActiveTab = "summary";
+
+function updateLastSyncDisplay() {
+  const el = document.getElementById("adm-last-sync");
+  if (el) {
+    const d = new Date();
+    el.textContent = d.toTimeString().split(" ")[0];
+  }
+}
+
+// Track active tab
+const origSwitchAdminTab = window.switchAdminTab;
+window.switchAdminTab = function(tabName) {
+  currentAdminActiveTab = tabName;
+  if (typeof origSwitchAdminTab === "function") origSwitchAdminTab(tabName);
+  updateLastSyncDisplay();
+};
+
+function startAdminAutoSync() {
+  if (globalAdminSyncTimer) clearInterval(globalAdminSyncTimer);
+  globalAdminSyncTimer = setInterval(async () => {
+    const activeEl = document.activeElement;
+    if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) {
+      return;
+    }
+    try {
+      if (currentAdminActiveTab === "summary") {
+        await load();
+      } else if (currentAdminActiveTab === "apikeys") {
+        await loadApiKeys();
+      } else if (currentAdminActiveTab === "signals") {
+        await loadSignals();
+      } else if (currentAdminActiveTab === "users") {
+        await loadUsers(0);
+      }
+      updateLastSyncDisplay();
+    } catch (e) {}
+  }, 5000);
+}
+
+// Auto start sync on load
+setTimeout(startAdminAutoSync, 1000);
+
+
+// Global window bindings for inline HTML handlers
+window.toast = toast;
+window.switchAdminTab = switchAdminTab;
+window.load = load;
+window.loadUsers = loadUsers;
+window.loadSignals = loadSignals;
+window.loadApiKeys = loadApiKeys;
+window.loadLogs = loadLogs;
+window.toggleAutoRefresh = toggleAutoRefresh;
+window.getApiBase = getApiBase;
+window.fetchLiveTunnelFromSync = fetchLiveTunnelFromSync;

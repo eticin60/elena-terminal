@@ -19,11 +19,24 @@
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:8px">
+    <button type="button" class="btn" id="btn-toggle-tunnel-bar" style="padding:7px 11px;font-size:11.5px;color:var(--accent-gold);border-color:rgba(255,210,90,0.4)" title="Termux Tünel Ayarı">⚡ Tünel Eşle</button>
     <a href="index.html" class="btn" style="padding:7px 11px;font-size:12px;gap:4px;text-decoration:none">← Geri</a>
     <button class="lang-dropdown-btn" id="btn-adm-lang" aria-label="Dil seç">
       <span>🌐</span>
       <span id="adm-lang-label">TR</span>
     </button>
+  </div>
+</div>
+
+<!-- ================= CANLI TÜNEL EŞLEME KUTUSU (HER ZAMAN KULLANILABİLİR) ================= -->
+<div id="tunnel-connect-box" style="display:none;margin:12px 14px 0;padding:12px 14px;background:rgba(255,210,90,0.06);border:1px solid rgba(255,210,90,0.3);border-radius:12px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <span style="font-size:12px;color:var(--accent-gold);font-weight:700">⚡ Termux Canlı Tünel Adresi Eşle:</span>
+    <span style="font-size:10px;color:var(--text-muted)">trycloudflare.com</span>
+  </div>
+  <div style="display:flex;gap:6px">
+    <input type="text" id="manual-tunnel-input" placeholder="https://xxxx.trycloudflare.com" style="flex:1;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:8px 10px;border-radius:8px;font-size:12px">
+    <button type="button" id="btn-save-tunnel" class="btn-royal" style="padding:8px 14px;font-size:12px">Bağlan</button>
   </div>
 </div>
 
@@ -44,7 +57,17 @@
 </div>
 
 <!-- ================= ADMIN İÇERİK ================= -->
-<div id="content" style="display:none">
+<div id="content">
+  <!-- CANLI SENKRONİZASYON DURUM BARI -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;margin-bottom:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px">
+    <div style="display:flex;align-items:center;gap:6px">
+      <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#00e676;box-shadow:0 0 6px #00e676"></span>
+      <span style="font-size:11px;color:#00e676;font-weight:700">CANLI VERİ AKIŞI</span>
+      <span style="font-size:10px;color:var(--text-muted)">(Otomatik 5s)</span>
+    </div>
+    <div id="adm-last-sync" style="font-size:11px;color:#a5d6ff;font-family:monospace">--:--:--</div>
+  </div>
+
 
   <!-- TABS -->
   <nav class="tabs" role="tablist" aria-label="Yönetim sekmeleri">
@@ -73,11 +96,21 @@
         <div class="stat"><div class="n gold"  id="s-open">—</div><div class="l" id="adm-lbl-open">Açık İşlem</div></div>
         <div class="stat"><div class="n red"   id="s-alerts">—</div><div class="l" id="adm-lbl-alerts">Alarmlar</div></div>
       </div>
+      <div class="stat-grid stat-grid-3" style="margin-top:10px">
+        <div class="stat"><div class="n green"  id="s-new7d">—</div><div class="l">Yeni Üye (7g)</div></div>
+        <div class="stat"><div class="n blue"   id="s-api">—</div><div class="l">API Anahtarlı</div></div>
+        <div class="stat"><div class="n red"    id="s-banned">—</div><div class="l">Yasaklı</div></div>
+      </div>
     </div>
 
     <div class="card">
       <h2>🌐 Dile Göre Kullanıcı Dağılımı</h2>
       <div id="lang-list"><div class="empty">Yükleniyor…</div></div>
+    </div>
+
+    <div class="card" id="top-users-card" style="display:none">
+      <h2>🏆 En Aktif Kullanıcılar</h2>
+      <div id="top-users-list"></div>
     </div>
 
     <button class="btn" id="btn-refresh-summary" style="width:100%;padding:12px">🔄 İstatistikleri Yenile</button>
@@ -93,15 +126,15 @@
         <table>
           <thead>
             <tr>
-              <th id="adm-th-chatid">Chat ID</th>
-              <th id="adm-th-name">İsim</th>
-              <th id="adm-th-lang">Dil</th>
-              <th id="adm-th-status">Durum</th>
+              <th id="adm-th-chatid">Kullanıcı &amp; Kimlik</th>
+              <th id="adm-th-name">İsim &amp; Ticaret Ayarları</th>
+              <th id="adm-th-lang">Takip Edilen Coinler &amp; TF</th>
+              <th id="adm-th-status">Cüzdan &amp; Borsa API</th>
               <th id="adm-th-action">İşlem</th>
             </tr>
           </thead>
           <tbody id="users-tbody">
-            <tr><td colspan="5" class="empty">Yükleniyor…</td></tr>
+            <tr><td colspan="11" class="empty">Yükleniyor…</td></tr>
           </tbody>
         </table>
       </div>
@@ -139,15 +172,21 @@
         <table>
           <thead>
             <tr>
-              <th id="adm-th-symbol">Sembol</th>
-              <th id="adm-th-tf">TF</th>
-              <th id="adm-th-side">Yön</th>
-              <th id="adm-th-entry">Giriş</th>
-              <th id="adm-th-sig-status">Durum</th>
+              <th>Tarih</th>
+              <th>Sembol</th>
+              <th>TF</th>
+              <th>Yön</th>
+              <th>Giriş</th>
+              <th>Stop (SL)</th>
+              <th>TP1</th>
+              <th>TP2 / TP3</th>
+              <th>Çıkış</th>
+              <th>Net R</th>
+              <th>Durum</th>
             </tr>
           </thead>
           <tbody id="signals-tbody">
-            <tr><td colspan="5" class="empty">Yükleniyor…</td></tr>
+            <tr><td colspan="11" class="empty">Yükleniyor…</td></tr>
           </tbody>
         </table>
       </div>
@@ -159,6 +198,8 @@
        DUYURU SEKMESİ
        ======================================== -->
   <section id="apage-manage" class="page" role="tabpanel">
+
+    <!-- DUYURU -->
     <div class="card">
       <h2 id="adm-broadcast-title">📢 Tüm Kullanıcılara Duyuru</h2>
       <p style="font-size:12px;color:var(--text-muted);margin:0 0 12px;line-height:1.6">
@@ -168,10 +209,62 @@
         <label class="pwd-field-label">Duyuru Metni</label>
         <textarea id="broadcast-text" rows="5" class="pwd-input" placeholder="Gönderilecek duyuru metnini yazın…"></textarea>
       </div>
-      <button class="btn btn-main" id="btn-broadcast" style="width:100%;padding:13px;font-size:14px">
-        📢 Yayını Gönder
-      </button>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-main" id="btn-broadcast" style="flex:1;padding:13px;font-size:14px">
+          📢 Yayını Gönder
+        </button>
+        <button class="btn btn-ghost" id="btn-broadcast-preview" style="padding:13px;font-size:13px" title="Önizle (sadece yöneticiye gönder)">
+          👁 Önizle
+        </button>
+      </div>
+      <div id="broadcast-result" style="margin-top:10px;font-size:12px;color:var(--accent-green);display:none"></div>
     </div>
+
+    <!-- SİNYAL YÖNETİMİ -->
+    <div class="card">
+      <h2>📡 Sinyal Yönetimi</h2>
+      <div style="display:grid;gap:8px">
+        <button class="btn btn-ghost" id="btn-close-all-signals" style="padding:11px;font-size:13px">
+          🛑 Tüm Açık Sinyalleri Kapat
+        </button>
+        <button class="btn btn-ghost" id="btn-delete-old-signals" style="padding:11px;font-size:13px">
+          🗑 Eski Sinyalleri Temizle (30g+)
+        </button>
+        <div id="signal-manage-result" style="font-size:12px;color:var(--text-muted);text-align:center;margin-top:4px"></div>
+      </div>
+    </div>
+
+    <!-- KULLANICI ARAÇLARI -->
+    <div class="card">
+      <h2>🔧 Tekil Kullanıcı İşlemi</h2>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input id="admin-target-cid" class="pwd-input" type="number" placeholder="Chat ID girin…" style="flex:1" />
+        <button class="btn" id="btn-lookup-user" style="padding:0 14px;font-size:13px">🔍 Ara</button>
+      </div>
+      <div id="admin-user-lookup-result" style="font-size:12px;line-height:1.7;color:var(--text-muted)"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+        <button class="btn btn-danger" id="btn-ban-target" style="padding:10px;font-size:12px">🚫 Kullanıcıyı Yasakla</button>
+        <button class="btn btn-ghost" id="btn-unban-target" style="padding:10px;font-size:12px">🔓 Yasağı Kaldır</button>
+        <button class="btn btn-ghost" id="btn-delete-user-data" style="padding:10px;font-size:12px">🗑 Veriyi Sil</button>
+        <button class="btn btn-ghost" id="btn-send-msg-target" style="padding:10px;font-size:12px">💬 Mesaj Gönder</button>
+      </div>
+      <textarea id="admin-target-msg" class="pwd-input" rows="2" placeholder="Kullanıcıya özel mesaj…" style="margin-top:8px;display:none"></textarea>
+    </div>
+
+    <!-- SİSTEM ARAÇLARI -->
+    <div class="card">
+      <h2>⚙️ Sistem Araçları</h2>
+      <div style="display:grid;gap:8px">
+        <button class="btn btn-ghost" id="btn-export-users" style="padding:11px;font-size:13px">
+          📥 Kullanıcı Listesini İndir (JSON)
+        </button>
+        <button class="btn btn-ghost" id="btn-cleanup-db" style="padding:11px;font-size:13px">
+          🧹 Veritabanı Temizliği
+        </button>
+      </div>
+      <div id="system-tools-result" style="font-size:12px;color:var(--text-muted);text-align:center;margin-top:8px"></div>
+    </div>
+
   </section>
 
   <!-- ========================================
@@ -211,6 +304,6 @@
 </div>
 
 <div id="toast-container" aria-live="polite"></div>
-<script type="module" src="admin.js?v=46"></script>
+<script src="admin.js?v=v65"></script>
 </body>
 </html>

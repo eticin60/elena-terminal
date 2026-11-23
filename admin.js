@@ -6,15 +6,36 @@ tg?.expand();
 const initData = tg?.initData || "";
 
 function getApiBase() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const qApi = urlParams.get("api");
+  // 1. URL search (?api=https://...)
+  const searchParams = new URLSearchParams(window.location.search);
+  let qApi = searchParams.get("api");
+
+  // 2. URL hash (#...api=https://...)
+  if (!qApi && window.location.hash) {
+    const hashStr = window.location.hash.replace(/^#/, "");
+    const hashParams = new URLSearchParams(hashStr);
+    qApi = hashParams.get("api");
+    if (!qApi) {
+      const match = window.location.href.match(/[?&#]api=([^&#]+)/);
+      if (match && match[1]) qApi = decodeURIComponent(match[1]);
+    }
+  }
+
+  // 3. Telegram WebApp start_param
+  if (!qApi && window.Telegram?.WebApp?.initDataUnsafe?.start_param) {
+    const sp = window.Telegram.WebApp.initDataUnsafe.start_param;
+    if (sp.startsWith("http")) qApi = sp;
+  }
+
   if (qApi && qApi.startsWith("https://")) {
+    qApi = qApi.replace(/\/+$/, "");
     localStorage.setItem("elena_api_base", qApi);
     return qApi;
   }
+
   const cached = localStorage.getItem("elena_api_base");
   if (cached && location.hostname.includes("github.io")) {
-    return cached;
+    return cached.replace(/\/+$/, "");
   }
   return "";
 }

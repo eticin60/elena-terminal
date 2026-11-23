@@ -314,18 +314,22 @@
 
     <!-- 👑 OTO-BOT CANLI YÖNETİM & BORSA/WEB3 TERMİNAL PANOSU (Görsel 2 ve 3) -->
     <div class="card" id="autobot-live-dashboard" style="background:rgba(18,24,38,0.7);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:16px">
-      <!-- Aktif Bot Modu & Güvenlik Başlığı -->
-      <div style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,rgba(14,165,233,0.15),rgba(6,182,212,0.08));border:1px solid rgba(14,165,233,0.3);border-radius:12px;padding:10px 14px;margin-bottom:14px">
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:14px">⚡</span>
-          <div>
-            <div style="font-size:12px;font-weight:700;color:#fff">ELENA OTOMATİK TİCARET MOTORU</div>
-            <div style="font-size:10.5px;color:#38bdf8;font-weight:600">Canlı Borsa &amp; Web3 İşlem Modu</div>
+      <!-- Aktif Bot Modu & Güvenlik Başlığı (Geniş & Şık Çift Katmanlı Düzen) -->
+      <div style="background:linear-gradient(135deg,rgba(14,165,233,0.14),rgba(6,182,212,0.06));border:1px solid rgba(14,165,233,0.28);border-radius:14px;padding:12px 14px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:18px">⚡</span>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:0.02em">ELENA OTOMATİK TİCARET MOTORU</div>
+              <div style="font-size:11px;color:#38bdf8;font-weight:500">Canlı Borsa &amp; Web3 İşlem Modu</div>
+            </div>
           </div>
+          <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#4ade80;box-shadow:0 0 10px #4ade80"></span>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:11px">
-          <span style="background:rgba(255,255,255,0.08);padding:3px 8px;border-radius:6px;color:#fff;font-weight:700" id="lbl-active-exchange-name">BINANCE</span>
-          <span style="background:rgba(234,179,8,0.15);border:1px solid rgba(234,179,8,0.3);padding:3px 8px;border-radius:6px;color:var(--accent-gold);font-weight:700">IP: 3.122.154.213</span>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding-top:8px;border-top:1px solid rgba(255,255,255,0.07)">
+          <span style="background:rgba(255,255,255,0.08);padding:4px 10px;border-radius:8px;color:#fff;font-weight:700;font-size:11px" id="lbl-active-exchange-name">BINANCE</span>
+          <span style="background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.3);padding:4px 10px;border-radius:8px;color:#38bdf8;font-weight:600;font-size:11px">⚡ CANLI MOTOR</span>
+          <span style="background:rgba(234,179,8,0.15);border:1px solid rgba(234,179,8,0.3);padding:4px 10px;border-radius:8px;color:var(--accent-gold);font-weight:700;font-size:11px">🛡️ SABİT IP: 3.122.154.213</span>
         </div>
       </div>
 
@@ -700,35 +704,12 @@
         <button class="btn exch-btn" data-exch="mexc" onclick="selectExchange('mexc',this)">
           <img src="assets/exchanges/mexc.svg" width="16" height="16" style="border-radius:3px;object-fit:contain" onerror="this.style.display='none'"> MEXC
         </button>
+        <button class="btn exch-btn" data-exch="kucoin" onclick="selectExchange('kucoin',this)">KuCoin</button>
+        <button class="btn exch-btn" data-exch="gateio" onclick="selectExchange('gateio',this)">Gate.io</button>
+        <button class="btn exch-btn" data-exch="bitget" onclick="selectExchange('bitget',this)">Bitget</button>
       </div>
 
-      <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em">Web3 Cüzdanlar &amp; DEX:</div>
-      <div style="display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap">
-        <button class="btn exch-btn" data-exch="metamask" onclick="selectExchange('metamask',this)">
-          <img src="assets/wallets/metamask.svg" width="16" height="16" style="vertical-align:middle;object-fit:contain" onerror="this.style.display='none'"> MetaMask
-        </button>
-        <button class="btn exch-btn" data-exch="trustwallet" onclick="selectExchange('trustwallet',this)">
-          <img src="assets/wallets/trust-wallet.svg" width="16" height="16" style="vertical-align:middle;object-fit:contain" onerror="this.style.display='none'"> Trust Wallet
-        </button>
-        <button class="btn exch-btn" data-exch="okxweb3" onclick="selectExchange('okxweb3',this)">
-          <img src="assets/exchanges/okx.svg" width="16" height="16" style="vertical-align:middle;object-fit:contain" onerror="this.style.display='none'"> OKX Web3
-        </button>
-        <button class="btn exch-btn" data-exch="binanceweb3" onclick="selectExchange('binanceweb3',this)">
-          <img src="assets/wallets/binance.svg" width="16" height="16" style="vertical-align:middle;object-fit:contain" onerror="this.style.display='none'"> Binance Web3
-        </button>
-        <button class="btn exch-btn" data-exch="bitget" onclick="selectExchange('bitget',this)">
-          <img src="assets/wallets/bitget-wallet.svg" width="16" height="16" style="vertical-align:middle;object-fit:contain" onerror="this.style.display='none'"> Bitget Wallet
-        </button>
-        <button class="btn exch-btn" data-exch="coinbase" onclick="selectExchange('coinbase',this)">
-          <img src="assets/exchanges/coinbase.svg" width="16" height="16" style="vertical-align:middle;object-fit:contain" onerror="this.style.display='none'"> Coinbase Wallet
-        </button>
-        <button class="btn exch-btn" data-exch="phantom" onclick="selectExchange('phantom',this)">
-          <img src="assets/wallets/phantom.svg" width="16" height="16" style="vertical-align:middle;object-fit:contain" onerror="this.style.display='none'"> Phantom
-        </button>
-        <button class="btn exch-btn" data-exch="walletconnect" onclick="selectExchange('walletconnect',this)">
-          <img src="assets/coins/wc.svg" width="16" height="16" style="vertical-align:middle;object-fit:contain" onerror="this.style.display='none'"> WalletConnect
-        </button>
-      </div>
+
 
       <div class="pwd-field-block" style="margin-bottom:10px">
         <label class="pwd-field-label" for="f-api-key">API KEY</label>
@@ -1631,6 +1612,60 @@
        ======================================== -->
   <div id="page-settings" class="page" role="tabpanel">
 
+        <!-- 🛡️ Akıllı Risk & Sermaye Yönetimi (Elena Shield) -->
+    <div class="card">
+      <h2 style="color:var(--accent-gold)">🛡️ Akıllı Risk &amp; Sermaye Kalkanı</h2>
+      <div class="row">
+        <div>
+          <span class="label" style="display:block;color:#fff;font-weight:600">Otomatik Başabaş Taşıma (Break-Even)</span>
+          <small style="color:var(--text-muted);font-size:11px">TP1 vurulunca Stop seviyesini otomatik Girişe taşır (Sıfır Risk)</small>
+        </div>
+        <div class="toggle on" id="t-auto-breakeven"></div>
+      </div>
+      <div class="row">
+        <div>
+          <span class="label" style="display:block;color:#fff;font-weight:600">İz Süren Kâr Kilidi (Trailing Stop)</span>
+          <small style="color:var(--text-muted);font-size:11px">Fiyat TP2'ye yaklaştıkça kârı dinamik olarak kilitler</small>
+        </div>
+        <div class="toggle on" id="t-trailing-stop"></div>
+      </div>
+      <div class="row">
+        <span class="label">İşlem Başına Maksimum Sermaye Riski</span>
+        <div class="seg" id="seg-risk-pct" style="width:220px">
+          <button data-v="1">%1</button>
+          <button data-v="2" class="sel">%2</button>
+          <button data-v="3">%3</button>
+          <button data-v="5">%5</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🌐 Varlık & Piyasa Tercihleri -->
+    <div class="card">
+      <h2 style="color:#38bdf8">🌐 Varlık Sınıfı Seçimi</h2>
+      <div class="row">
+        <div>
+          <span class="label" style="display:block;color:#fff;font-weight:600">Kripto Para Sinyalleri (BTC, ETH, Altcoin)</span>
+          <small style="color:var(--text-muted);font-size:11px">Binance Spot ve Vadeli sinyalleri</small>
+        </div>
+        <div class="toggle on" id="t-asset-crypto"></div>
+      </div>
+      <div class="row">
+        <div>
+          <span class="label" style="display:block;color:#fff;font-weight:600">BIST 100 &amp; Türk Hisseleri (THYAO, ASELS...)</span>
+          <small style="color:var(--text-muted);font-size:11px">Borsa İstanbul hisse trend kırılımları</small>
+        </div>
+        <div class="toggle on" id="t-asset-bist"></div>
+      </div>
+      <div class="row">
+        <div>
+          <span class="label" style="display:block;color:#fff;font-weight:600">Emtia &amp; Değerli Madenler (Altın, Petrol, Gümüş)</span>
+          <small style="color:var(--text-muted);font-size:11px">Global makro emtia analizleri</small>
+        </div>
+        <div class="toggle on" id="t-asset-commodities"></div>
+      </div>
+    </div>
+
     <!-- Sinyal Türü & Kaldıraç -->
     <div class="card">
       <h2 data-i18n-h2="h2_sig_type_lev">📈 Sinyal Türü &amp; Kaldıraç Limiti</h2>
@@ -1856,7 +1891,7 @@
 <!-- ================= TOAST ================= -->
 <div id="toast-container" aria-live="polite"></div>
 
-<script type="module" src="app.js?v=v58"></script>
+<script type="module" src="app.js?v=v59"></script>
 
   <!-- ========================================
        WALLETCONNECT v2 GELİŞMİŞ DEEPLINK & QR MODAL

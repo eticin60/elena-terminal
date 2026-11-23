@@ -814,7 +814,9 @@ async function _updateProfileBalance() {
   const bWrap  = document.getElementById('upc-balance-wrap');
   if (!balVal) return;
   try {
-    const r = await api('/api/wallet/balance');
+    const curAddr = (typeof WALLET !== 'undefined' && WALLET?.address) || localStorage.getItem('elena_wallet_addr') || '';
+    const curChain = (typeof WALLET !== 'undefined' && WALLET?.chain) || localStorage.getItem('elena_wallet_chain') || 'eip155:1';
+    const r = await api('/api/wallet/balance', { address: curAddr, chain: curChain });
     if (r && r.ok) {
       // YALNIZCA USDT / STABLECOIN BAKİYESİ (Native coin TRX/ETH/BNB ASLA GÖSTERİLMEZ!)
       let stableSum = 0;
@@ -2920,13 +2922,27 @@ async function loadDashboard() {
         const isClosed = s.status === "closed";
 
         let outcomeText = "";
+        let outcomeColor = "var(--text-muted)";
         if (isClosed) {
-          if (s.reason === "tp3" || s.tp_hit >= 3) outcomeText = "🎯 TP3 Alındı";
-          else if (s.reason === "tp2" || s.tp_hit === 2) outcomeText = "🎯 TP2 Alındı";
-          else if (s.reason === "tp1" || s.tp_hit === 1) outcomeText = "🎯 TP1 Alındı";
-          else if (s.reason === "be" || s.reason === "breakeven") outcomeText = "🛡️ Girişe Stop";
-          else if (s.reason === "sl" || s.r_result < 0) outcomeText = "🛑 Stop Oldu";
-          else outcomeText = isWin ? "Kâr Alındı" : "Kapatıldı";
+          if (s.reason === "tp3" || s.tp_hit >= 3) {
+            outcomeText = "🎯 TP3 Alındı (+4.5R)";
+            outcomeColor = "var(--accent-green)";
+          } else if (s.reason === "tp2" || s.tp_hit === 2) {
+            outcomeText = "🎯 TP2 Alındı (+2.8R)";
+            outcomeColor = "var(--accent-green)";
+          } else if (s.reason === "tp1" || s.tp_hit === 1) {
+            outcomeText = "🎯 TP1 ➔ 🛡️ Girişe Stop";
+            outcomeColor = "var(--accent-green)";
+          } else if (s.reason === "be" || s.reason === "breakeven") {
+            outcomeText = "🛡️ Girişte Başabaş";
+            outcomeColor = "var(--accent-gold)";
+          } else if (s.reason === "sl" || s.r_result < 0) {
+            outcomeText = "🛑 Normal Stop (-1.0R)";
+            outcomeColor = "var(--accent-red)";
+          } else {
+            outcomeText = isWin ? "Kâr Kilitlendi" : "Kapatıldı";
+            outcomeColor = isWin ? "var(--accent-green)" : "var(--accent-red)";
+          }
         }
 
         const statusBadge = isClosed 
@@ -3811,61 +3827,94 @@ window.openSignalSnapshot = function(sigId) {
   const isLong = (sig.side === "LONG" || sig.side === "BUY");
   const dirColor = isLong ? "var(--accent-green)" : "var(--accent-red)";
   const isClosed = (sig.status === "closed");
+  const marketName = (sig.market || "futures").toUpperCase();
 
-  if (title) title.textContent = `${sig.symbol} · ${sig.tf} ${sig.side}`;
-  if (sub) sub.textContent = `Sinyal Tarihi: ${sig.date || '—'} · Güç Skoru: ⭐ ${sig.power_score || 8.4}/10`;
+  if (title) title.textContent = `${sig.symbol} · ${sig.tf || '1h'} ${sig.side}`;
+  if (sub) sub.textContent = `Sinyal Tarihi: ${sig.date || '—'} · Güç Skoru: ⭐ ${sig.power_score || 8.5}/10`;
   if (btnLive) btnLive.onclick = () => {
     if (modal) modal.style.display = "none";
     window.openGlobalSymbol(sig.symbol);
   };
 
-  const outcomeStr = isClosed
-    ? `<span style="color:${sig.r_result > 0 ? 'var(--accent-green)' : 'var(--accent-red)'};font-weight:700">${sig.r_result > 0 ? '+' : ''}${Number(sig.r_result||0).toFixed(2)}R ${sig.r_result > 0 ? '✅ KÂR' : '🛑 STOP'}</span>`
-    : `<span style="color:var(--accent-gold);font-weight:700">AÇIK POZİSYON ⏳</span>`;
+  // Detaylı Durum Açıklaması (TP1 -> Girişe Stop mu, Normal Stop mu, TP2/TP3 mü)
+  let outcomeBadge = "";
+  if (isClosed) {
+    if (sig.reason === "tp3" || sig.tp_hit >= 3) {
+      outcomeBadge = `<span style="color:var(--accent-green);font-weight:700">🎯 TP3 Alındı (+${Number(sig.r_result||4.2).toFixed(2)}R) ✅ Maksimum Hedef</span>`;
+    } else if (sig.reason === "tp2" || sig.tp_hit === 2) {
+      outcomeBadge = `<span style="color:var(--accent-green);font-weight:700">🎯 TP2 Alındı (+${Number(sig.r_result||2.8).toFixed(2)}R) ✅</span>`;
+    } else if (sig.reason === "tp1" || sig.tp_hit === 1) {
+      outcomeBadge = `<span style="color:var(--accent-green);font-weight:700">🎯 TP1 Vuruldu ➔ 🛡️ Girişe Stoplandı (+${Number(sig.r_result||1.0).toFixed(2)}R) Kâr Kilitli</span>`;
+    } else if (sig.reason === "be" || sig.reason === "breakeven") {
+      outcomeBadge = `<span style="color:var(--accent-gold);font-weight:700">🛡️ Giriş Fiyatında Başabaş Kapatıldı (0.00R) Risk Korundu</span>`;
+    } else if (sig.reason === "sl" || sig.r_result < 0) {
+      outcomeBadge = `<span style="color:var(--accent-red);font-weight:700">🛑 Normal Stop-Loss Tetiklendi (-1.00R)</span>`;
+    } else {
+      outcomeBadge = `<span style="color:${sig.r_result > 0 ? 'var(--accent-green)' : 'var(--accent-red)'};font-weight:700">${sig.r_result > 0 ? '+' : ''}${Number(sig.r_result||0).toFixed(2)}R Kapatıldı</span>`;
+    }
+  } else {
+    outcomeBadge = `<span style="color:#38bdf8;font-weight:700">⏳ AÇIK POZİSYON (Canlı Takipte) · Canlı K/Z: ${sig.pnl_pct >= 0 ? '+' : ''}${sig.pnl_pct || 0}%</span>`;
+  }
 
   if (body) {
-    const chartEndpoint = (getApiBase() ? getApiBase().replace(/\/+$/, '') : '') + `/api/signal/chart/${sig.id}`;
+    const apiBase = (typeof getApiBase === "function" && getApiBase()) ? getApiBase().replace(/\/+$/, '') : '';
+    const chartUrl = `${apiBase}/api/signal/chart/${sig.id}`;
+    const curP = sig.current_price || sig.entry || '—';
+    const pnlV = (sig.pnl_pct != null) ? sig.pnl_pct : 0;
+    const pnlCol = pnlV >= 0 ? "var(--accent-green)" : "var(--accent-red)";
+
     body.innerHTML = `
-      <!-- 📈 SİNYAL MUM GRAFİĞİ (TP/SL/GİRİŞ SEVİYELERİ İLE) -->
+      <!-- 📈 SİNYAL MUM GRAFİĞİ (TELEGRAM BİREBİR PNG) -->
       <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden;margin-bottom:12px;position:relative;text-align:center">
-        <img src="${chartEndpoint}" style="width:100%;height:auto;display:block;min-height:180px;object-fit:contain;background:#0f172a" alt="Sinyal Grafiği" onerror="this.style.display='none'" />
-        <div style="padding:6px 10px;background:rgba(0,0,0,0.4);font-size:10px;color:var(--text-muted);display:flex;justify-content:space-between">
+        <img src="${chartUrl}" style="width:100%;height:auto;display:block;min-height:180px;object-fit:contain;background:#0f172a" alt="Sinyal Grafiği" onerror="this.parentElement.innerHTML='<div style=\'padding:20px;color:var(--text-muted);font-size:12px\'>Grafik görseli hazırlanıyor...</div>'" />
+        <div style="padding:6px 10px;background:rgba(0,0,0,0.5);font-size:10.5px;color:var(--text-muted);display:flex;justify-content:space-between">
           <span>🎯 TP1-TP3 &amp; SL Seviyeli Canlı Grafik</span>
-          <span style="color:#38bdf8">Binance ${sig.market.toUpperCase()}</span>
+          <span style="color:#38bdf8">${marketName}</span>
         </div>
       </div>
+
+      <!-- Canlı Fiyat & K/Z Paneli -->
+      <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 14px;margin-bottom:12px">
+        <div>
+          <small style="color:var(--text-muted);font-size:10px;display:block">MEVCUT CANLI FİYAT</small>
+          <strong style="font-size:14px;color:#fff">$${curP} <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#00e676;vertical-align:middle"></span></strong>
+        </div>
+        <div style="text-align:right">
+          <small style="color:var(--text-muted);font-size:10px;display:block">CANLI KÂR / ZARAR</small>
+          <strong style="font-size:14px;color:${pnlCol}">${pnlV >= 0 ? '+' : ''}${pnlV}%</strong>
+        </div>
+      </div>
+
+      <!-- Seviyeler Detay Tablosu -->
       <div style="background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px;margin-bottom:12px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
           <span style="font-size:12px;color:var(--text-muted)">İşlem Modu:</span>
-          <strong style="color:${dirColor}">${isLong ? '🟢 LONG / ALIM' : '🔴 SHORT / SATIM'} (${sig.market === 'spot' ? 'SPOT' : 'VADELİ'})</strong>
+          <strong style="color:${dirColor}">${isLong ? '🟢 LONG / ALIM' : '🔴 SHORT / SATIM'} (${marketName})</strong>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
           <span style="font-size:12px;color:var(--text-muted)">Giriş Fiyatı:</span>
           <strong style="color:#fff;font-size:13.5px">${sig.entry || '—'}</strong>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <span style="font-size:12px;color:var(--text-muted)">Stop-Loss (Zarar Durdur):</span>
-          <strong style="color:var(--accent-red)">${sig.sl || '—'} (-${sig.sl_pct || 1.5}%)</strong>
+          <span style="font-size:12px;color:var(--accent-red)">Stop-Loss (Zarar Durdur):</span>
+          <strong style="color:var(--accent-red)">${sig.sl || '—'}</strong>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <span style="font-size:12px;color:var(--text-muted)">TP1 Hedefi:</span>
-          <strong style="color:var(--accent-green)">${sig.tp1 || '—'} (+${(sig.sl_pct||1.5)*1}%)</strong>
+          <span style="font-size:12px;color:var(--accent-green)">TP1 Hedefi:</span>
+          <strong style="color:var(--accent-green)">${sig.tp1 || '—'}</strong>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <span style="font-size:12px;color:var(--text-muted)">TP2 Hedefi:</span>
-          <strong style="color:var(--accent-green)">${sig.tp2 || (isLong ? (sig.entry*1.035).toFixed(2) : (sig.entry*0.965).toFixed(2))} (+${(sig.sl_pct||1.5)*2}%)</strong>
+          <span style="font-size:12px;color:#4ade80">TP2 Hedefi:</span>
+          <strong style="color:#4ade80">${sig.tp2 || (isLong ? (sig.entry*1.035).toFixed(2) : (sig.entry*0.965).toFixed(2))}</strong>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <span style="font-size:12px;color:var(--text-muted)">TP3 Hedefi:</span>
-          <strong style="color:var(--accent-green)">${sig.tp3 || (isLong ? (sig.entry*1.07).toFixed(2) : (sig.entry*0.93).toFixed(2))} (+${(sig.sl_pct||1.5)*3}%)</strong>
+          <span style="font-size:12px;color:#86efac">TP3 Hedefi:</span>
+          <strong style="color:#86efac">${sig.tp3 || (isLong ? (sig.entry*1.07).toFixed(2) : (sig.entry*0.93).toFixed(2))}</strong>
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:6px;border-top:1px solid rgba(255,255,255,0.06)">
-          <span style="font-size:12px;color:var(--text-muted)">Durum:</span>
-          ${outcomeStr}
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06)">
+          <span style="font-size:12px;color:var(--text-muted)">Sonuç / Durum:</span>
+          ${outcomeBadge}
         </div>
-      </div>
-      <div style="font-size:11.5px;color:var(--text-muted);line-height:1.5">
-        ℹ️ <strong>Güç Skoru (Power Score):</strong> Sinyal ilk oluştuğunda RSI, Hacim, Trend kırılımı ve Order Book derinliğine göre belirlenen teknik başarı olasılığı puanıdır.
       </div>
     `;
   }

@@ -798,4 +798,9 @@ document.querySelectorAll("#adm-lang-modal [data-lang]").forEach(btn => {
 });
 
 // Başlangıç
+const backLink = document.querySelector('a[href="index.html"]');
+if (backLink) {
+  const curApi = getApiBase();
+  if (curApi) backLink.href = `index.html?api=${encodeURIComponent(curApi)}`;
+}
 load();

@@ -3,19 +3,221 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Елена Хьюз · Terms of Service & Risk Disclosure</title>
+<title>Елена Хьюз · Terms of Service &amp; Risk Disclosure</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="stylesheet" href="style.css">
 <style>
-  .legal-container { max-width: 680px; margin: 0 auto; padding: 20px 16px 80px; }
-  .legal-card { background: var(--glass-card); border: 1px solid var(--glass-card-border); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 20px; backdrop-filter: blur(24px); box-shadow: var(--shadow-card); }
-  .legal-card h2 { font-size: 16px; color: var(--accent-gold); margin-top: 0; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-  .legal-card p, .legal-card li { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
-  .legal-card ul { padding-left: 20px; margin-bottom: 14px; }
-  .lang-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
-  .lang-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: 0.2s; }
-  .lang-btn.active { background: var(--accent-gold-dim); border-color: var(--accent-gold); color: var(--accent-gold); font-weight: 700; }
-  .warn-badge { background: rgba(255,77,77,0.15); color: var(--accent-red); border: 1px solid rgba(255,77,77,0.3); padding: 3px 8px; border-radius: 20px; font-size: 11px; }
+  :root {
+    --bg-deep: #04070e;
+    --glass-card: rgba(12, 18, 36, 0.76);
+    --glass-card-border: rgba(255, 255, 255, 0.09);
+    --glass-top-shine: rgba(255, 255, 255, 0.14);
+    --text-main: #f0f4ff;
+    --text-secondary: #c0ccde;
+    --text-muted: #6e82a0;
+    --accent-gold: #ffd45e;
+    --accent-gold-bright: #ffe87a;
+    --accent-gold-dim: rgba(255,212,94,0.16);
+    --accent-blue: #4b96ff;
+    --accent-cyan: #38bdf8;
+    --accent-green: #00ffaa;
+    --accent-red: #ff5252;
+    --accent-purple: #a78bfa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0;
+    background: var(--bg-deep);
+    color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    background:
+      radial-gradient(circle at 20% 15%, rgba(56, 189, 248, 0.12) 0%, transparent 40%),
+      radial-gradient(circle at 80% 25%, rgba(167, 139, 250, 0.14) 0%, transparent 45%),
+      radial-gradient(circle at 50% 80%, rgba(255, 212, 94, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba(0, 255, 170, 0.07) 0%, transparent 40%);
+    filter: blur(60px);
+    z-index: -1;
+    pointer-events: none;
+    animation: aurora-mesh 20s ease-in-out infinite alternate;
+  }
+  @keyframes aurora-mesh {
+    0%   { transform: scale(1) rotate(0deg); }
+    100% { transform: scale(1.08) rotate(3deg); }
+  }
+  @keyframes card-appear {
+    from { opacity: 0; transform: translateY(16px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .legal-container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px 16px 80px;
+  }
+  /* Top Bar */
+  .top-bar-glass {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 18px;
+    margin-bottom: 18px;
+    background: rgba(12, 18, 36, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  }
+  .top-brand { display: flex; align-items: center; gap: 12px; }
+  .top-flag-badge {
+    font-size: 24px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(255,212,94,0.2), rgba(56,189,248,0.1));
+    border: 1px solid rgba(255,212,94,0.35);
+    box-shadow: 0 0 18px rgba(255,212,94,0.25);
+  }
+  .top-title { font-size: 15px; font-weight: 800; color: #fff; letter-spacing: 0.3px; }
+  .top-subtitle { font-size: 11px; color: var(--accent-gold); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .btn-terminal {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(16px);
+    transition: all 0.2s ease;
+  }
+  .btn-terminal:hover {
+    background: var(--accent-gold-dim);
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(255,212,94,0.3);
+  }
+  /* Language Carousel */
+  .lang-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 2px 14px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .lang-bar::-webkit-scrollbar { display: none; }
+  .lang-btn {
+    flex-shrink: 0;
+    background: rgba(14, 20, 38, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(16px);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .lang-btn:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+  .lang-btn.active {
+    background: linear-gradient(135deg, rgba(255,212,94,0.22), rgba(56,189,248,0.12));
+    border-color: var(--accent-gold);
+    color: var(--accent-gold-bright);
+    font-weight: 700;
+    box-shadow: 0 0 16px rgba(255,212,94,0.3);
+  }
+  /* Legal Cards */
+  .legal-card {
+    position: relative;
+    background: rgba(13, 20, 38, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 20px;
+    padding: 22px 24px;
+    margin-bottom: 18px;
+    backdrop-filter: blur(40px) saturate(1.8);
+    -webkit-backdrop-filter: blur(40px) saturate(1.8);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    overflow: hidden;
+    animation: card-appear 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  }
+  .legal-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 10%; right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  }
+  .legal-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 212, 94, 0.25);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5), 0 0 24px rgba(255, 212, 94, 0.1);
+  }
+  .legal-card.banner {
+    border-top: 2px solid var(--accent-red);
+    background: linear-gradient(180deg, rgba(255,82,82,0.1) 0%, rgba(13,20,38,0.75) 45%);
+  }
+  .warn-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,82,82,0.16);
+    color: #ff7070;
+    border: 1px solid rgba(255,82,82,0.35);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .legal-card h2 {
+    font-size: 15px;
+    color: var(--accent-gold);
+    margin: 0 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+  }
+  .legal-card p, .legal-card li {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin: 0 0 8px;
+  }
+  .legal-card p:last-child { margin-bottom: 0; }
+  .footer-compliance {
+    text-align: center;
+    margin-top: 32px;
+    padding: 16px;
+    font-size: 11px;
+    color: var(--text-muted);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
 </style>
 </head>
 <body>
@@ -23,22 +225,22 @@
 <div class="legal-container">
 
   <!-- Top Bar -->
-  <div class="top-bar" style="margin-bottom:16px">
+  <div class="top-bar-glass">
     <div class="top-brand">
       <div class="top-flag-badge">⚖️</div>
       <div>
         <div class="top-title">Елена Хьюз · Legal</div>
-        <div class="top-subtitle">Terms of Service &amp; Risk Disclosure</div>
+        <div class="top-subtitle">Terms &amp; Risk Disclosure</div>
       </div>
     </div>
-    <a href="index.html" class="btn" style="padding:6px 12px;font-size:12px;text-decoration:none">← Terminal</a>
+    <a href="index.html" id="btn-back" class="btn-terminal">← Terminal</a>
   </div>
 
-  <!-- Language Switcher -->
+  <!-- Language Switcher Carousel -->
   <div class="lang-bar" id="lang-bar">
-    <button class="lang-btn active" data-lang="en">🇬🇧 English</button>
-    <button class="lang-btn" data-lang="ru">🇷🇺 Русский</button>
+    <button class="lang-btn active" data-lang="ru">🇷🇺 Русский</button>
     <button class="lang-btn" data-lang="tr">🇹🇷 Türkçe</button>
+    <button class="lang-btn" data-lang="en">🇬🇧 English</button>
     <button class="lang-btn" data-lang="uk">🇺🇦 Українська</button>
     <button class="lang-btn" data-lang="de">🇩🇪 Deutsch</button>
     <button class="lang-btn" data-lang="es">🇪🇸 Español</button>
@@ -48,116 +250,316 @@
 
   <div id="content-area"></div>
 
-  <div style="text-align:center;margin-top:24px;font-size:11px;color:var(--text-muted)">
-    Institutional Quantitative Terminal · Global Regulatory Disclaimer · Last Updated: November 2026
+  <div class="footer-compliance">
+    Institutional Quantitative Terminal · Global Regulatory Compliance · v51
   </div>
 
 </div>
 
 <script>
+const tg = window.Telegram?.WebApp;
+tg?.ready();
+tg?.expand();
+
+// Ensure ?api= parameter is preserved when clicking Back to Terminal
+function getTerminalUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  let api = urlParams.get("api");
+  if (!api && window.location.hash) {
+    const match = window.location.href.match(/[?&#]api=([^&#]+)/);
+    if (match && match[1]) api = decodeURIComponent(match[1]);
+  }
+  if (!api) api = localStorage.getItem("elena_api_base") || "";
+  return api ? `index.html?api=${encodeURIComponent(api)}` : "index.html";
+}
+const backBtn = document.getElementById("btn-back");
+if (backBtn) backBtn.href = getTerminalUrl();
+
 const TERMS = {
-  en: {
-    title: "Institutional Terms of Service & High-Risk Warning",
-    updated: "Updated: November 2026 · Global Compliance",
-    sections: [
-      {
-        h: "1. No Financial Advice or Investment Solicitation",
-        p: "All automated signals, technical indicator combinations (MavilimW, Supertrend, EMA, RSI, MACD, ADX), multi-timeframe assessments, and price levels displayed by this Platform are strictly algorithmic mathematical calculations for informational and educational purposes only. NONE of our communications constitute investment, financial, tax, or legal advice."
-      },
-      {
-        h: "2. Extreme Volatility & Leverage Warning",
-        p: "Trading cryptocurrencies, spot instruments, and derivative futures contracts carries an inherently high level of risk and may result in the substantial or complete loss of invested capital. Leverage magnifies both potential gains and losses. Never trade with capital you cannot afford to lose."
-      },
-      {
-        h: "3. Absolute Limitation of Liability",
-        p: "The Platform, its developers, operators, and affiliates shall in no event be held liable for any direct, indirect, incidental, or consequential damages resulting from trade executions, exchange outages, slippage, latency, API disconnection, liquidation, or user error."
-      },
-      {
-        h: "4. Eligibility and Age Representation",
-        p: "By using this platform or executing the bot, you certify that you are at least eighteen (18) years of age (or the legal age of majority in your jurisdiction) and that digital asset trading is permissible under the laws applicable to you."
-      },
-      {
-        h: "5. Non-Custodial Architecture",
-        p: "The Platform is completely non-custodial. No deposit accounts are held by us. All trades executed via API keys or decentralized wallets are settled directly on external exchanges or blockchain smart contracts."
-      }
-    ]
-  },
   ru: {
     title: "Условия обслуживания и предупреждение о рисках",
-    updated: "Ноябрь 2026 · Международный стандарт",
+    updated: "Обновлено: Ноябрь 2026 · Международный стандарт",
+    badge: "Предупреждение о высоких рисках",
+    desc: "Официальные условия использования Telegram Mini App и торгового ядра «Елена Хьюз».",
     sections: [
       {
+        icon: "📊",
         h: "1. Отказ от инвестиционных рекомендаций",
         p: "Все автоматические сигналы, индикаторы (Supertrend, MavilimW, RSI, MACD, EMA) и графики носят исключительно информационный и аналитический характер. Сервис НЕ предоставляет инвестиционных советов и не дает гарантий доходности."
       },
       {
-        h: "2. Предупреждение о высоких рисках торговли с плечом",
+        icon: "⚡",
+        h: "2. Предупреждение о рисках торговли с плечом",
         p: "Торговля криптовалютами на споте и фьючерсах сопряжена с высоким уровнем риска и может привести к полной потере средств. Кредитное плечо увеличивает риск ликвидации. Не торгуйте на заемные или критически важные средства."
       },
       {
+        icon: "🛡️",
         h: "3. Ограничение ответственности",
         p: "Администрация и разработчики платформы не несут ответственности за результаты ваших торговых решений, технические сбои бирж, проскальзывание цен или задержки в сети."
       },
       {
+        icon: "🔞",
         h: "4. Возрастные и правовые ограничения",
         p: "Используя сервис, вы подтверждаете, что вам исполнилось 18 лет и деятельность с цифровыми активами не запрещена законами вашей юрисдикции."
       },
       {
-        h: "5. Некастодиальность",
+        icon: "🔐",
+        h: "5. Некастодиальность (Non-Custodial)",
         p: "Платформа не принимает и не хранит клиентские депозиты. Все операции происходят напрямую на ваших биржевых аккаунтах или в некастодиальных кошельках."
       }
     ]
   },
   tr: {
     title: "Kullanım Koşulları ve Yüksek Risk Bildirimi",
-    updated: "Kasım 2026 · Küresel Uyum Standardı",
+    updated: "Güncelleme: Kasım 2026 · Küresel Standart",
+    badge: "Yüksek Piyasa Riski Uyarısı",
+    desc: "Telegram Mini App ve «Елена Хьюз» Sinyal Defteri Terminali resmi kullanım şartlarıdır.",
     sections: [
       {
+        icon: "📊",
         h: "1. Yatırım Tavsiyesi Niteliğinde Değildir",
         p: "Platform tarafından üretilen tüm teknik sinyaller, indikatör analizleri (MavilimW, Supertrend, EMA, RSI, MACD) ve hesaplamalar tamamen matematiksel algoritmik modellere dayanmaktadır. Kesinlikle yatırım, finansal, hukuki veya mali tavsiye DEĞİLDİR."
       },
       {
+        icon: "⚡",
         h: "2. Kripto Varlık ve Kaldıraç Risk Uyarısı",
         p: "Kripto varlık piyasaları ve özellikle vadeli (Futures) kaldıraçlı işlemler yüksek derecede volatilite içerir ve sermayenizin tamamının kaybedilmesine yol açabilir. Asla kaybetmeyi göze alamayacağınız miktarlarla işlem yapmayınız."
       },
       {
+        icon: "🛡️",
         h: "3. Sorumluluğun Sınırlandırılması",
         p: "Kullanıcının aldığı alım-satım kararlarından, borsa API gecikmelerinden, likidasyonlardan veya piyasa hareketlerinden doğan hiçbir doğrudan veya dolaylı maddi zarardan platformumuz veya geliştiriciler sorumlu tutulamaz."
       },
       {
+        icon: "🔞",
         h: "4. 18 Yaş Sınırı ve Hukuki Ehliyet",
         p: "Botu ve terminali kullanan her kullanıcı, en az 18 yaşında olduğunu ve kendi ülkesindeki mevzuata uygun hareket ettiğini beyan ve taahhüt eder."
       },
       {
-        h: "5. Non-Custodial (Gözetimsiz) Yapı",
-        p: "Sistem fon emaneti almaz, cüzdanınızdaki varlıklara el süremez. Tüm emirler kullanıcının borsa API'si veya Web3 cüzdanı üzerinden kullanıcı kontrolünde çalışır."
+        icon: "🔐",
+        h: "5. Non-Custodial (Gözetimsiz) Güvenlik Yapısı",
+        p: "Sistem fon emaneti almaz, cüzdanınızdaki varlıklara el süremez. Tüm emirler kullanıcının borsa API'si veya Web3 cüzdanı üzerinden kullanıcı tam kontrolünde çalışır."
+      }
+    ]
+  },
+  en: {
+    title: "Institutional Terms of Service & High-Risk Warning",
+    updated: "Updated: November 2026 · Global Compliance",
+    badge: "High Risk Market Warning",
+    desc: "Official Terms of Service for Telegram Mini App & Trading Engine.",
+    sections: [
+      {
+        icon: "📊",
+        h: "1. No Financial Advice or Investment Solicitation",
+        p: "All automated signals, technical indicator combinations (MavilimW, Supertrend, EMA, RSI, MACD, ADX), multi-timeframe assessments, and price levels displayed by this Platform are strictly algorithmic mathematical calculations for informational and educational purposes only. NONE of our communications constitute investment, financial, tax, or legal advice."
+      },
+      {
+        icon: "⚡",
+        h: "2. Extreme Volatility & Leverage Warning",
+        p: "Trading cryptocurrencies, spot instruments, and derivative futures contracts carries an inherently high level of risk and may result in the substantial or complete loss of invested capital. Leverage magnifies both potential gains and losses. Never trade with capital you cannot afford to lose."
+      },
+      {
+        icon: "🛡️",
+        h: "3. Absolute Limitation of Liability",
+        p: "The Platform, its developers, operators, and affiliates shall in no event be held liable for any direct, indirect, incidental, or consequential damages resulting from trade executions, exchange outages, slippage, latency, API disconnection, liquidation, or user error."
+      },
+      {
+        icon: "🔞",
+        h: "4. Eligibility and Age Representation",
+        p: "By using this platform or executing the bot, you certify that you are at least eighteen (18) years of age (or the legal age of majority in your jurisdiction) and that digital asset trading is permissible under the laws applicable to you."
+      },
+      {
+        icon: "🔐",
+        h: "5. Non-Custodial Architecture",
+        p: "The Platform is completely non-custodial. No deposit accounts are held by us. All trades executed via API keys or decentralized wallets are settled directly on external exchanges or blockchain smart contracts."
+      }
+    ]
+  },
+  uk: {
+    title: "Умови використання та попередження про ризики",
+    updated: "Оновлено: Листопад 2026 · Міжнародний стандарт",
+    badge: "Попередження про високі ризики",
+    desc: "Офіційні умови використання Telegram Mini App та торгового терміналу.",
+    sections: [
+      {
+        icon: "📊",
+        h: "1. Відмова від фінансових консультацій",
+        p: "Усі автоматичні сигнали та технічні індикатори носять виключно інформаційний характер і не є фінансовими рекомендаціями."
+      },
+      {
+        icon: "⚡",
+        h: "2. Ризик торгівлі з кредитним плечем",
+        p: "Торгівля деривативами та криптовалютами пов'язана з ризиком втрати капіталу. Не ризикуйте коштами, які не можете дозволити собі втратити."
+      },
+      {
+        icon: "🛡️",
+        h: "3. Обмеження відповідальності",
+        p: "Розробники та оператори не несуть відповідальності за збитки внаслідок торговельних операцій або збоїв бірж."
+      },
+      {
+        icon: "🔞",
+        h: "4. Вікові обмеження",
+        p: "Користувач підтверджує, що досяг 18 років та має повну правоздатність."
+      },
+      {
+        icon: "🔐",
+        h: "5. Некастодіальність",
+        p: "Платформа ніколи не зберігає активи користувачів. Усі операції здійснюються напряму через біржові API або Web3-гаманці."
+      }
+    ]
+  },
+  de: {
+    title: "Nutzungsbedingungen & Risikohinweis",
+    updated: "Aktualisiert: November 2026 · Globaler Standard",
+    badge: "Warnung vor hohem Marktrisiko",
+    desc: "Offizielle Bedingungen für die Telegram Mini App & Handelsplattform.",
+    sections: [
+      {
+        icon: "📊",
+        h: "1. Keine Finanzberatung",
+        p: "Alle Signale und Analysen sind mathematische Berechnungen und stellen keine Anlageberatung dar."
+      },
+      {
+        icon: "⚡",
+        h: "2. Hebel- & Volatilitätsrisiko",
+        p: "Der Handel mit Kryptowährungen birgt ein hohes Verlustrisiko. Handeln Sie nur mit Kapital, dessen Verlust Sie verkraften können."
+      },
+      {
+        icon: "🛡️",
+        h: "3. Haftungsausschluss",
+        p: "Die Betreiber übernehmen keinerlei Haftung für Handelsentscheidungen oder Börsenausfälle."
+      },
+      {
+        icon: "🔞",
+        h: "4. Mindestalter 18 Jahre",
+        p: "Die Nutzung ist nur Personen ab 18 Jahren gestattet."
+      },
+      {
+        icon: "🔐",
+        h: "5. Non-Custodial Sicherheit",
+        p: "Wir verwalten keine Kundengelder. Die Kontrolle verbleibt zu 100% bei Ihrem eigenen Börsen- oder Web3-Konto."
+      }
+    ]
+  },
+  es: {
+    title: "Términos de Servicio y Advertencia de Riesgo",
+    updated: "Actualizado: Noviembre 2026 · Cumplimiento Global",
+    badge: "Advertencia de Alto Riesgo",
+    desc: "Términos oficiales para la Telegram Mini App y el motor analítico.",
+    sections: [
+      {
+        icon: "📊",
+        h: "1. Sin Asesoramiento Financiero",
+        p: "Todas las señales son puramente informativas y no constituyen asesoría de inversión."
+      },
+      {
+        icon: "⚡",
+        h: "2. Riesgo de Apalancamiento",
+        p: "El comercio de criptoactivos conlleva un alto riesgo de pérdida total de capital."
+      },
+      {
+        icon: "🛡️",
+        h: "3. Límite de Responsabilidad",
+        p: "No nos hacemos responsables por pérdidas derivadas de ejecuciones comerciales o fallos de terceros."
+      },
+      {
+        icon: "🔞",
+        h: "4. Mayoría de Edad (18+)",
+        p: "El usuario certifica ser mayor de 18 años y operar conforme a las leyes de su país."
+      },
+      {
+        icon: "🔐",
+        h: "5. Arquitectura Sin Custodia",
+        p: "Nunca retenemos fondos de clientes. Todo opera directamente vía API de exchanges o wallets descentralizadas."
+      }
+    ]
+  },
+  fr: {
+    title: "Conditions d'Utilisation et Avertissement sur les Risques",
+    updated: "Mis à jour: Novembre 2026 · Conformité Mondiale",
+    badge: "Avertissement Risque Élevé",
+    desc: "Conditions officielles d'utilisation de la Telegram Mini App.",
+    sections: [
+      {
+        icon: "📊",
+        h: "1. Aucun Conseil Financier",
+        p: "Les signaux et indicateurs sont fournis à titre strictement informatif et algorithmique."
+      },
+      {
+        icon: "⚡",
+        h: "2. Risque de Perte et d'Effet de Levier",
+        p: "Le trading de cryptomonnaies comporte un risque élevé de perte totale du capital investi."
+      },
+      {
+        icon: "🛡️",
+        h: "3. Limitation de Responsabilité",
+        p: "Nous déclinons toute responsabilité quant aux résultats de vos ordres de trading."
+      },
+      {
+        icon: "🔞",
+        h: "4. Âge Légal (18+)",
+        p: "L'utilisation de la plateforme est réservée aux personnes majeures."
+      },
+      {
+        icon: "🔐",
+        h: "5. Sécurité Non-Custodiale",
+        p: "Aucun dépôt n'est conservé. Le contrôle de vos fonds reste intégralement sur vos comptes personnels."
+      }
+    ]
+  },
+  ar: {
+    title: "شروط الخدمة وإخلاء المسؤولية عن المخاطر",
+    updated: "تحديث: نوفمبر 2026 · الامتثال العالمي",
+    badge: "تحذير من مخاطر السوق العالية",
+    desc: "الشروط الرسمية لتطبيق Telegram Mini App ومحرك التحليل الكمي.",
+    sections: [
+      {
+        icon: "📊",
+        h: "1. لا توجد نصائح مالية",
+        p: "جميع الإشارات والمؤشرات الحسابية هي لأغراض تعليمية وإعلامية فقط ولا تشكل أي توصية استثمارية."
+      },
+      {
+        icon: "⚡",
+        h: "2. تحذير من تقلبات السوق والرافعة المالية",
+        p: "تداول العملات المشفرة والعقود الآجلة ينطوي على مخاطر عالية قد تؤدي إلى خسارة كامل رأس المال."
+      },
+      {
+        icon: "🛡️",
+        h: "3. إخلاء المسؤولية القانونية",
+        p: "المطورون غير مسؤولين عن أي قرارات تداول أو انقطاعات في منصات التداول الخارجية."
+      },
+      {
+        icon: "🔞",
+        h: "4. السن القانوني (18+)",
+        p: "باستخدامك للتطبيق، تؤكد أنك تبلغ من العمر 18 عاماً على الأقل ومسموح لك قانونياً بالتداول."
+      },
+      {
+        icon: "🔐",
+        h: "5. معمارية غير وصائية (Non-Custodial)",
+        p: "النظام لا يحتفظ بأي ودائع أو أصول، وجميع المعاملات تتم عبر واجهات API الخاصة بك مباشرة."
       }
     ]
   }
 };
 
-['uk','de','es','fr','ar'].forEach(l => {
-  if (!TERMS[l]) TERMS[l] = TERMS.en;
-});
-
 function renderTerms(lang) {
-  const data = TERMS[lang] || TERMS.en;
+  const data = TERMS[lang] || TERMS.ru;
   const area = document.getElementById("content-area");
   let html = `
-    <div class="legal-card" style="border-top:2px solid var(--accent-red)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <span class="warn-badge">High Risk Market Warning</span>
+    <div class="legal-card banner">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+        <span class="warn-badge">⚠️ ${data.badge}</span>
         <span style="font-size:11px;color:var(--text-muted)">${data.updated}</span>
       </div>
-      <h1 style="font-size:20px;font-weight:800;color:#fff;margin:0 0 10px">${data.title}</h1>
-      <p style="color:var(--text-secondary);font-size:13px;line-height:1.6">Official Terms of Service for Telegram Mini App &amp; Trading Engine</p>
+      <h1 style="font-size:18px;font-weight:800;color:#fff;margin:0 0 8px">${data.title}</h1>
+      <p style="color:var(--text-secondary);font-size:13px;line-height:1.6">${data.desc}</p>
     </div>
   `;
 
-  data.sections.forEach(s => {
+  data.sections.forEach((s, idx) => {
     html += `
-      <div class="legal-card">
-        <h2>${s.h}</h2>
+      <div class="legal-card" style="animation-delay: ${idx * 0.05}s">
+        <h2><span>${s.icon}</span> ${s.h}</h2>
         <p>${s.p}</p>
       </div>
     `;
@@ -170,13 +572,14 @@ document.querySelectorAll(".lang-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
+    localStorage.setItem("elena_lang", btn.dataset.lang);
     renderTerms(btn.dataset.lang);
   });
 });
 
-const defaultLang = localStorage.getItem("elena_lang") || "en";
-const activeBtn = document.querySelector(`.lang-btn[data-lang="${defaultLang}"]`) || document.querySelector('.lang-btn[data-lang="en"]');
-if (activeBtn) activeBtn.click(); else renderTerms("en");
+const defaultLang = localStorage.getItem("elena_lang") || "ru";
+const activeBtn = document.querySelector(`.lang-btn[data-lang="${defaultLang}"]`) || document.querySelector('.lang-btn[data-lang="ru"]');
+if (activeBtn) activeBtn.click(); else renderTerms("ru");
 </script>
 
 </body>

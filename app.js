@@ -1328,6 +1328,22 @@ function getApiBase() {
   return "";
 }
 
+function preserveApiLinks() {
+  const curApi = getApiBase();
+  if (!curApi) return;
+  document.querySelectorAll('a[href]').forEach(a => {
+    const h = a.getAttribute('href');
+    if (h && (h.startsWith('admin.html') || h.startsWith('terms.html') || h.startsWith('privacy.html') || h.startsWith('index.html'))) {
+      if (!h.includes('api=')) {
+        const sep = h.includes('?') ? '&' : '?';
+        a.setAttribute('href', `${h}${sep}api=${encodeURIComponent(curApi)}`);
+      }
+    }
+  });
+}
+document.addEventListener("DOMContentLoaded", preserveApiLinks);
+setTimeout(preserveApiLinks, 500);
+
 async function api(path, body = {}) {
   const baseUrl = getApiBase();
   const fullUrl = (baseUrl && path.startsWith("/")) ? (baseUrl.replace(/\/$/, "") + path) : path;

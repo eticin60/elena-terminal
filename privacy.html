@@ -7,15 +7,232 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="stylesheet" href="style.css">
 <style>
-  .legal-container { max-width: 680px; margin: 0 auto; padding: 20px 16px 80px; }
-  .legal-card { background: var(--glass-card); border: 1px solid var(--glass-card-border); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 20px; backdrop-filter: blur(24px); box-shadow: var(--shadow-card); }
-  .legal-card h2 { font-size: 16px; color: var(--accent-gold); margin-top: 0; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-  .legal-card p, .legal-card li { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
-  .legal-card ul { padding-left: 20px; margin-bottom: 14px; }
-  .lang-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
-  .lang-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: 0.2s; }
-  .lang-btn.active { background: var(--accent-gold-dim); border-color: var(--accent-gold); color: var(--accent-gold); font-weight: 700; }
-  .badge-tag { background: rgba(0,255,163,0.12); color: var(--accent-green); border: 1px solid rgba(0,255,163,0.3); padding: 3px 8px; border-radius: 20px; font-size: 11px; }
+  :root {
+    --bg-deep: #04070e;
+    --glass-card: rgba(12, 18, 36, 0.76);
+    --glass-card-border: rgba(255, 255, 255, 0.09);
+    --glass-top-shine: rgba(255, 255, 255, 0.14);
+    --text-main: #f0f4ff;
+    --text-secondary: #c0ccde;
+    --text-muted: #6e82a0;
+    --accent-gold: #ffd45e;
+    --accent-gold-bright: #ffe87a;
+    --accent-gold-dim: rgba(255,212,94,0.16);
+    --accent-blue: #4b96ff;
+    --accent-cyan: #38bdf8;
+    --accent-green: #00ffaa;
+    --accent-red: #ff5252;
+    --accent-purple: #a78bfa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0;
+    background: var(--bg-deep);
+    color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    background:
+      radial-gradient(circle at 20% 15%, rgba(0, 255, 170, 0.10) 0%, transparent 40%),
+      radial-gradient(circle at 80% 25%, rgba(56, 189, 248, 0.12) 0%, transparent 45%),
+      radial-gradient(circle at 50% 80%, rgba(255, 212, 94, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba(167, 139, 250, 0.10) 0%, transparent 40%);
+    filter: blur(60px);
+    z-index: -1;
+    pointer-events: none;
+    animation: aurora-mesh 20s ease-in-out infinite alternate;
+  }
+  @keyframes aurora-mesh {
+    0%   { transform: scale(1) rotate(0deg); }
+    100% { transform: scale(1.08) rotate(3deg); }
+  }
+  @keyframes card-appear {
+    from { opacity: 0; transform: translateY(16px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .legal-container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px 16px 80px;
+  }
+  /* Top Bar */
+  .top-bar-glass {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 18px;
+    margin-bottom: 18px;
+    background: rgba(12, 18, 36, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  }
+  .top-brand { display: flex; align-items: center; gap: 12px; }
+  .top-flag-badge {
+    font-size: 24px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(0,255,170,0.2), rgba(56,189,248,0.1));
+    border: 1px solid rgba(0,255,170,0.35);
+    box-shadow: 0 0 18px rgba(0,255,170,0.25);
+  }
+  .top-title { font-size: 15px; font-weight: 800; color: #fff; letter-spacing: 0.3px; }
+  .top-subtitle { font-size: 11px; color: var(--accent-green); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .btn-terminal {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(16px);
+    transition: all 0.2s ease;
+  }
+  .btn-terminal:hover {
+    background: var(--accent-gold-dim);
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(255,212,94,0.3);
+  }
+  /* Language Carousel */
+  .lang-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 2px 14px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .lang-bar::-webkit-scrollbar { display: none; }
+  .lang-btn {
+    flex-shrink: 0;
+    background: rgba(14, 20, 38, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(16px);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .lang-btn:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+  .lang-btn.active {
+    background: linear-gradient(135deg, rgba(0,255,170,0.22), rgba(56,189,248,0.12));
+    border-color: var(--accent-green);
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 0 16px rgba(0,255,170,0.3);
+  }
+  /* Legal Cards */
+  .legal-card {
+    position: relative;
+    background: rgba(13, 20, 38, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 20px;
+    padding: 22px 24px;
+    margin-bottom: 18px;
+    backdrop-filter: blur(40px) saturate(1.8);
+    -webkit-backdrop-filter: blur(40px) saturate(1.8);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    overflow: hidden;
+    animation: card-appear 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  }
+  .legal-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 10%; right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  }
+  .legal-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(0, 255, 170, 0.3);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5), 0 0 24px rgba(0, 255, 170, 0.12);
+  }
+  .legal-card.banner {
+    border-top: 2px solid var(--accent-green);
+    background: linear-gradient(180deg, rgba(0,255,170,0.12) 0%, rgba(13,20,38,0.75) 45%);
+  }
+  .safe-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0,255,170,0.16);
+    color: #6affc4;
+    border: 1px solid rgba(0,255,170,0.35);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .legal-card h2 {
+    font-size: 15px;
+    color: var(--accent-green);
+    margin: 0 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+  }
+  .legal-card p, .legal-card li {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin: 0 0 8px;
+  }
+  .legal-card ul {
+    margin: 8px 0;
+    padding-left: 20px;
+  }
+  .legal-card li {
+    margin-bottom: 6px;
+  }
+  .legal-card p:last-child { margin-bottom: 0; }
+  code {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    padding: 2px 6px;
+    font-size: 12px;
+    color: var(--accent-cyan);
+  }
+  .footer-compliance {
+    text-align: center;
+    margin-top: 32px;
+    padding: 16px;
+    font-size: 11px;
+    color: var(--text-muted);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
 </style>
 </head>
 <body>
@@ -23,22 +240,22 @@
 <div class="legal-container">
 
   <!-- Top Bar -->
-  <div class="top-bar" style="margin-bottom:16px">
+  <div class="top-bar-glass">
     <div class="top-brand">
       <div class="top-flag-badge">🛡️</div>
       <div>
         <div class="top-title">Елена Хьюз · Legal</div>
-        <div class="top-subtitle">Institutional Privacy Policy</div>
+        <div class="top-subtitle">Privacy &amp; Data Protection</div>
       </div>
     </div>
-    <a href="index.html" class="btn" style="padding:6px 12px;font-size:12px;text-decoration:none">← Terminal</a>
+    <a href="index.html" id="btn-back" class="btn-terminal">← Terminal</a>
   </div>
 
-  <!-- Language Switcher -->
+  <!-- Language Switcher Carousel -->
   <div class="lang-bar" id="lang-bar">
-    <button class="lang-btn active" data-lang="en">🇬🇧 English</button>
-    <button class="lang-btn" data-lang="ru">🇷🇺 Русский</button>
+    <button class="lang-btn active" data-lang="ru">🇷🇺 Русский</button>
     <button class="lang-btn" data-lang="tr">🇹🇷 Türkçe</button>
+    <button class="lang-btn" data-lang="en">🇬🇧 English</button>
     <button class="lang-btn" data-lang="uk">🇺🇦 Українська</button>
     <button class="lang-btn" data-lang="de">🇩🇪 Deutsch</button>
     <button class="lang-btn" data-lang="es">🇪🇸 Español</button>
@@ -46,31 +263,130 @@
     <button class="lang-btn" data-lang="ar">🇸🇦 العربية</button>
   </div>
 
-  <div id="content-area">
-    <!-- Populated dynamically by JS according to selected language -->
-  </div>
+  <div id="content-area"></div>
 
-  <div style="text-align:center;margin-top:24px;font-size:11px;color:var(--text-muted)">
-    Official Verification: Telegram Mini App &amp; Quantitative Engine · Last Updated: November 2026
+  <div class="footer-compliance">
+    GDPR &amp; Institutional Non-Custodial Architecture · Global Compliance · v51
   </div>
 
 </div>
 
 <script>
-const POLICIES = {
-  en: {
-    title: "Global Privacy Policy & Data Protection",
-    updated: "Effective Date: November 2026",
+const tg = window.Telegram?.WebApp;
+tg?.ready();
+tg?.expand();
+
+// Ensure ?api= parameter is preserved when clicking Back to Terminal
+function getTerminalUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  let api = urlParams.get("api");
+  if (!api && window.location.hash) {
+    const match = window.location.href.match(/[?&#]api=([^&#]+)/);
+    if (match && match[1]) api = decodeURIComponent(match[1]);
+  }
+  if (!api) api = localStorage.getItem("elena_api_base") || "";
+  return api ? `index.html?api=${encodeURIComponent(api)}` : "index.html";
+}
+const backBtn = document.getElementById("btn-back");
+if (backBtn) backBtn.href = getTerminalUrl();
+
+const PRIVACY = {
+  ru: {
+    title: "Политика конфиденциальности и защита данных",
+    updated: "Дата вступления в силу: Ноябрь 2026",
+    badge: "100% Non-Custodial & GDPR",
+    desc: "Институциональный регламент конфиденциальности данных терминала «Елена Хьюз».",
     sections: [
       {
+        icon: "🏛️",
+        h: "1. Институциональные обязательства",
+        p: "«Елена Хьюз» — квантовый криптоаналитический терминал и Telegram Mini App. Мы строго придерживаемся принципов минимизации данных и международных стандартов защиты информации (включая европейский регламент GDPR)."
+      },
+      {
+        icon: "🔐",
+        h: "2. Полная некастодиальность (Non-Custodial)",
+        p: "Сервис на 100% некастодиален. Мы НИКОГДА не запрашиваем, не храним и не передаем ваши приватные ключи или seed-фразы. Подключение Web3 кошельков работает исключительно в режиме безопасного чтения открытых балансов."
+      },
+      {
+        icon: "📋",
+        h: "3. Обрабатываемые данные",
+        p: "Для доставки сигналов и работы аналитики обрабатывается строго минимальный набор данных:",
+        ul: [
+          "Telegram ID и никнейм — исключительно для авторизации и доставки персональных сигналов.",
+          "Пользовательские настройки — выбранные торговые пары, таймфреймы, плечи и фильтры.",
+          "API ключи бирж — опционально, исключительно для отправки ордеров по команде пользователя (права на вывод средств СТРОГО запрещены).",
+          "Публичный адрес кошелька — только для проверки баланса в блокчейн-сетях."
+        ]
+      },
+      {
+        icon: "🚫",
+        h: "4. Никакой продажи данных третьим лицам",
+        p: "Мы категорически не продаем, не передаем и не сдаем в аренду ваши персональные данные брокерам, рекламодателям или внешним аналитическим агентствам."
+      },
+      {
+        icon: "🗑️",
+        h: "5. Право на полное удаление данных",
+        p: "Каждый пользователь сохраняет полный суверенитет над своими данными. Вы можете в любой момент выполнить команду <code>/delete</code> в Telegram боте или нажать «🗑 Удалить мои данные» в терминале для полного стирания всех записей."
+      }
+    ]
+  },
+  tr: {
+    title: "Küresel Gizlilik Politikası ve Veri Güvenliği",
+    updated: "Yürürlük Tarihi: Kasım 2026",
+    badge: "%100 Non-Custodial & KVKK/GDPR Uyumlu",
+    desc: "«Елена Хьюз» kantitatif analiz terminali ve Mini App resmi veri koruma beyanıdır.",
+    sections: [
+      {
+        icon: "🏛️",
+        h: "1. Kurumsal Taahhüt ve Kapsam",
+        p: "«Елена Хьюз · Crypto Signals» kantitatif kripto analiz terminali ve Telegram Mini App platformu olarak kullanıcı mahremiyetine ve KVKK/GDPR uluslararası veri koruma standartlarına tam uyum sağlamayı taahhüt eder."
+      },
+      {
+        icon: "🔐",
+        h: "2. Kesinlikle Non-Custodial (Salt Okunur)",
+        p: "Sistem %100 gözetimsizdir (non-custodial). Özel anahtarınız (private key) veya kurtarma kelimeleriniz (seed phrase) ASLA istenmez, iletilmez ve saklanmaz. Web3 cüzdan bağlantıları sadece genel adresi salt okunur okur."
+      },
+      {
+        icon: "📋",
+        h: "3. İşlenen Minimum Veriler",
+        p: "Sinyal ve borsa bildirimlerinin iletilmesi için yalnızca minimum düzeyde veri işlenir:",
+        ul: [
+          "Telegram ID ve Kullanıcı Adı: Yalnızca alarm ve sinyallerin doğru kullanıcıya iletilmesi amacıyla.",
+          "Terminal Tercihleri: Takip edilen coinler, zaman dilimleri ve strateji tercihleri.",
+          "Borsa API Anahtarları: Kullanıcının kendi rızasıyla girdiği emir anahtarları (Çekim izni kesinlikle yasaktır).",
+          "Genel Cüzdan Adresi: Bakiye görüntüleme amacıyla salt-okunur kullanılan genel blokzincir adresi."
+        ]
+      },
+      {
+        icon: "🚫",
+        h: "4. Üçüncü Taraflara Veri Satışı Yapılmaz",
+        p: "Kullanıcı verileri reklamverenlere, veri komisyoncularına veya üçüncü taraf şirketlere ASLA satılmaz ve kiralanmaz."
+      },
+      {
+        icon: "🗑️",
+        h: "5. Tam Veri Silme Hakkı (Right to Erasure)",
+        p: "Telegram botunda <code>/delete</code> komutunu çalıştırarak veya Terminal arayüzünden «🗑 Verilerimi Sil» butonuna basarak tüm veritabanı kayıtlarınızı kalıcı olarak anında silebilirsiniz."
+      }
+    ]
+  },
+  en: {
+    title: "Institutional Privacy Policy & Data Protection",
+    updated: "Effective Date: November 2026",
+    badge: "100% Non-Custodial & GDPR Compliant",
+    desc: "Official Privacy Policy for Elena Hughes Quantitative Terminal.",
+    sections: [
+      {
+        icon: "🏛️",
         h: "1. Institutional Commitment & Scope",
-        p: "Елена Хьюз (the \"Platform\", \"we\", \"our\") operates as an automated quantitative crypto-analytics terminal and Telegram Mini App. We are strictly committed to user privacy, data minimization, and adherence to international data protection standards including the European General Data Protection Regulation (GDPR)."
+        p: "Елена Хьюз operates as an automated quantitative crypto-analytics terminal and Telegram Mini App. We are strictly committed to user privacy, data minimization, and adherence to international data protection standards including the European General Data Protection Regulation (GDPR)."
       },
       {
+        icon: "🔐",
         h: "2. Absolute Non-Custodial Architecture",
-        p: "The Platform is 100% non-custodial. We NEVER request, hold, or transmit private keys, seed phrases, or custodial custody of digital assets. Web3 wallet integrations (via WalletConnect v2) operate strictly in read-only mode to retrieve public balances."
+        p: "The Platform is 100% non-custodial. We NEVER request, hold, or transmit private keys, seed phrases, or custodial control of digital assets. Web3 wallet integrations operate strictly in read-only mode to retrieve public balances."
       },
       {
+        icon: "📋",
         h: "3. Information We Collect and Process",
         p: "To deliver real-time technical signals and user preferences, we collect only minimal telemetric data:",
         ul: [
@@ -81,106 +397,208 @@ const POLICIES = {
         ]
       },
       {
+        icon: "🚫",
         h: "4. Zero Third-Party Monetization",
         p: "We do NOT sell, rent, or monetize personal user data to advertisers, data brokers, or third-party institutions. All telemetry is utilized solely to power signal distribution and terminal logic."
       },
       {
+        icon: "🗑️",
         h: "5. User Control & Absolute Right to Deletion",
-        p: "Every user retains permanent control over their stored data. You may execute the <code>/delete</code> command inside the Telegram bot or click \"🗑 Verilerimi Sil\" within the Mini App to immediately purge all profile records, API credentials, and preferences from our database."
+        p: "Every user retains permanent control over their stored data. You may execute the <code>/delete</code> command inside the Telegram bot or click \"🗑 Delete My Data\" within the Mini App to immediately purge all profile records from our database."
       }
     ]
   },
-  ru: {
-    title: "Политика конфиденциальности и защита данных",
-    updated: "Дата вступления в силу: Ноябрь 2026",
+  uk: {
+    title: "Політика конфіденційності та захист даних",
+    updated: "Дата набуття чинності: Листопад 2026",
+    badge: "100% Некастодіально & GDPR",
+    desc: "Офіційний регламент захисту інформації користувачів.",
     sections: [
       {
-        h: "1. Институциональные обязательства",
-        p: "«Елена Хьюз» — квантовый криптоаналитический терминал и Telegram Mini App. Мы строго придерживаемся принципов минимизации данных и международных стандартов защиты информации (включая GDPR)."
+        icon: "🏛️",
+        h: "1. Зобов'язання щодо конфіденційності",
+        p: "Ми суворо дотримуємося стандартів GDPR та мінімізації даних."
       },
       {
-        h: "2. Полная некастодиальность (Non-Custodial)",
-        p: "Сервис на 100% некастодиален. Мы НИКОГДА не запрашиваем и не храним приватные ключи или seed-фразы. Подключение кошельков через WalletConnect работает исключительно в режиме чтения балансов."
+        icon: "🔐",
+        h: "2. Повна некастодіальність",
+        p: "Ми ніколи не запитуємо та не зберігаємо ваші приватні ключі чи seed-фрази."
       },
       {
-        h: "3. Собираемые данные",
-        p: "Для доставки сигналов и аналитики обрабатываются минимально необходимые данные:",
-        ul: [
-          "Telegram ID и никнейм — исключительно для отправки уведомлений.",
-          "Пользовательские настройки — выбранные монеты, таймфреймы, индикаторы.",
-          "API ключи бирж — исключительно для авторизованных пользователем ордеров (права на вывод средств запрещены).",
-          "Публичный адрес кошелька — только для отображения баланса."
-        ]
+        icon: "📋",
+        h: "3. Оброблювані дані",
+        p: "Обробляються лише мінімальні дані для сповіщень та аналітики (Telegram ID, налаштування фільтрів, публічна адреса гаманця)."
       },
       {
-        h: "4. Никакой продажи данных третьим лицам",
-        p: "Мы не передаем и не продаем данные рекламодателям или брокерам. Данные используются исключительно для функционирования терминала."
+        icon: "🚫",
+        h: "4. Без продажу даних",
+        p: "Дані ніколи не передаються третім сторонам чи рекламодавцям."
       },
       {
-        h: "5. Право на полное удаление",
-        p: "Каждый пользователь может в любой момент удалить всю свою историю и настройки командой <code>/delete</code> в боте или кнопкой «Удалить мои данные» в терминале."
+        icon: "🗑️",
+        h: "5. Право на видалення",
+        p: "Ви можете в будь-який момент видалити всі свої дані командою <code>/delete</code> у боті."
       }
     ]
   },
-  tr: {
-    title: "Küresel Gizlilik Politikası ve Veri Güvenliği",
-    updated: "Yürürlük Tarihi: Kasım 2026",
+  de: {
+    title: "Datenschutzerklärung & Datenschutz",
+    updated: "Gültig ab: November 2026",
+    badge: "100% Non-Custodial & DSGVO-konform",
+    desc: "Offizielle Datenschutzerklärung für das Handelsterminal.",
     sections: [
       {
-        h: "1. Kurumsal Taahhüt ve Kapsam",
-        p: "«Елена Хьюз · Crypto Signals» kantitatif kripto analiz terminali ve Telegram Mini App platformu olarak kullanıcı mahremiyetine ve KVKK/GDPR uluslararası veri koruma standartlarına tam uyum sağlamayı taahhüt eder."
+        icon: "🏛️",
+        h: "1. Schutzverpflichtung",
+        p: "Wir verarbeiten Daten streng nach den Vorgaben der europäischen DSGVO."
       },
       {
-        h: "2. Kesinlikle Non-Custodial (Salt Okunur)",
-        p: "Sistem %100 gözetimsizdir (non-custodial). Özel anahtarınız (private key) veya kurtarma kelimeleriniz ASLA istenmez, iletilmez ve saklanmaz. Web3 cüzdan bağlantıları sadece genel adresi salt okunur okur."
+        icon: "🔐",
+        h: "2. Keine Verwahrung (Non-Custodial)",
+        p: "Private Schlüssel oder Seed-Phrasen werden niemals abgefragt oder gespeichert."
       },
       {
-        h: "3. İşlenen Veriler",
-        p: "Sinyal ve borsa bildirimlerinin iletilmesi için yalnızca minimum düzeyde veri işlenir:",
-        ul: [
-          "Telegram Chat ID ve Kullanıcı Adı: Sinyal ve alarmların hedeflenmesi için.",
-          "Kullanıcı Tercihleri: Favori coinler, periyotlar, kaldıraç sınırları.",
-          "Borsa API Anahtarları: Kullanıcının kendi rızasıyla kaydettiği işlem anahtarları (Çekim yetkisi kesinlikle yasaktır).",
-          "Genel Cüzdan Adresi: Bakiye görüntüleme amacıyla salt okunur."
-        ]
+        icon: "📋",
+        h: "3. Datenerfassung",
+        p: "Nur technisch notwendige Daten wie Telegram-ID und Filtereinstellungen werden gespeichert."
       },
       {
-        h: "4. Üçüncü Taraflarla Veri Paylaşımı Yoktur",
-        p: "Verileriniz hiçbir reklam ağı, veri simsarı veya ticari kuruluşa satılmaz, devredilmez."
+        icon: "🚫",
+        h: "4. Keine Weitergabe",
+        p: "Ihre Daten werden zu keinem Zeitpunkt an Werbetreibende oder Dritte verkauft."
       },
       {
-        h: "5. Anında Silme ve Unutulma Hakkı",
-        p: "Telegram botunda <code>/delete</code> komutunu girerek veya Mini App içindeki '🗑 Verilerimi Sil' butonuna basarak tüm verilerinizi veritabanımızdan kalıcı olarak silebilirsiniz."
+        icon: "🗑️",
+        h: "5. Recht auf Löschung",
+        p: "Nutzen Sie <code>/delete</code> im Bot, um alle Ihre Daten restlos zu entfernen."
+      }
+    ]
+  },
+  es: {
+    title: "Política de Privacidad y Protección de Datos",
+    updated: "Fecha de vigencia: Noviembre 2026",
+    badge: "100% Sin Custodia & Cumple GDPR",
+    desc: "Declaración oficial de protección de datos personales.",
+    sections: [
+      {
+        icon: "🏛️",
+        h: "1. Compromiso de Privacidad",
+        p: "Cumplimos estrictamente con las normas globales de privacidad y el RGPD europeo."
+      },
+      {
+        icon: "🔐",
+        h: "2. Arquitectura Sin Custodia",
+        p: "Nunca solicitamos ni retenemos sus claves privadas o palabras de recuperación."
+      },
+      {
+        icon: "📋",
+        h: "3. Datos Procesados",
+        p: "Solo procesamos los datos mínimos requeridos para la entrega de alertas (Telegram ID, pares seguidos)."
+      },
+      {
+        icon: "🚫",
+        h: "4. Cero Venta de Datos",
+        p: "No comercializamos ni transferimos información a corredores de datos ni anunciantes."
+      },
+      {
+        icon: "🗑️",
+        h: "5. Derecho al Olvido",
+        p: "Puede suprimir todos sus registros instantáneamente mediante el comando <code>/delete</code>."
+      }
+    ]
+  },
+  fr: {
+    title: "Politique de Confidentialité et Protection des Données",
+    updated: "Date d'effet: Novembre 2026",
+    badge: "100% Non-Custodial & RGPD",
+    desc: "Déclaration officielle de confidentialité de la plateforme.",
+    sections: [
+      {
+        icon: "🏛️",
+        h: "1. Engagement Institutionnel",
+        p: "Nous appliquons une stricte conformité au RGPD européen et le principe de minimisation des données."
+      },
+      {
+        icon: "🔐",
+        h: "2. Architecture Non-Custodiale",
+        p: "Vos clés privées et phrases de récupération ne sont jamais requises ni stockées."
+      },
+      {
+        icon: "📋",
+        h: "3. Données Traitées",
+        p: "Seules les données strictement indispensables aux signaux (ID Telegram, préférences) sont conservées."
+      },
+      {
+        icon: "🚫",
+        h: "4. Aucune Monétisation",
+        p: "Vos données ne sont ni vendues ni cédées à des tiers publicitaires."
+      },
+      {
+        icon: "🗑️",
+        h: "5. Droit à l'Effacement",
+        p: "Exécutez la commande <code>/delete</code> dans le bot pour purger immédiatement vos données."
+      }
+    ]
+  },
+  ar: {
+    title: "سياسة الخصوصية وحماية البيانات",
+    updated: "تاريخ السريان: نوفمبر 2026",
+    badge: "غير وصائي 100% ومتوافق مع GDPR",
+    desc: "السياسة الرسمية لحماية خصوصية بيانات المستخدمين.",
+    sections: [
+      {
+        icon: "🏛️",
+        h: "1. التزام الخصوصية",
+        p: "نحن ملتزمون التزاماً صارماً بمعايير حماية البيانات الدولية واللائحة الأوروبية العامة لحماية البيانات (GDPR)."
+      },
+      {
+        icon: "🔐",
+        h: "2. معمارية غير وصائية بالكامل",
+        p: "نحن لا نطلب أو نخزن أبداً المفاتيح الخاصة بك أو عبارات الاسترداد السرية."
+      },
+      {
+        icon: "📋",
+        h: "3. البيانات المعالجة",
+        p: "تتم معالجة الحد الأدنى من البيانات الضرورية فقط مثل معرّف Telegram وتفضيلات العملات المختارة."
+      },
+      {
+        icon: "🚫",
+        h: "4. لا بيع للبيانات",
+        p: "نحن لا نبيع أو نشارك بياناتك مع أي معلنين أو أطراف خارجية."
+      },
+      {
+        icon: "🗑️",
+        h: "5. حق الحذف الكامل",
+        p: "يمكنك في أي وقت كتابة <code>/delete</code> في البوت لحذف جميع بياناتك بشكل دائم وفوري."
       }
     ]
   }
 };
 
-// Fallback to English for other languages
-['uk','de','es','fr','ar'].forEach(l => {
-  if (!POLICIES[l]) POLICIES[l] = POLICIES.en;
-});
-
-function renderPolicy(lang) {
-  const data = POLICIES[lang] || POLICIES.en;
+function renderPrivacy(lang) {
+  const data = PRIVACY[lang] || PRIVACY.ru;
   const area = document.getElementById("content-area");
   let html = `
-    <div class="legal-card" style="border-top:2px solid var(--accent-gold)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <span class="badge-tag">GDPR &amp; WebApp Verified</span>
+    <div class="legal-card banner">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+        <span class="safe-badge">🛡️ ${data.badge}</span>
         <span style="font-size:11px;color:var(--text-muted)">${data.updated}</span>
       </div>
-      <h1 style="font-size:20px;font-weight:800;color:#fff;margin:0 0 10px">${data.title}</h1>
-      <p style="color:var(--text-secondary);font-size:13px;line-height:1.6">Official Privacy Policy for Telegram Bot &amp; WebApp Terminal</p>
+      <h1 style="font-size:18px;font-weight:800;color:#fff;margin:0 0 8px">${data.title}</h1>
+      <p style="color:var(--text-secondary);font-size:13px;line-height:1.6">${data.desc}</p>
     </div>
   `;
 
-  data.sections.forEach(s => {
+  data.sections.forEach((s, idx) => {
+    let listHtml = "";
+    if (s.ul && s.ul.length) {
+      listHtml = "<ul>" + s.ul.map(item => `<li>${item}</li>`).join("") + "</ul>";
+    }
     html += `
-      <div class="legal-card">
-        <h2>${s.h}</h2>
+      <div class="legal-card" style="animation-delay: ${idx * 0.05}s">
+        <h2><span>${s.icon}</span> ${s.h}</h2>
         <p>${s.p}</p>
-        ${s.ul ? `<ul>${s.ul.map(item => `<li>${item}</li>`).join('')}</ul>` : ''}
+        ${listHtml}
       </div>
     `;
   });
@@ -192,13 +610,14 @@ document.querySelectorAll(".lang-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
-    renderPolicy(btn.dataset.lang);
+    localStorage.setItem("elena_lang", btn.dataset.lang);
+    renderPrivacy(btn.dataset.lang);
   });
 });
 
-const defaultLang = localStorage.getItem("elena_lang") || "en";
-const activeBtn = document.querySelector(`.lang-btn[data-lang="${defaultLang}"]`) || document.querySelector('.lang-btn[data-lang="en"]');
-if (activeBtn) activeBtn.click(); else renderPolicy("en");
+const defaultLang = localStorage.getItem("elena_lang") || "ru";
+const activeBtn = document.querySelector(`.lang-btn[data-lang="${defaultLang}"]`) || document.querySelector('.lang-btn[data-lang="ru"]');
+if (activeBtn) activeBtn.click(); else renderPrivacy("ru");
 </script>
 
 </body>

@@ -4,6 +4,29 @@ const tg = window.Telegram?.WebApp;
 tg?.ready();
 tg?.expand();
 const initData = tg?.initData || "";
+const TUNNEL_SYNC_URL = "https://ntfy.sh/elena_hughes_terminal_sync_8f93b1/raw?poll=1";
+
+async function fetchLiveTunnelFromSync() {
+  try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 3500);
+    const r = await fetch(TUNNEL_SYNC_URL, { signal: ctrl.signal });
+    clearTimeout(tid);
+    if (r.ok) {
+      const text = await r.text();
+      const lines = text.trim().split("\n");
+      const live = lines[lines.length - 1].trim().replace(/\/+$/, "");
+      if (live && live.startsWith("https://") && live.includes("trycloudflare.com")) {
+        console.log("👑 Canlı Termux tüneli admin paneline bağlandı:", live);
+        localStorage.setItem("elena_api_base", live);
+        return live;
+      }
+    }
+  } catch (err) {
+    console.warn("admin fetchLiveTunnelFromSync uyarısı:", err);
+  }
+  return "";
+}
 
 function getApiBase() {
   // 1. URL search (?api=https://...)
@@ -40,15 +63,57 @@ function getApiBase() {
   return "";
 }
 
+// Sayfa açılırken arka planda canlı tüneli eşle
+if (location.hostname.includes("github.io")) {
+  fetchLiveTunnelFromSync();
+}
+
 async function api(path, body = {}) {
-  const baseUrl = getApiBase();
+  let baseUrl = getApiBase();
+  if (!baseUrl && location.hostname.includes("github.io")) {
+    baseUrl = await fetchLiveTunnelFromSync();
+  }
   const fullUrl = (baseUrl && path.startsWith("/")) ? (baseUrl.replace(/\/$/, "") + path) : path;
-  const r = await fetch(fullUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ initData, ...body })
-  });
+  let r;
+  try {
+    r = await fetch(fullUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ initData, ...body })
+    });
+  } catch (netErr) {
+    // Ağ hatası veya tünel ölmüşse, canlı tüneli ntfy'den çekip 1 kez tekrar dene
+    if (location.hostname.includes("github.io")) {
+      const freshBase = await fetchLiveTunnelFromSync();
+      if (freshBase && freshBase !== baseUrl) {
+        const retryUrl = freshBase.replace(/\/$/, "") + path;
+        r = await fetch(retryUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ initData, ...body })
+        });
+      } else {
+        throw netErr;
+      }
+    } else {
+      throw netErr;
+    }
+  }
+
   if (!r.ok) {
+    // 404/502 alındıysa ve GitHub Pages'te isek tünel yenilenmiş olabilir
+    if ((r.status === 404 || r.status === 502) && location.hostname.includes("github.io")) {
+      const freshBase = await fetchLiveTunnelFromSync();
+      if (freshBase && freshBase !== baseUrl) {
+        const retryUrl = freshBase.replace(/\/$/, "") + path;
+        const r2 = await fetch(retryUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ initData, ...body })
+        });
+        if (r2.ok) return r2.json();
+      }
+    }
     const err = await r.json().catch(() => ({}));
     throw new Error(err.error || r.statusText);
   }

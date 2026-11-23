@@ -1201,6 +1201,36 @@ if (backLink) {
   const curApi = getApiBase();
   if (curApi) backLink.href = `index.html?api=${encodeURIComponent(curApi)}`;
 }
+
+// Tünel eşleme butonu ve barı
+document.getElementById("btn-toggle-tunnel-bar")?.addEventListener("click", () => {
+  const box = document.getElementById("tunnel-connect-box");
+  if (!box) return;
+  const isHidden = box.style.display === "none" || !box.style.display;
+  box.style.display = isHidden ? "block" : "none";
+  if (isHidden) {
+    const inp = document.getElementById("manual-tunnel-input");
+    if (inp) inp.value = localStorage.getItem("elena_api_base") || "";
+  }
+});
+
+document.getElementById("btn-save-tunnel")?.addEventListener("click", () => {
+  const inp = document.getElementById("manual-tunnel-input");
+  let v = (inp?.value || "").trim().replace(/\/+$/, "");
+  if (v && !v.startsWith("http")) v = "https://" + v;
+  if (v && v.includes("trycloudflare.com")) {
+    localStorage.setItem("elena_api_base", v);
+    toast("⚡ Tünel kaydedildi, bağlanılıyor...", "success");
+    setTimeout(() => {
+      const url = new URL(location.href);
+      url.searchParams.set("api", v);
+      location.href = url.toString();
+    }, 500);
+  } else {
+    toast("Geçerli bir trycloudflare tünel linki girin", "error");
+  }
+});
+
 load();
 
 

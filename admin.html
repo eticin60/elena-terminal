@@ -19,11 +19,24 @@
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:8px">
+    <button type="button" class="btn" id="btn-toggle-tunnel-bar" style="padding:7px 11px;font-size:11.5px;color:var(--accent-gold);border-color:rgba(255,210,90,0.4)" title="Termux Tünel Ayarı">⚡ Tünel Eşle</button>
     <a href="index.html" class="btn" style="padding:7px 11px;font-size:12px;gap:4px;text-decoration:none">← Geri</a>
     <button class="lang-dropdown-btn" id="btn-adm-lang" aria-label="Dil seç">
       <span>🌐</span>
       <span id="adm-lang-label">TR</span>
     </button>
+  </div>
+</div>
+
+<!-- ================= CANLI TÜNEL EŞLEME KUTUSU (HER ZAMAN KULLANILABİLİR) ================= -->
+<div id="tunnel-connect-box" style="display:none;margin:12px 14px 0;padding:12px 14px;background:rgba(255,210,90,0.06);border:1px solid rgba(255,210,90,0.3);border-radius:12px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <span style="font-size:12px;color:var(--accent-gold);font-weight:700">⚡ Termux Canlı Tünel Adresi Eşle:</span>
+    <span style="font-size:10px;color:var(--text-muted)">trycloudflare.com</span>
+  </div>
+  <div style="display:flex;gap:6px">
+    <input type="text" id="manual-tunnel-input" placeholder="https://xxxx.trycloudflare.com" style="flex:1;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:8px 10px;border-radius:8px;font-size:12px">
+    <button type="button" id="btn-save-tunnel" class="btn-royal" style="padding:8px 14px;font-size:12px">Bağlan</button>
   </div>
 </div>
 
@@ -291,6 +304,6 @@
 </div>
 
 <div id="toast-container" aria-live="polite"></div>
-<script src="admin.js?v=v63"></script>
+<script src="admin.js?v=v64"></script>
 </body>
 </html>

@@ -287,21 +287,18 @@
 
     <!-- 👑 OTO-BOT CANLI YÖNETİM & BORSA/WEB3 TERMİNAL PANOSU (Görsel 2 ve 3) -->
     <div class="card" id="autobot-live-dashboard" style="background:rgba(18,24,38,0.7);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:16px">
-      <!-- Mod Seçimi (Elena Gerçek / Demo) -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-        <button type="button" class="btn" id="btn-mode-real" style="padding:10px;font-size:12px;font-weight:700;border-radius:10px;background:linear-gradient(135deg,rgba(14,165,233,0.35),rgba(6,182,212,0.2));border:1px solid #38bdf8;color:#fff">
-          ⚡ ELENA (Gerçek)
-        </button>
-        <button type="button" class="btn" id="btn-mode-demo" style="padding:10px;font-size:12px;font-weight:700;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--text-muted)">
-          🧪 DEMO
-        </button>
-      </div>
-
-      <div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--text-muted);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.06)">
-        <div>Mod: <strong style="color:#38bdf8" id="lbl-active-bot-mode">ELENA (Gerçek)</strong></div>
+      <!-- Aktif Bot Modu & Güvenlik Başlığı -->
+      <div style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,rgba(14,165,233,0.15),rgba(6,182,212,0.08));border:1px solid rgba(14,165,233,0.3);border-radius:12px;padding:10px 14px;margin-bottom:14px">
         <div style="display:flex;align-items:center;gap:8px">
-          <span>API: <strong style="color:#fff;background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px" id="lbl-active-exchange-name">BINANCE</strong></span>
-          <span>GÜVENLİ IP: <strong style="color:var(--accent-gold);background:rgba(234,179,8,0.1);padding:2px 6px;border-radius:4px">3.122.154.213</strong></span>
+          <span style="font-size:14px">⚡</span>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#fff">ELENA OTOMATİK TİCARET MOTORU</div>
+            <div style="font-size:10.5px;color:#38bdf8;font-weight:600">Canlı Borsa &amp; Web3 İşlem Modu</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:11px">
+          <span style="background:rgba(255,255,255,0.08);padding:3px 8px;border-radius:6px;color:#fff;font-weight:700" id="lbl-active-exchange-name">BINANCE</span>
+          <span style="background:rgba(234,179,8,0.15);border:1px solid rgba(234,179,8,0.3);padding:3px 8px;border-radius:6px;color:var(--accent-gold);font-weight:700">IP: 3.122.154.213</span>
         </div>
       </div>
 
@@ -1423,18 +1420,18 @@
         <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(255,210,90,0.18);color:var(--accent-gold);font-weight:700">CANLI PERFORMANS</span>
       </div>
 
-      <div class="stat-grid" style="margin-bottom:12px">
-        <div class="stat" style="border:1px solid rgba(0,255,163,0.25)">
-          <div class="n green" id="board-winrate" style="font-size:22px">84.2%</div>
-          <div class="l">Genel Başarı Oranı</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;width:100%">
+        <div class="stat" style="border:1px solid rgba(0,255,163,0.3);background:linear-gradient(145deg,rgba(0,255,163,0.06),rgba(8,12,24,0.85));padding:16px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+          <div class="n green" id="board-winrate" style="font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px">84.2%</div>
+          <div class="l" style="font-size:11.5px;color:rgba(255,255,255,0.7);white-space:nowrap">Genel Başarı Oranı</div>
         </div>
-        <div class="stat" style="border:1px solid rgba(255,210,90,0.25)">
-          <div class="n gold" id="board-total-r" style="font-size:22px">+142.6R</div>
-          <div class="l">Net Kümülatif Kâr</div>
+        <div class="stat" style="border:1px solid rgba(255,210,90,0.3);background:linear-gradient(145deg,rgba(255,210,90,0.06),rgba(8,12,24,0.85));padding:16px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+          <div class="n gold" id="board-total-r" style="font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px">+142.6R</div>
+          <div class="l" style="font-size:11.5px;color:rgba(255,255,255,0.7);white-space:nowrap">Net Kümülatif Kâr</div>
         </div>
       </div>
 
-      <div style="font-size:1<div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+      <div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
         <span>🔥 Son 30 Günün En Çok Kazandıran Varlıkları:</span>
         <small style="color:var(--accent-gold);font-size:10px;font-weight:600">CANLI DİNAMİK</small>
       </div>

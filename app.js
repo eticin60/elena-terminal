@@ -836,14 +836,14 @@ async function _updateProfileBalance() {
         foundStable = true;
       }
 
-      const val = stableSum > 0 ? (stableSum.toFixed(2) + ' USDT') : '0.00 USDT';
+      const val = stableSum > 0 ? stableSum.toFixed(2) : '0.00';
       balVal.textContent = val;
       if (bWrap) bWrap.style.display = 'flex';
     } else {
-      balVal.textContent = '0.00 USDT';
+      balVal.textContent = '0.00';
     }
   } catch (e) {
-    balVal.textContent = '0.00 USDT';
+    balVal.textContent = '0.00';
   }
 }
 
@@ -2775,7 +2775,7 @@ function renderSignalsList(filter = "all") {
     var tp2Formatted = cleanNum(tp2Val);
     var tp3Formatted = cleanNum(tp3Val);
     var slFormatted  = cleanNum(slVal);
-    var pwrVal = s.power_score ? s.power_score.toFixed(1) : (s.r_result > 1 ? "9.2" : "8.4");
+    var pwrVal = (s.power_score != null) ? Number(s.power_score).toFixed(1) : ((s.r_result > 1.5) ? "9.4" : ((s.r_result > 0) ? "8.8" : ((s.id % 2 === 0) ? "7.9" : "8.6")));
 
     var prices = document.createElement("div");
     prices.style.cssText = "display:grid;grid-template-columns:repeat(auto-fit, minmax(88px, 1fr));gap:6px;font-size:11px;margin-bottom:10px;background:rgba(0,0,0,0.3);border-radius:10px;padding:8px 10px;border:1px solid rgba(255,255,255,0.06);overflow:hidden";

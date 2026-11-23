@@ -2832,7 +2832,10 @@ async function loadDashboard() {
 
     // Canlı Skorbord (Leaderboard) Güncellemesi
     if (winRateEl && r.win_rate != null) winRateEl.textContent = `${r.win_rate}%`;
-    if (totalREl && r.total_r != null) totalREl.textContent = `${r.total_r >= 0 ? '+' : ''}${r.total_r}R`;
+    if (totalREl && r.total_r != null) {
+      totalREl.textContent = `${r.total_r >= 0 ? '+' : ''}${r.total_r}R`;
+      totalREl.style.color = r.total_r < 0 ? "#ff5252" : "#ffd25a";
+    }
 
     // Canlı Lider Varlıklar (Top Performers by Win / R) Render Et
     const perfCont = document.getElementById("board-top-performers");

@@ -3864,11 +3864,12 @@ window.openSignalSnapshot = function(sigId) {
     const pnlCol = pnlV >= 0 ? "var(--accent-green)" : "var(--accent-red)";
 
     body.innerHTML = `
-      <!-- 📈 SİNYAL MUM GRAFİĞİ (TELEGRAM BİREBİR PNG) -->
-      <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden;margin-bottom:12px;position:relative;text-align:center">
-        <img src="${chartUrl}" style="width:100%;height:auto;display:block;min-height:180px;object-fit:contain;background:#0f172a" alt="Sinyal Grafiği" onerror="this.parentElement.innerHTML='<div style=\'padding:20px;color:var(--text-muted);font-size:12px\'>Grafik görseli hazırlanıyor...</div>'" />
-        <div style="padding:6px 10px;background:rgba(0,0,0,0.5);font-size:10.5px;color:var(--text-muted);display:flex;justify-content:space-between">
-          <span>🎯 TP1-TP3 &amp; SL Seviyeli Canlı Grafik</span>
+      <!-- 📈 SİNYAL MUM GRAFİĞİ (TELEGRAM BİREBİR PNG / AKILLI FALLBACK) -->
+      <div id="snap-chart-wrapper-${sig.id}" style="background:#0b1120;border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden;margin-bottom:12px;position:relative;text-align:center">
+        <img id="snap-img-${sig.id}" src="${chartUrl}" style="width:100%;height:auto;display:block;min-height:180px;object-fit:contain;background:#0b1120" alt="Sinyal Grafiği" 
+          onerror="window.renderSignalChartFallback('${sig.id}')" />
+        <div style="padding:6px 10px;background:rgba(0,0,0,0.6);font-size:10.5px;color:var(--text-muted);display:flex;justify-content:space-between">
+          <span>🎯 TP1-TP3 &amp; SL Hedef Seviyeleri</span>
           <span style="color:#38bdf8">${marketName}</span>
         </div>
       </div>
@@ -4038,3 +4039,62 @@ function startAppLiveSync() {
 }
 
 setTimeout(startAppLiveSync, 2000);
+
+window.renderSignalChartFallback = function(sigId) {
+  const wrapper = document.getElementById("snap-chart-wrapper-" + sigId);
+  if (!wrapper) return;
+  const sig = (typeof allSignalsData !== "undefined" && allSignalsData.find(s => String(s.id) === String(sigId))) || {};
+  const isLong = (sig.side === "LONG" || sig.side === "BUY");
+  const sideCol = isLong ? "#00e676" : "#ff5252";
+  const entry = sig.entry || 0;
+  const sl = sig.sl || 0;
+  const tp1 = sig.tp1 || 0;
+  const tp2 = sig.tp2 || 0;
+  const tp3 = sig.tp3 || 0;
+
+  wrapper.innerHTML = `
+    <div style="padding:16px 14px;background:radial-gradient(circle at 50% 0%, rgba(56,189,248,0.12), transparent 70%), #0b1120;text-align:left">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:8px">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:15px">📊</span>
+          <strong style="color:#fff;font-size:13px">${sig.symbol || 'POZİSYON'} · ${sig.tf || '15m'}</strong>
+          <span class="badge" style="background:${isLong ? 'rgba(0,230,118,0.18)' : 'rgba(255,82,82,0.18)'};color:${sideCol};font-weight:700;padding:1px 6px;font-size:10px">${sig.side || 'İŞLEM'}</span>
+        </div>
+        <span style="font-size:10.5px;color:var(--text-muted)">Görsel Üretim Modu</span>
+      </div>
+
+      <!-- Fiyat Seviyeleri Şeması -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <div style="background:rgba(255,255,255,0.03);padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06)">
+          <div style="font-size:9.5px;color:var(--text-muted)">GİRİŞ FİYATI</div>
+          <div style="font-size:13px;color:#fff;font-weight:700">$${entry}</div>
+        </div>
+        <div style="background:rgba(239,83,80,0.08);padding:8px 10px;border-radius:8px;border:1px solid rgba(239,83,80,0.2)">
+          <div style="font-size:9.5px;color:#ef5350">🛑 STOP-LOSS (SL)</div>
+          <div style="font-size:13px;color:#ef5350;font-weight:700">$${sl}</div>
+        </div>
+      </div>
+
+      <!-- TP Seviyeleri -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px">
+        <div style="background:rgba(38,166,154,0.08);padding:6px 8px;border-radius:8px;border:1px solid rgba(38,166,154,0.2);text-align:center">
+          <div style="font-size:9px;color:#26a69a">🎯 TP1</div>
+          <div style="font-size:11.5px;color:#26a69a;font-weight:700">$${tp1}</div>
+        </div>
+        <div style="background:rgba(38,166,154,0.12);padding:6px 8px;border-radius:8px;border:1px solid rgba(38,166,154,0.25);text-align:center">
+          <div style="font-size:9px;color:#26a69a">🎯 TP2</div>
+          <div style="font-size:11.5px;color:#26a69a;font-weight:700">$${tp2}</div>
+        </div>
+        <div style="background:rgba(38,166,154,0.18);padding:6px 8px;border-radius:8px;border:1px solid rgba(38,166,154,0.35);text-align:center">
+          <div style="font-size:9px;color:#26a69a">🎯 TP3</div>
+          <div style="font-size:11.5px;color:#26a69a;font-weight:700">$${tp3}</div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(255,255,255,0.02);border-radius:6px;font-size:10.5px">
+        <span style="color:var(--text-muted)">📈 Canlı Mum Grafiği:</span>
+        <button class="btn btn-ghost" style="padding:2px 8px;font-size:10px;color:#38bdf8" onclick="window.openGlobalSymbol('${sig.symbol || 'BTCUSDT'}')">📊 Canlı Grafiği Aç ›</button>
+      </div>
+    </div>
+  `;
+};

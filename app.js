@@ -1218,8 +1218,8 @@ function renderGuide(lang) {
         ${d.c6_body}
       </p>
       <div style="display:flex;gap:8px">
-        <a href="terms.html" class="btn" style="flex:1;padding:10px;font-size:12px;text-decoration:none" target="_blank">${d.btn_terms}</a>
-        <a href="privacy.html" class="btn" style="flex:1;padding:10px;font-size:12px;text-decoration:none" target="_blank">${d.btn_privacy}</a>
+        <a href="terms.html" class="btn" style="flex:1;padding:10px;font-size:12px;text-decoration:none" >${d.btn_terms}</a>
+        <a href="privacy.html" class="btn" style="flex:1;padding:10px;font-size:12px;text-decoration:none" >${d.btn_privacy}</a>
       </div>
     </div>
   `;
@@ -1687,6 +1687,7 @@ function preserveApiLinks() {
   document.querySelectorAll('a[href]').forEach(a => {
     const h = a.getAttribute('href');
     if (h && (h.startsWith('terms.html') || h.startsWith('privacy.html') || h.startsWith('admin.html'))) {
+      a.removeAttribute('target');
       if (curApi && curApi.startsWith('https://')) {
         const cleanBase = curApi.replace(/\/+$/, '');
         a.setAttribute('href', `${cleanBase}/${h}`);

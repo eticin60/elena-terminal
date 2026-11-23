@@ -1285,14 +1285,42 @@ function coinBadge(sym, size) {
 }
 const EXTRA_DEFAULTS = { strategy_tf: '1h', max_account_risk_pct: 100, corr_min_trades: 3, corr_win_rate: 60 };
 
+
+const _TRON_B58_CHARS = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+function _helperTronB58ToHex(s) {
+  try {
+    let num = 0n;
+    for (const c of String(s).trim()) {
+      const idx = _TRON_B58_CHARS.indexOf(c);
+      if (idx < 0) return "";
+      num = num * 58n + BigInt(idx);
+    }
+    let hex = num.toString(16);
+    if (hex.length % 2 !== 0) hex = "0" + hex;
+    return hex.slice(0, -8);
+  } catch(_) { return ""; }
+}
+
 // Dinamik API Base URL (Doğrudan tünelden açılırsa bağıl kalır; GitHub Pages'den açılırsa tünel adresine bağlanır)
 function getApiBase() {
+  // 1. URL Query Param (?api=https://...)
   const urlParams = new URLSearchParams(window.location.search);
-  const qApi = urlParams.get("api");
+  let qApi = urlParams.get("api");
+  
+  // 2. Hash Param (#...api=https://...)
+  if (!qApi && window.location.hash) {
+    const hashMatches = window.location.hash.match(/[?&#]api=([^&#]+)/);
+    if (hashMatches && hashMatches[1]) {
+      qApi = decodeURIComponent(hashMatches[1]);
+    }
+  }
+
   if (qApi && qApi.startsWith("https://")) {
     localStorage.setItem("elena_api_base", qApi);
     return qApi;
   }
+  
+  // 3. LocalStorage Cached
   const cached = localStorage.getItem("elena_api_base");
   if (cached && location.hostname.includes("github.io")) {
     return cached;
@@ -1632,21 +1660,23 @@ async function loadBalance() {
 
   const isTron = (WALLET.chain || "").startsWith("tron") || (WALLET.address || "").startsWith("T");
 
-  // --- TRON ---
+  // --- TRON (Kesintisiz Backend + Doğrudan Tarayıcı RPC Çift Güvencesi) ---
   if (isTron) {
+    let tronDone = false;
     try {
       const r = await api("/api/wallet/balance");
-      if (r.ok) {
+      if (r && r.ok) {
+        tronDone = true;
         if (nativeEl) nativeEl.textContent = (r.native ?? 0).toFixed(4) + " TRX";
         if (chainEl) chainEl.textContent = "TRON";
         list.innerHTML = "";
         if (r.tokens && r.tokens.length) {
           r.tokens.forEach(t => _appendToken(list, t));
-          // Update profile balance bar with USDT total
           const _usdtTok = r.tokens.find(t => (t.symbol||'').toUpperCase() === 'USDT' || (t.name||'').toLowerCase().includes('tether'));
           const _usdtBal = document.getElementById('upc-balance-val');
-          if (_usdtBal && _usdtTok) {
-            _usdtBal.textContent = parseFloat(_usdtTok.balance || 0).toFixed(2);
+          const totalVal = (r.usdt_total != null && r.usdt_total > 0) ? r.usdt_total : (_usdtTok ? parseFloat(_usdtTok.balance || 0) : 0);
+          if (_usdtBal) {
+            _usdtBal.textContent = totalVal.toFixed(2);
             const _bWrap = document.getElementById('upc-balance-wrap');
             if (_bWrap) _bWrap.style.display = 'flex';
           }
@@ -1654,7 +1684,82 @@ async function loadBalance() {
           list.innerHTML = `<div style="color:var(--text-muted);font-size:12px;padding:6px 0">TRC20 token bulunamadı</div>`;
         }
       }
-    } catch(e) { list.innerHTML = `<div style="color:var(--accent-red);font-size:12px">Bakiye alınamadı</div>`; }
+    } catch(e) {
+      console.warn("Backend Tron bakiye servisi meşgul, doğrudan tarayıcı TronGrid RPC deneniyor...", e);
+    }
+
+    // Doğrudan Tarayıcıdan Tron FullNode Sorgusu (Fallback)
+    if (!tronDone) {
+      try {
+        const _tronHex = _helperTronB58ToHex(WALLET.address);
+        if (_tronHex && _tronHex.length === 42) {
+          const _addrParam = _tronHex.slice(2).padStart(64, "0");
+          // TRX
+          const trxR = await fetch("https://api.trongrid.io/wallet/getaccount", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ address: _tronHex }),
+            signal: AbortSignal.timeout(6000)
+          });
+          const trxData = await trxR.json();
+          const trxBal = (trxData.balance || 0) / 1e6;
+          if (nativeEl) nativeEl.textContent = trxBal.toFixed(4) + " TRX";
+          if (chainEl) chainEl.textContent = "TRON";
+          list.innerHTML = "";
+
+          // USDT TRC20
+          const usdtHex = _helperTronB58ToHex("TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t");
+          const usdtR = await fetch("https://api.trongrid.io/wallet/triggerconstantcontract", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              owner_address: _tronHex,
+              contract_address: usdtHex,
+              function_selector: "balanceOf(address)",
+              parameter: _addrParam
+            }),
+            signal: AbortSignal.timeout(6000)
+          });
+          const usdtData = await usdtR.json();
+          let usdtBal = 0;
+          if (usdtData.constant_result && usdtData.constant_result[0]) {
+            usdtBal = Number(BigInt("0x" + usdtData.constant_result[0])) / 1e6;
+          }
+
+          // USDC TRC20
+          const usdcHex = _helperTronB58ToHex("TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8");
+          const usdcR = await fetch("https://api.trongrid.io/wallet/triggerconstantcontract", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              owner_address: _tronHex,
+              contract_address: usdcHex,
+              function_selector: "balanceOf(address)",
+              parameter: _addrParam
+            }),
+            signal: AbortSignal.timeout(6000)
+          });
+          const usdcData = await usdcR.json();
+          let usdcBal = 0;
+          if (usdcData.constant_result && usdcData.constant_result[0]) {
+            usdcBal = Number(BigInt("0x" + usdcData.constant_result[0])) / 1e6;
+          }
+
+          _appendToken(list, { symbol: "USDT", name: "Tether USD", balance: usdtBal, logo: "assets/coins/usdt.svg" });
+          _appendToken(list, { symbol: "USDC", name: "USD Coin", balance: usdcBal, logo: "assets/coins/usdc.svg" });
+
+          const _uBal = document.getElementById('upc-balance-val');
+          if (_uBal) {
+            _uBal.textContent = usdtBal.toFixed(2);
+            const _bW = document.getElementById('upc-balance-wrap');
+            if (_bW) _bW.style.display = 'flex';
+          }
+          tronDone = true;
+        }
+      } catch(err2) {
+        list.innerHTML = `<div style="color:var(--accent-red);font-size:12px">Bakiye alınamadı: ${err2.message || 'Bağlantı hatası'}</div>`;
+      }
+    }
     return;
   }
 

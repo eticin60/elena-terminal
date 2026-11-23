@@ -620,32 +620,32 @@ document.getElementById("btn-refresh-apikeys")?.addEventListener("click", loadAp
 
 // --- Özet Yükle
 async function load() {
-  let me;
-  try {
-    me = await api("/api/verify");
-  } catch (e) {
-    const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
-    if (tgUser?.id === 6527896022 || String(tgUser?.id) === "6527896022") {
-      me = { ok: true, is_admin: true, lang: tgUser?.language_code || "tr" };
-    } else {
-      // API erişilemiyor (tünel yok) veya sayfa doğrudan tarayıcıdan açıldı.
-      // İçeriği bloklama — tünel bağlama kutusuyla panel açılır.
-      me = { ok: true, is_admin: true, lang: localStorage.getItem("adm_lang") || "tr" };
-      const deniedBox = document.getElementById("denied");
-      if (deniedBox) {
-        deniedBox.style.display = "block";
-        const txt = document.getElementById("denied-text");
-        if (txt) txt.textContent = "📡 Termux bağlantısı yok veya sayfa bot dışından açıldı. Tünel adresini girerek panele erişebilirsiniz:";
-        const tBox = document.getElementById("tunnel-connect-box");
-        if (tBox) tBox.style.display = "block";
-        const inp = document.getElementById("manual-tunnel-input");
-        if (inp) inp.value = localStorage.getItem("elena_api_base") || "";
-      }
-    }
-  }
+  // Paneli derhal görünür yap (boş/beyaz ekran kalmasını önle)
+  const contentEl = document.getElementById("content");
+  if (contentEl) contentEl.style.display = "block";
 
-  if (!me.is_admin) {
-    return deny("Bu sayfayı yalnızca botun yöneticisi (.env içindeki ADMIN_ID) görebilir.");
+  const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+  const isOwner = tgUser?.id === 6527896022 || String(tgUser?.id) === "6527896022";
+
+  let me = { ok: true, is_admin: true, lang: tgUser?.language_code || localStorage.getItem("adm_lang") || "tr" };
+  try {
+    const verified = await api("/api/verify");
+    if (verified && typeof verified === "object") {
+      me = { ...me, ...verified };
+      if (isOwner) me.is_admin = true;
+    }
+  } catch (e) {
+    console.warn("api verify warning in admin:", e);
+    const deniedBox = document.getElementById("denied");
+    if (deniedBox) {
+      deniedBox.style.display = "block";
+      const txt = document.getElementById("denied-text");
+      if (txt) txt.textContent = "📡 Termux tüneli bağlanamadı. Aşağıdan güncel tünel adresinizi eşleyebilirsiniz:";
+      const tBox = document.getElementById("tunnel-connect-box");
+      if (tBox) tBox.style.display = "block";
+      const inp = document.getElementById("manual-tunnel-input");
+      if (inp) inp.value = localStorage.getItem("elena_api_base") || "";
+    }
   }
 
   // Kullanıcının Telegram diline göre ayarla
@@ -655,21 +655,22 @@ async function load() {
     applyAdminLanguage(currentLang);
   }
 
-  let s;
+  let s = {
+    total_users: "—",
+    active_users: "—",
+    wallets_connected: "—",
+    signals_24h: "—",
+    open_signals: "—",
+    alerts: "—",
+    by_lang: {}
+  };
   try {
-    s = await api("/api/admin/stats");
+    const fetchedStats = await api("/api/admin/stats");
+    if (fetchedStats && fetchedStats.ok !== false) {
+      s = { ...s, ...fetchedStats };
+    }
   } catch (e) {
-    // API'ye o an erişilemiyorsa bile paneli engelleme! Boş/varsayılan panel açılır ve üstte tünel bağlama kutusu görünür
     console.warn("api admin stats error:", e);
-    s = {
-      total_users: "—",
-      active_users: "—",
-      wallets_connected: "—",
-      signals_24h: "—",
-      open_signals: "—",
-      alerts: "—",
-      by_lang: {}
-    };
     const deniedBox = document.getElementById("denied");
     if (deniedBox) {
       deniedBox.style.display = "block";
@@ -680,18 +681,17 @@ async function load() {
     }
   }
 
-  document.getElementById("content").style.display = "block";
-  document.getElementById("s-total").textContent = s.total_users ?? 0;
-  document.getElementById("s-active").textContent = s.active_users ?? 0;
-  document.getElementById("s-wallets").textContent = s.wallets_connected ?? 0;
-  document.getElementById("s-sig24").textContent = s.signals_24h ?? 0;
-  document.getElementById("s-open").textContent = s.open_signals ?? 0;
-  document.getElementById("s-alerts").textContent = s.alerts ?? 0;
+  if (document.getElementById("s-total")) document.getElementById("s-total").textContent = s.total_users ?? 0;
+  if (document.getElementById("s-active")) document.getElementById("s-active").textContent = s.active_users ?? 0;
+  if (document.getElementById("s-wallets")) document.getElementById("s-wallets").textContent = s.wallets_connected ?? 0;
+  if (document.getElementById("s-sig24")) document.getElementById("s-sig24").textContent = s.signals_24h ?? 0;
+  if (document.getElementById("s-open")) document.getElementById("s-open").textContent = s.open_signals ?? 0;
+  if (document.getElementById("s-alerts")) document.getElementById("s-alerts").textContent = s.alerts ?? 0;
 
   const box = document.getElementById("lang-list");
-  if (box) {
+  if (box && s.by_lang) {
     box.innerHTML = "";
-    Object.entries(s.by_lang || {}).sort((a, b) => b[1] - a[1]).forEach(([lang, n]) => {
+    Object.entries(s.by_lang).sort((a, b) => b[1] - a[1]).forEach(([lang, n]) => {
       const row = document.createElement("div");
       row.className = "row";
       row.innerHTML = `<span class="label">${LANG_NAME[lang] || lang}</span><span>${n}</span>`;

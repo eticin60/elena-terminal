@@ -1884,6 +1884,12 @@ async function initWalletConnect() {
 }
 
 async function startConnectFlow() {
+  const btn = document.getElementById("btn-landing-connect");
+  const origHtml = btn ? btn.innerHTML : "";
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<span style="display:inline-block;animation:spin 1s linear infinite">⏳</span> <span>Bağlanıyor...</span>`;
+  }
   try {
     // wcClient sadece bir kez init olur (dil değişmediyse yeniden oluşturmaya gerek yok)
     // Dil değişikliği durumu için lang'ı sakla
@@ -1892,7 +1898,9 @@ async function startConnectFlow() {
       await initWalletConnect();
       if (wcClient) wcClient.__lang = currentLang;
     }
-    if (!wcClient) return;
+    if (!wcClient) {
+      throw new Error("WalletConnect modülü yüklenemedi. Lütfen doğrudan cüzdan adresinizle bağlanın.");
+    }
 
     // Tron, BSC, Ethereum, Polygon hepsini kapsayan optionalNamespaces
     let connectResult;
@@ -1978,7 +1986,14 @@ async function startConnectFlow() {
       return;
     }
     console.error("[WalletConnect]", e);
-    toast("Bağlantı hatası: " + (e.message || "Bilinmeyen hata"), "error");
+    toast("WalletConnect başlatılamadı. Doğrudan cüzdan adresinizle bağlanabilirsiniz ✍️", "warn");
+    const manualModal = document.getElementById("manual-wallet-modal");
+    if (manualModal) manualModal.style.display = "flex";
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = origHtml;
+    }
   }
 }
 

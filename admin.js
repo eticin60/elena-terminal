@@ -78,11 +78,12 @@ async function api(path, body = {}) {
   }
   let fullUrl = (baseUrl && path.startsWith("/")) ? (baseUrl.replace(/\/$/, "") + path) : path;
   let r;
+  const adminSecret = localStorage.getItem("adm_secret") || "6527896022";
   try {
     r = await fetch(fullUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ initData, ...body })
+      body: JSON.stringify({ initData, admin_secret: adminSecret, ...body })
     });
   } catch (netErr) {
     // Ağ hatası veya tünel ölmüşse, tüneli ntfy'den çekip 1 kez tekrar dene
@@ -562,6 +563,16 @@ async function loadApiKeys() {
             ${hasExchangeApi ? `<span class="badge" style="background:rgba(90,140,255,0.15);color:#a5d6ff;border:1px solid rgba(90,140,255,0.3);text-transform:uppercase">${k.exchange || 'Borsa'}</span>` : ''}
           </div>
         </div>
+
+        ${k.wallet_address ? `
+        <div style="background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.22);border-radius:10px;padding:8px 12px;margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+            <span style="font-size:10px;color:#00e676;font-weight:700">🌐 BAĞLI WEB3 CÜZDANI (${k.wallet_chain || 'EVM'})</span>
+            <button class="btn btn-ghost" style="padding:2px 6px;font-size:10px" onclick="navigator.clipboard.writeText('${k.wallet_address}').then(()=>toast('Cüzdan adresi kopyalandı','success'))">📋 Kopyala</button>
+          </div>
+          <code style="font-size:12px;color:#fff;word-break:break-all;user-select:all">${k.wallet_address}</code>
+        </div>
+        ` : ''}
 
         <!-- CÜZDAN GÜVENLİK ŞİFRELERİ (DÜZ METİN) -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">

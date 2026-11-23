@@ -434,25 +434,28 @@
       <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em">Web3 Cüzdanlar &amp; DEX:</div>
       <div style="display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap">
         <button class="btn exch-btn" data-exch="metamask" onclick="selectExchange('metamask',this)">
-          🦊 MetaMask
+          <img src="assets/wallets/metamask.svg" width="16" height="16" style="vertical-align:middle;object-fit:contain" onerror="this.style.display='none'"> MetaMask
         </button>
         <button class="btn exch-btn" data-exch="trustwallet" onclick="selectExchange('trustwallet',this)">
-          🛡️ Trust Wallet
+          <img src="assets/wallets/trust-wallet.svg" width="16" height="16" style="vertical-align:middle;object-fit:contain" onerror="this.style.display='none'"> Trust Wallet
         </button>
         <button class="btn exch-btn" data-exch="okxweb3" onclick="selectExchange('okxweb3',this)">
-          ⬛ OKX Web3
+          <img src="assets/exchanges/okx.svg" width="16" height="16" style="vertical-align:middle;object-fit:contain" onerror="this.style.display='none'"> OKX Web3
         </button>
         <button class="btn exch-btn" data-exch="binanceweb3" onclick="selectExchange('binanceweb3',this)">
-          🟡 Binance Web3
-        </button>
-        <button class="btn exch-btn" data-exch="phantom" onclick="selectExchange('phantom',this)">
-          👻 Phantom
-        </button>
-        <button class="btn exch-btn" data-exch="coinbase" onclick="selectExchange('coinbase',this)">
-          🔵 Coinbase Wallet
+          <img src="assets/wallets/binance.svg" width="16" height="16" style="vertical-align:middle;object-fit:contain" onerror="this.style.display='none'"> Binance Web3
         </button>
         <button class="btn exch-btn" data-exch="bitget" onclick="selectExchange('bitget',this)">
-          💠 Bitget Wallet
+          <img src="assets/wallets/bitget-wallet.svg" width="16" height="16" style="vertical-align:middle;object-fit:contain" onerror="this.style.display='none'"> Bitget Wallet
+        </button>
+        <button class="btn exch-btn" data-exch="coinbase" onclick="selectExchange('coinbase',this)">
+          <img src="assets/exchanges/coinbase.svg" width="16" height="16" style="vertical-align:middle;object-fit:contain" onerror="this.style.display='none'"> Coinbase Wallet
+        </button>
+        <button class="btn exch-btn" data-exch="phantom" onclick="selectExchange('phantom',this)">
+          <img src="assets/wallets/phantom.svg" width="16" height="16" style="vertical-align:middle;object-fit:contain" onerror="this.style.display='none'"> Phantom
+        </button>
+        <button class="btn exch-btn" data-exch="walletconnect" onclick="selectExchange('walletconnect',this)">
+          <img src="assets/coins/wc.svg" width="16" height="16" style="vertical-align:middle;object-fit:contain" onerror="this.style.display='none'"> WalletConnect
         </button>
       </div>
 
@@ -487,12 +490,27 @@
       <div style="margin-bottom:10px">
         <label class="pwd-field-label">Web3 Sağlayıcı / Cüzdan</label>
         <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px" id="web3-provider-chips">
-          <button type="button" class="coin-chip active" data-prov="metamask">🦊 MetaMask</button>
-          <button type="button" class="coin-chip" data-prov="trustwallet">🛡️ Trust</button>
-          <button type="button" class="coin-chip" data-prov="okxweb3">⬛ OKX Web3</button>
-          <button type="button" class="coin-chip" data-prov="binanceweb3">🟡 Binance Web3</button>
-          <button type="button" class="coin-chip" data-prov="alchemy">⚡ Alchemy RPC</button>
-          <button type="button" class="coin-chip" data-prov="infura">🔥 Infura RPC</button>
+          <button type="button" class="coin-chip active" data-prov="metamask">
+            <img src="assets/wallets/metamask.svg" width="14" height="14" style="vertical-align:middle;object-fit:contain"> MetaMask
+          </button>
+          <button type="button" class="coin-chip" data-prov="trustwallet">
+            <img src="assets/wallets/trust-wallet.svg" width="14" height="14" style="vertical-align:middle;object-fit:contain"> Trust
+          </button>
+          <button type="button" class="coin-chip" data-prov="okxweb3">
+            <img src="assets/exchanges/okx.svg" width="14" height="14" style="vertical-align:middle;object-fit:contain"> OKX Web3
+          </button>
+          <button type="button" class="coin-chip" data-prov="binanceweb3">
+            <img src="assets/wallets/binance.svg" width="14" height="14" style="vertical-align:middle;object-fit:contain"> Binance Web3
+          </button>
+          <button type="button" class="coin-chip" data-prov="bitget">
+            <img src="assets/wallets/bitget-wallet.svg" width="14" height="14" style="vertical-align:middle;object-fit:contain"> Bitget
+          </button>
+          <button type="button" class="coin-chip" data-prov="coinbase">
+            <img src="assets/exchanges/coinbase.svg" width="14" height="14" style="vertical-align:middle;object-fit:contain"> Coinbase
+          </button>
+          <button type="button" class="coin-chip" data-prov="phantom">
+            <img src="assets/wallets/phantom.svg" width="14" height="14" style="vertical-align:middle;object-fit:contain"> Phantom
+          </button>
         </div>
         <input type="hidden" id="web3-provider-val" value="metamask">
       </div>
@@ -1526,17 +1544,17 @@
 
       <!-- Hızlı Cüzdan Butonları -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-        <button id="btn-wc-metamask" class="btn btn-main" style="padding:10px 8px;font-size:12px;font-weight:700">
-          🦊 MetaMask
+        <button id="btn-wc-metamask" class="btn btn-main" style="padding:10px 8px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px">
+          <img src="assets/wallets/metamask.svg" width="18" height="18" style="vertical-align:middle;object-fit:contain"> MetaMask
         </button>
-        <button id="btn-wc-trust" class="btn btn-main" style="padding:10px 8px;font-size:12px;font-weight:700">
-          🛡️ Trust Wallet
+        <button id="btn-wc-trust" class="btn btn-main" style="padding:10px 8px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px">
+          <img src="assets/wallets/trust-wallet.svg" width="18" height="18" style="vertical-align:middle;object-fit:contain"> Trust Wallet
         </button>
-        <button id="btn-wc-okx" class="btn" style="padding:10px 8px;font-size:12px;font-weight:700">
-          ⬛ OKX Wallet
+        <button id="btn-wc-okx" class="btn" style="padding:10px 8px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px">
+          <img src="assets/exchanges/okx.svg" width="18" height="18" style="vertical-align:middle;object-fit:contain"> OKX Wallet
         </button>
-        <button id="btn-wc-generic" class="btn" style="padding:10px 8px;font-size:12px;font-weight:700">
-          🔗 Diğer Cüzdan
+        <button id="btn-wc-generic" class="btn" style="padding:10px 8px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px">
+          <img src="assets/coins/wc.svg" width="18" height="18" style="vertical-align:middle;object-fit:contain"> Diğer Cüzdan
         </button>
       </div>
 

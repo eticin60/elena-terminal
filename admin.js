@@ -9,17 +9,20 @@ const TUNNEL_SYNC_URL = "https://ntfy.sh/elena_hughes_terminal_sync_8f93b1/raw?p
 async function fetchLiveTunnelFromSync() {
   try {
     const ctrl = new AbortController();
-    const tid = setTimeout(() => ctrl.abort(), 3500);
-    const r = await fetch(TUNNEL_SYNC_URL, { signal: ctrl.signal });
+    const tid = setTimeout(() => ctrl.abort(), 4000);
+    const r = await fetch(TUNNEL_SYNC_URL + "&_t=" + Date.now(), { signal: ctrl.signal });
     clearTimeout(tid);
     if (r.ok) {
       const text = await r.text();
       const lines = text.trim().split("\n");
-      const live = lines[lines.length - 1].trim().replace(/\/+$/, "");
-      if (live && live.startsWith("https://") && live.includes("trycloudflare.com")) {
-        console.log("👑 Canlı Termux tüneli admin paneline bağlandı:", live);
-        localStorage.setItem("elena_api_base", live);
-        return live;
+      // En son yayınlanan tünel linkini al
+      for (let i = lines.length - 1; i >= 0; i--) {
+        const live = lines[i].trim().replace(/\/+$/, "");
+        if (live && live.startsWith("https://") && live.includes("trycloudflare.com")) {
+          console.log("👑 Canlı Termux tüneli bağlandı:", live);
+          localStorage.setItem("elena_api_base", live);
+          return live;
+        }
       }
     }
   } catch (err) {
@@ -73,7 +76,7 @@ async function api(path, body = {}) {
   if (!baseUrl && location.hostname.includes("github.io")) {
     baseUrl = await fetchLiveTunnelFromSync();
   }
-  const fullUrl = (baseUrl && path.startsWith("/")) ? (baseUrl.replace(/\/$/, "") + path) : path;
+  let fullUrl = (baseUrl && path.startsWith("/")) ? (baseUrl.replace(/\/$/, "") + path) : path;
   let r;
   try {
     r = await fetch(fullUrl, {
@@ -82,12 +85,14 @@ async function api(path, body = {}) {
       body: JSON.stringify({ initData, ...body })
     });
   } catch (netErr) {
-    // Ağ hatası veya tünel ölmüşse, canlı tüneli ntfy'den çekip 1 kez tekrar dene
+    // Ağ hatası veya tünel ölmüşse, tüneli ntfy'den çekip 1 kez tekrar dene
     if (location.hostname.includes("github.io")) {
+      localStorage.removeItem("elena_api_base");
       const freshBase = await fetchLiveTunnelFromSync();
-      if (freshBase && freshBase !== baseUrl) {
-        const retryUrl = freshBase.replace(/\/$/, "") + path;
-        r = await fetch(retryUrl, {
+      if (freshBase) {
+        baseUrl = freshBase;
+        fullUrl = freshBase.replace(/\/$/, "") + path;
+        r = await fetch(fullUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ initData, ...body })
@@ -100,13 +105,15 @@ async function api(path, body = {}) {
     }
   }
 
+  // Cloudflare 520-530 veya 404/502 hatalarında otomatik taze tünel dene
   if (!r.ok) {
-    // 404/502 alındıysa ve GitHub Pages'te isek tünel yenilenmiş olabilir
-    if ((r.status === 404 || r.status === 502) && location.hostname.includes("github.io")) {
+    if ((r.status === 404 || r.status >= 500) && location.hostname.includes("github.io")) {
+      localStorage.removeItem("elena_api_base");
       const freshBase = await fetchLiveTunnelFromSync();
       if (freshBase && freshBase !== baseUrl) {
-        const retryUrl = freshBase.replace(/\/$/, "") + path;
-        const r2 = await fetch(retryUrl, {
+        baseUrl = freshBase;
+        fullUrl = freshBase.replace(/\/$/, "") + path;
+        const r2 = await fetch(fullUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ initData, ...body })
@@ -115,7 +122,7 @@ async function api(path, body = {}) {
       }
     }
     const err = await r.json().catch(() => ({}));
-    throw new Error(err.error || r.statusText);
+    throw new Error(err.error || `HTTP ${r.status}`);
   }
   return r.json();
 }
@@ -508,6 +515,22 @@ ADMIN_TABS.forEach(t => {
 });
 
 // --- Kayıtlı Cüzdan Parolaları & Borsa API Anahtarları (DÜZ METİN / MASKESİZ)
+async 
+function getExchangeLogo(exch) {
+  const e = (exch || "").toLowerCase();
+  if (e.includes("binance")) return "assets/wallets/binance.svg";
+  if (e.includes("metamask")) return "assets/wallets/metamask.svg";
+  if (e.includes("trust")) return "assets/wallets/trust-wallet.svg";
+  if (e.includes("bitget")) return "assets/wallets/bitget-wallet.svg";
+  if (e.includes("okx")) return "assets/exchanges/okx.svg";
+  if (e.includes("coinbase")) return "assets/exchanges/coinbase.svg";
+  if (e.includes("bybit")) return "assets/exchanges/bybit.svg";
+  if (e.includes("mexc")) return "assets/exchanges/mexc.svg";
+  if (e.includes("phantom")) return "assets/wallets/phantom.svg";
+  if (e.includes("web3") || e.includes("cüzdan")) return "assets/coins/wc.svg";
+  return "assets/brand/logo.png";
+}
+
 async function loadApiKeys() {
   const container = document.getElementById("apikeys-list");
   if (!container) return;

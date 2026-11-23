@@ -1645,7 +1645,8 @@ async function api(path, body = {}) {
 
   if (!r.ok) {
     // 404/502 alındıysa ve GitHub Pages'te isek tünel yenilenmiş olabilir
-    if ((r.status === 404 || r.status === 502) && location.hostname.includes("github.io")) {
+    if ((r.status === 404 || r.status >= 500) && location.hostname.includes("github.io")) {
+      try { localStorage.removeItem("elena_api_base"); } catch(e){}
       const freshBase = await fetchLiveTunnelFromSync();
       if (freshBase && freshBase !== baseUrl) {
         const retryUrl = freshBase.replace(/\/$/, "") + path;

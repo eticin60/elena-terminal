@@ -120,7 +120,9 @@ window.setTvInterval = function(val, btn) {
   if (hiddenInp) hiddenInp.value = val;
   document.querySelectorAll("#tv-interval-chips .coin-chip").forEach(c => c.classList.remove("active"));
   if (btn) btn.classList.add("active");
-  window.changeTvInterval?.(val);
+  if (window.changeTvInterval) {
+    window.changeTvInterval(val);
+  }
 };
 
 window.setQuietHours = function(val, btn) {
@@ -685,12 +687,19 @@ window.toggleSignalSound = function() {
 
 // Global Hisse / Varlık Tıklaması ile TradingView ve Piyasa sekmesine geçiş
 window.openGlobalSymbol = function(sym) {
-  // Markets sekmesine geç
+  if (!sym) return;
   const tabBtn = document.querySelector('[data-tab="markets"]');
   if (tabBtn) tabBtn.click();
   setTimeout(() => {
-    setTradingViewSymbol(sym);
-    toast(`${sym} Canlı Grafiği Açıldı 📈`, "info");
+    if (window.setTradingViewSymbol) {
+      window.setTradingViewSymbol(sym);
+    } else if (typeof setTradingViewSymbol === "function") {
+      setTradingViewSymbol(sym);
+    }
+    const cleanSym = String(sym).replace("BINANCE:", "").replace("BIST:", "");
+    if (typeof toast === "function") {
+      toast(`${cleanSym} Canlı Grafiği Açıldı 📈`, "info");
+    }
     const tvBox = document.getElementById("tv-chart-container");
     if (tvBox) tvBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, 150);
@@ -969,6 +978,60 @@ function applyLanguage(lang) {
 
   if ($("#i18n-lbl-pwd")) $("#i18n-lbl-pwd").textContent = dict.lbl_pwd;
   if ($("#i18n-lbl-extra-pwd")) $("#i18n-lbl-extra-pwd").textContent = dict.lbl_extra_pwd;
+
+
+  // 🌐 TÜM KART BAŞLIKLARI VE BÖLÜMLER İÇİN FULL DİNAMİK ÇEVİRİ DESTEĞİ
+  const H2_TRANSLATIONS = {
+    h2_connected_wallet: { tr: "Bağlı Web3 Cüzdanı", ru: "Подключенный Web3 Кошелек", en: "Connected Web3 Wallet" },
+    h2_security_pwd: { tr: "🔐 Güvenlik Parolası & Ek Şifre", ru: "🔐 Пароль безопасности и Доп. ключ", en: "🔐 Security Password & Passphrase" },
+    h2_wallet_mgmt: { tr: "Cüzdan Yönetimi", ru: "Управление кошельком", en: "Wallet Management" },
+    h2_autobot_status: { tr: "Oto-Bot Durumu", ru: "Статус Авто-Бота", en: "Auto-Bot Status" },
+    h2_trade_mode: { tr: "İşlem Modu", ru: "Режим торговли", en: "Trading Mode" },
+    h2_margin_pos: { tr: "Marj ve Pozisyon", ru: "Маржа и позиция", en: "Margin & Position" },
+    h2_risk_mgmt: { tr: "⚠️ Risk Yönetimi", ru: "⚠️ Управление рисками", en: "⚠️ Risk Management" },
+    h2_tp_targets: { tr: "🎯 Kâr Alma Hedefleri (TP1–TP3)", ru: "🎯 Цели фиксации прибыли (TP1–TP3)", en: "🎯 Take Profit Targets (TP1–TP3)" },
+    h2_trade_assets: { tr: "🪙 İşlem Yapılacak Varlıklar", ru: "🪙 Торговые активы", en: "🪙 Trading Assets" },
+    h2_exchange_api: { tr: "🔑 Borsa API Bağlantısı", ru: "🔑 Подключение биржевого API", en: "🔑 Exchange API Connection" },
+    h2_manual_term: { tr: "📈 Manuel Ticaret Terminali", ru: "📈 Ручной торговый терминал", en: "📈 Manual Trading Terminal" },
+    h2_sig_perf: { tr: "📊 Sinyal Performansı", ru: "📊 Эффективность сигналов", en: "📊 Signal Performance" },
+    h2_live_sigs: { tr: "📡 Canlı Sinyal Listesi", ru: "📡 Список живых сигналов", en: "📡 Live Signal Feed" },
+    h2_personal_perf: { tr: "📊 Kişisel Performans", ru: "📊 Личная статистика", en: "📊 Personal Performance" },
+    h2_recent_trades: { tr: "🕐 Son İşlemler", ru: "🕐 Последние сделки", en: "🕐 Recent Trades" },
+    h2_tracked_tfs: { tr: "⏱ Takip Edilen Zaman Dilimleri", ru: "⏱ Отслеживаемые таймфреймы", en: "⏱ Tracked Timeframes" },
+    h2_pos_calc: { tr: "🧮 Pozisyon & Risk Hesaplayıcı", ru: "🧮 Калькулятор позиции и риска", en: "🧮 Position & Risk Calculator" },
+    h2_price_alerts: { tr: "🔔 Fiyat Alarmları", ru: "🔔 Ценовые оповещения", en: "🔔 Price Alerts" },
+    h2_vol_leaders: { tr: "🔥 24s Hacim Liderleri (Futures)", ru: "🔥 Лидеры объема 24ч (Фьючерсы)", en: "🔥 24h Volume Leaders (Futures)" },
+    h2_top_gainers: { tr: "🟢 En Çok Yükselenler", ru: "🟢 Лидеры роста", en: "🟢 Top Gainers" },
+    h2_top_losers: { tr: "🔴 En Çok Düşenler", ru: "🔴 Лидеры падения", en: "🔴 Top Losers" },
+    h2_sig_type_lev: { tr: "📈 Sinyal Türü & Kaldıraç Limiti", ru: "📈 Тип сигнала и лимит плеча", en: "📈 Signal Type & Leverage Limit" },
+    h2_view_chart_sett: { tr: "🖥 Görünüm & Grafik Ayarları", ru: "🖥 Настройки вида и графиков", en: "🖥 View & Chart Settings" },
+    h2_notif_filters: { tr: "⚙️ Bildirim & Sinyal Filtreleri", ru: "⚙️ Фильтры сигналов и уведомлений", en: "⚙️ Notification & Signal Filters" },
+    h2_quiet_tz: { tr: "🌙 Sessiz Saatler & Saat Dilimi", ru: "🌙 Тихие часы и часовой пояс", en: "🌙 Quiet Hours & Timezone" },
+    h2_legal_sec: { tr: "⚖️ Yasal & Güvenlik", ru: "⚖️ Правовая информация и безопасность", en: "⚖️ Legal & Security" }
+  };
+
+  const curLangKey = (lang === "ru" || lang === "uk") ? "ru" : (lang === "tr" ? "tr" : "en");
+  document.querySelectorAll("[data-i18n-h2]").forEach(el => {
+    const key = el.getAttribute("data-i18n-h2");
+    if (H2_TRANSLATIONS[key] && H2_TRANSLATIONS[key][curLangKey]) {
+      const spanTarget = el.querySelector("span:first-child");
+      if (spanTarget && !spanTarget.classList.contains("pill") && !spanTarget.classList.contains("badge")) {
+        spanTarget.textContent = H2_TRANSLATIONS[key][curLangKey];
+      } else {
+        // Doğrudan ilk metin düğümünü güncelle
+        const badge = el.querySelector(".pill, .badge");
+        if (badge) {
+          el.childNodes[0].nodeValue = H2_TRANSLATIONS[key][curLangKey] + " ";
+        } else {
+          el.textContent = H2_TRANSLATIONS[key][curLangKey];
+        }
+      }
+    }
+  });
+
+  if ($("#lbl-connected-w")) $("#lbl-connected-w").textContent = curLangKey === "ru" ? "Подключенный Web3 Кошелек" : (curLangKey === "tr" ? "Bağlı Web3 Cüzdanı" : "Connected Web3 Wallet");
+  if ($("#lbl-sec-pwd")) $("#lbl-sec-pwd").textContent = curLangKey === "ru" ? "🔐 Пароль безопасности и Доп. ключ" : (curLangKey === "tr" ? "🔐 Güvenlik Parolası & Ek Şifre" : "🔐 Security Password & Passphrase");
+  if ($("#lbl-exc-api")) $("#lbl-exc-api").textContent = curLangKey === "ru" ? "🔑 Подключение биржевого API" : (curLangKey === "tr" ? "🔑 Borsa API Bağlantısı" : "🔑 Exchange API Connection");
 
   // Dil değiştiğinde Canlı Piyasa Okuma analizini de anında yeni dille güncelle
   if (window.runMarketInspection) {
@@ -1873,13 +1936,32 @@ function renderSignalsList(filter = "all") {
     badge.textContent = (s.status||"").toUpperCase();
     header.appendChild(badge);
     card.appendChild(header);
-    // Price row
+    // Price row with detailed Entry, Exit, Stop and TP Hit indicator
+    var isClosed = (s.status === "closed");
+    var exitText = (isClosed && s.exit_price) ? s.exit_price : (s.tp1 || "—");
+    var exitLabel = isClosed ? "ÇIKIŞ" : "HEDEF 1";
+    var reasonBadge = "";
+    if (isClosed) {
+      if (s.reason === "tp3" || s.tp_hit >= 3) reasonBadge = "<span style='color:var(--accent-green);font-size:10px'>🎯 TP3 Vuruldu</span>";
+      else if (s.reason === "tp2" || s.tp_hit === 2) reasonBadge = "<span style='color:var(--accent-green);font-size:10px'>🎯 TP2 Vuruldu</span>";
+      else if (s.reason === "tp1" || s.tp_hit === 1) reasonBadge = "<span style='color:var(--accent-green);font-size:10px'>🎯 TP1 Vuruldu -> Girişe Stop</span>";
+      else if (s.reason === "be" || s.reason === "breakeven") reasonBadge = "<span style='color:var(--accent-gold);font-size:10px'>🛡️ Girişe Stop Tetiklendi</span>";
+      else if (s.reason === "sl" || s.r_result < 0) reasonBadge = "<span style='color:var(--accent-red);font-size:10px'>🛑 Stop Tetiklendi</span>";
+    }
+
     var prices = document.createElement("div");
-    prices.style.cssText = "display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:12px;margin-bottom:8px;background:rgba(0,0,0,0.2);border-radius:8px;padding:8px 10px";
+    prices.style.cssText = "display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:12px;margin-bottom:8px;background:rgba(0,0,0,0.25);border-radius:8px;padding:8px 10px";
     prices.innerHTML = "<div><div style='color:var(--text-muted);font-size:10px;margin-bottom:2px'>GİRİŞ</div><strong style='color:#fff'>" + (s.entry||"—") + "</strong></div>"
-      + "<div><div style='color:var(--text-muted);font-size:10px;margin-bottom:2px'>STOP</div><strong style='color:var(--accent-red)'>" + (s.sl||"—") + "</strong></div>"
-      + "<div><div style='color:var(--text-muted);font-size:10px;margin-bottom:2px'>SONUÇ</div><strong style='color:" + (s.r_result >= 0 ? "var(--accent-green)" : "var(--accent-red)") + "'>" + (s.r_result != null ? (s.r_result >= 0 ? "+" : "") + s.r_result.toFixed(2) + "R" : "—") + "</strong></div>";
+      + "<div><div style='color:var(--text-muted);font-size:10px;margin-bottom:2px'>" + exitLabel + "</div><strong style='color:" + (isClosed ? "#38bdf8" : "var(--accent-green)") + "'>" + exitText + "</strong></div>"
+      + "<div><div style='color:var(--text-muted);font-size:10px;margin-bottom:2px'>NET R</div><strong style='color:" + (s.r_result >= 0 ? "var(--accent-green)" : "var(--accent-red)") + "'>" + (s.r_result != null ? (s.r_result >= 0 ? "+" : "") + s.r_result.toFixed(2) + "R" : "—") + "</strong></div>";
     card.appendChild(prices);
+
+    if (reasonBadge) {
+      var reasonDiv = document.createElement("div");
+      reasonDiv.style.cssText = "margin-bottom:6px;font-weight:700";
+      reasonDiv.innerHTML = reasonBadge;
+      card.appendChild(reasonDiv);
+    }
     // Footer
     var footer = document.createElement("div");
     footer.style.cssText = "font-size:11px;color:var(--text-muted)";
@@ -1931,21 +2013,37 @@ async function loadDashboard() {
         const isLong = s.side === "LONG" || s.side === "BUY";
         const isWin = s.r_result > 0;
         const isClosed = s.status === "closed";
+
+        let outcomeText = "";
+        if (isClosed) {
+          if (s.reason === "tp3" || s.tp_hit >= 3) outcomeText = "🎯 TP3 Alındı";
+          else if (s.reason === "tp2" || s.tp_hit === 2) outcomeText = "🎯 TP2 Alındı";
+          else if (s.reason === "tp1" || s.tp_hit === 1) outcomeText = "🎯 TP1 Alındı";
+          else if (s.reason === "be" || s.reason === "breakeven") outcomeText = "🛡️ Girişe Stop";
+          else if (s.reason === "sl" || s.r_result < 0) outcomeText = "🛑 Stop Oldu";
+          else outcomeText = isWin ? "Kâr Alındı" : "Kapatıldı";
+        }
+
         const statusBadge = isClosed 
-          ? (isWin ? `<span style="color:var(--accent-green);font-weight:700">+${s.r_result}R ✅</span>` : `<span style="color:var(--accent-red);font-weight:700">${s.r_result}R 🛑</span>`)
+          ? `<div style="text-align:right">
+               <span style="color:${isWin ? 'var(--accent-green)' : 'var(--accent-red)'};font-weight:700">${s.r_result >= 0 ? '+' : ''}${s.r_result.toFixed(2)}R ${isWin ? '✅' : '🛑'}</span>
+               <div style="font-size:10px;color:var(--text-muted)">${outcomeText}</div>
+             </div>`
           : `<span style="color:var(--accent-gold);font-weight:700">AÇIK ⏳</span>`;
+
+        const exitStr = (isClosed && s.exit_price) ? ` · Çıkış: ${s.exit_price}` : "";
 
         row.innerHTML = `
           <div style="display:flex;align-items:center;gap:10px">
-            <img src="${logo}" width="24" height="24" style="border-radius:50%;object-fit:cover" onerror="this.src='assets/brand/logo.png'">
+            <img src="${logo}" width="26" height="26" style="border-radius:50%;object-fit:cover" onerror="this.src='assets/brand/logo.png'">
             <div>
-              <div style="font-weight:700;color:#fff">${clean} <small style="color:${isLong ? 'var(--accent-green)' : 'var(--accent-red)'}">${s.side}</small></div>
-              <small style="color:var(--text-muted);font-size:11px">⏱ ${s.tf} · Giriş: ${s.entry || '—'}</small>
+              <div style="font-weight:700;color:#fff">${clean} <small style="color:${isLong ? 'var(--accent-green)' : 'var(--accent-red)'};font-weight:700">${s.side}</small></div>
+              <small style="color:var(--text-muted);font-size:11px">⏱ ${s.tf} · Giriş: ${s.entry || '—'}${exitStr}</small>
             </div>
           </div>
           <div>${statusBadge}</div>
         `;
-        row.onclick = () => setTradingViewSymbol(s.symbol);
+        row.onclick = () => window.openGlobalSymbol(s.symbol);
         dashBox.appendChild(row);
       });
     }
@@ -2315,6 +2413,16 @@ function renderTradingViewChart(symbol = currentTvSymbol, interval = currentTvIn
     </iframe>`;
 }
 
+// Global window bindings for cross-module and inline HTML access
+window.setTradingViewSymbol = setTradingViewSymbol;
+window.renderTradingViewChart = renderTradingViewChart;
+window.changeTvInterval = function(interval) {
+  currentTvInterval = String(interval);
+  const hiddenInp = document.getElementById("tv-interval-select");
+  if (hiddenInp) hiddenInp.value = currentTvInterval;
+  renderTradingViewChart(currentTvSymbol, currentTvInterval);
+};
+
 document.getElementById("tv-symbol-select")?.addEventListener("change", (e) => {
   setTradingViewSymbol(e.target.value);
 });
@@ -2326,8 +2434,16 @@ document.getElementById("tv-interval-select")?.addEventListener("change", (e) =>
 
 document.getElementById("btn-tv-search")?.addEventListener("click", () => {
   const inp = document.getElementById("tv-custom-symbol-input");
-  if (inp && inp.value) {
-    setTradingViewSymbol(inp.value);
+  if (inp && inp.value && inp.value.trim()) {
+    const val = inp.value.trim();
+    if (window.setTradingViewSymbol) {
+      window.setTradingViewSymbol(val);
+    } else if (typeof setTradingViewSymbol === "function") {
+      setTradingViewSymbol(val);
+    }
+    if (typeof toast === "function") {
+      toast(`${val.toUpperCase()} Grafiği Yükleniyor... 📊`, "info");
+    }
   }
 });
 
@@ -2685,21 +2801,16 @@ let _inspectAutoTimer = null;
 function startInspectAutoRefresh() {
   if (_inspectAutoTimer) clearInterval(_inspectAutoTimer);
   _inspectAutoTimer = setInterval(async () => {
-    // Sadece Sinyal Defteri sekmesi aktifken güncelle
-    const proSection = document.getElementById("sinyal-defteri-pro-card");
-    if (!proSection) return;
-    // Kartın display:none olmadığını kontrol et (tab gizliyse skip)
-    const style = window.getComputedStyle(proSection);
-    if (style.display === "none") return;
+    // Sayfa görünür değilse polling yapma (arka planda pil tasarrufu)
+    if (document.hidden) return;
 
-    // Sadece anlık fiyat güncelle (tam runMarketInspection çok ağır — 15sn'de bir hızlı tick)
     const sym = (currentInspectSymbol || "BTCUSDT").trim().toUpperCase();
     const tf = currentInspectTf || "5m";
     const isCrypto = !["THYAO", "ASELS", "NVDA", "GOLD"].includes(sym.replace("USDT",""));
     if (!isCrypto) return;
+
     try {
       const cleanSym = sym.endsWith("USDT") ? sym : sym + "USDT";
-      const interval = { "1m": "1m", "5m": "5m", "15m": "15m", "1h": "1h", "4h": "4h", "1d": "1d" }[tf] || "5m";
       const res = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${cleanSym}`);
       const d = await res.json();
       if (!d || d.code) return;
@@ -2708,15 +2819,36 @@ function startInspectAutoRefresh() {
       const bigPriceEl = document.getElementById("inspect-big-price");
       const changeBadgeEl = document.getElementById("inspect-change-badge");
       const timeValEl = document.getElementById("inspect-time-val");
-      if (bigPriceEl) bigPriceEl.textContent = `$${price >= 10 ? price.toLocaleString("en-US", {minimumFractionDigits: 1, maximumFractionDigits: 2}) : price.toFixed(4)}`;
+      if (bigPriceEl) {
+        bigPriceEl.textContent = `$${price >= 10 ? price.toLocaleString("en-US", {minimumFractionDigits: 1, maximumFractionDigits: 2}) : price.toFixed(4)}`;
+      }
       if (changeBadgeEl) {
         changeBadgeEl.textContent = `${pct >= 0 ? "▲" : "▼"} ${Math.abs(pct).toFixed(2)}% (24s)`;
         changeBadgeEl.style.color = pct >= 0 ? "#00ffa3" : "#f87171";
         changeBadgeEl.style.background = pct >= 0 ? "rgba(0,255,163,0.15)" : "rgba(239,68,68,0.18)";
       }
-      if (timeValEl) timeValEl.textContent = new Date().toTimeString().split(" ")[0];
+      if (timeValEl) {
+        timeValEl.textContent = new Date().toTimeString().split(" ")[0];
+      }
+
+      // Canlı grafik açıksa ve son mum varsa son mumun kapanış fiyatını anında güncelle ve çiz
+      if (Array.isArray(inspectCachedKlines) && inspectCachedKlines.length > 0) {
+        const lastCandle = inspectCachedKlines[inspectCachedKlines.length - 1];
+        if (lastCandle) {
+          lastCandle.close = price;
+          if (price > lastCandle.high) lastCandle.high = price;
+          if (price < lastCandle.low) lastCandle.low = price;
+          // Canvas çizim fonksiyonunu güvenli çağır
+          if (typeof window.drawInspectCharts === "function") {
+            const candleCanvas = document.getElementById("inspect-candle-canvas");
+            if (candleCanvas && candleCanvas.offsetParent !== null) {
+              window.drawInspectCharts();
+            }
+          }
+        }
+      }
     } catch (_) {}
-  }, 15000);
+  }, 4000);
 }
 
 startInspectAutoRefresh();

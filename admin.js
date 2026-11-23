@@ -625,9 +625,27 @@ async function loadUsers(page = 0) {
       const banBtn = u.banned
         ? `<button class="btn btn-ghost" style="padding:4px 8px;font-size:11px" onclick="unbanUser(${u.chat_id})">🔓 Kaldır</button>`
         : `<button class="btn btn-danger" style="padding:4px 8px;font-size:11px" onclick="openBanModal(${u.chat_id},'${u.name || ''}')">🚫 Ban</button>`;
+
+      const coinsDisplay = (u.coins && u.coins.length) 
+        ? u.coins.map(c => `<span style="background:rgba(255,255,255,0.08);padding:2px 5px;border-radius:4px;font-size:10px;margin-right:2px">${c}</span>`).join("")
+        : '<span style="color:var(--text-muted);font-size:10px">Tümü</span>';
+
+      const apiBadge = u.has_api 
+        ? '<span style="color:var(--accent-green);font-size:10px;font-weight:700">🔑 API Var</span>' 
+        : '<span style="color:var(--text-muted);font-size:10px">API Yok</span>';
+
       tr.innerHTML = `
-        <td style="padding:10px"><strong>${u.chat_id}</strong></td>
-        <td style="padding:10px">${u.name || '-'}</td>
+        <td style="padding:10px">
+          <strong>${u.chat_id}</strong>
+          <div style="font-size:10px;color:var(--text-muted)">${u.created_ago || ''} · ${apiBadge}</div>
+        </td>
+        <td style="padding:10px">
+          <div><strong>${u.name || '-'}</strong> ${u.username ? `<small style="color:var(--text-muted)">(@${u.username})</small>` : ''}</div>
+          <div style="font-size:11px;color:#a5d6ff;margin-top:2px">
+            ⚙️ ${u.market?.toUpperCase()} · ${u.max_lev}x · ${u.strong_only ? '⭐ Güçlü' : '⚡ Tümü'} · ${u.tz}
+          </div>
+          <div style="margin-top:3px">${coinsDisplay} ${u.coins_count > 8 ? `<small style="color:var(--text-muted)">+${u.coins_count - 8}</small>` : ''}</div>
+        </td>
         <td style="padding:10px">${LANG_NAME[u.lang] || u.lang}</td>
         <td style="padding:10px" class="${u.active ? 'green' : 'muted'}">${u.active ? 'Aktif' : 'Pasif'}</td>
         <td style="padding:10px">${banBtn}</td>

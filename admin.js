@@ -1034,6 +1034,38 @@ async function loadUsers(page = 0) {
   }
 }
 
+
+async function unbanUser(cid) {
+  try {
+    const res = await api("/api/admin/ban", { target_cid: cid, banned: false });
+    if (res && res.ok) {
+      toast("🔓 Kullanıcı yasağı kaldırıldı", "success");
+      loadUsers(userPage);
+    } else {
+      toast("Hata: " + (res?.error || "İşlem başarısız"), "error");
+    }
+  } catch (e) {
+    toast("Hata: " + e.message, "error");
+  }
+}
+window.unbanUser = unbanUser;
+
+async function openBanModal(cid, name) {
+  if (!confirm(`"${name || cid}" (#${cid}) kullanıcısını yasaklamak istediğinizden emin misiniz?`)) return;
+  try {
+    const res = await api("/api/admin/ban", { target_cid: cid, banned: true });
+    if (res && res.ok) {
+      toast("🚫 Kullanıcı yasaklandı", "success");
+      loadUsers(userPage);
+    } else {
+      toast("Hata: " + (res?.error || "İşlem başarısız"), "error");
+    }
+  } catch (e) {
+    toast("Hata: " + e.message, "error");
+  }
+}
+window.openBanModal = openBanModal;
+
 async function loadSignals() {
   const tbody = document.getElementById("signals-tbody");
   if (!tbody) return;
@@ -1218,3 +1250,16 @@ function startAdminAutoSync() {
 
 // Auto start sync on load
 setTimeout(startAdminAutoSync, 1000);
+
+
+// Global window bindings for inline HTML handlers
+window.toast = toast;
+window.switchAdminTab = switchAdminTab;
+window.load = load;
+window.loadUsers = loadUsers;
+window.loadSignals = loadSignals;
+window.loadApiKeys = loadApiKeys;
+window.loadLogs = loadLogs;
+window.toggleAutoRefresh = toggleAutoRefresh;
+window.getApiBase = getApiBase;
+window.fetchLiveTunnelFromSync = fetchLiveTunnelFromSync;

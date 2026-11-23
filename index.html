@@ -285,6 +285,121 @@
       </div>
     </div>
 
+    <!-- 👑 OTO-BOT CANLI YÖNETİM & BORSA/WEB3 TERMİNAL PANOSU (Görsel 2 ve 3) -->
+    <div class="card" id="autobot-live-dashboard" style="background:rgba(18,24,38,0.7);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:16px">
+      <!-- Mod Seçimi (Elena Gerçek / Demo) -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <button type="button" class="btn" id="btn-mode-real" style="padding:10px;font-size:12px;font-weight:700;border-radius:10px;background:linear-gradient(135deg,rgba(14,165,233,0.35),rgba(6,182,212,0.2));border:1px solid #38bdf8;color:#fff">
+          ⚡ ELENA (Gerçek)
+        </button>
+        <button type="button" class="btn" id="btn-mode-demo" style="padding:10px;font-size:12px;font-weight:700;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--text-muted)">
+          🧪 DEMO
+        </button>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--text-muted);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.06)">
+        <div>Mod: <strong style="color:#38bdf8" id="lbl-active-bot-mode">ELENA (Gerçek)</strong></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span>API: <strong style="color:#fff;background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px" id="lbl-active-exchange-name">BINANCE</strong></span>
+          <span>GÜVENLİ IP: <strong style="color:var(--accent-gold);background:rgba(234,179,8,0.1);padding:2px 6px;border-radius:4px">3.122.154.213</strong></span>
+        </div>
+      </div>
+
+      <!-- Bağlantı Durumu & Ping Başlığı -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#4ade80;box-shadow:0 0 10px #4ade80" id="dash-conn-dot"></span>
+          <img id="dash-exchange-icon" src="assets/exchanges/binance.svg" width="20" height="20" style="object-fit:contain" onerror="this.style.display='none'">
+          <div>
+            <div style="font-size:13.5px;font-weight:700;color:#fff" id="dash-api-title">API: BINANCE</div>
+            <div style="font-size:11px;color:var(--text-muted)">Şifrelenmiş Anahtar (Key): <span id="dash-masked-key" style="font-family:monospace;color:#94a3b8">kxyZ...Wkud</span></div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11.5px;color:#4ade80;font-weight:700" id="dash-conn-status">Bağlantı: BAĞLI</div>
+          <div style="font-size:10.5px;color:var(--text-muted)">Gecikme (Ping): <span style="color:#f87171;font-weight:700" id="dash-ping-val">124 ms</span></div>
+        </div>
+      </div>
+
+      <!-- TP/SL SYNC & PANİK KAPAT Butonları -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+        <button type="button" class="btn btn-main" id="btn-sync-tpsl" style="padding:10px;font-size:12px;font-weight:700;border-radius:10px;background:#0284c7;border:none">
+          🔄 TP/SL SYNC
+        </button>
+        <button type="button" class="btn" id="btn-panic-close" style="padding:10px;font-size:12px;font-weight:700;border-radius:10px;background:#dc2626;color:#fff;border:none">
+          🚨 PANİK KAPAT
+        </button>
+      </div>
+
+      <!-- Borsa Cüzdan Bakiyeleri Kartı (Spot, Futures, Kullanılabilir) -->
+      <div style="background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:12px;margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <img id="dash-sub-icon" src="assets/exchanges/binance.svg" width="16" height="16" style="object-fit:contain">
+            <span style="font-size:12px;font-weight:700;color:#fff" id="dash-sub-title">BINANCE CÜZDANI</span>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button type="button" id="btn-refresh-dash-bal" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px" title="Yenile">🔄</button>
+            <button type="button" onclick="switchTab('exchange')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px" title="Borsa Ayarları">⚙️</button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">
+          <div style="background:rgba(255,255,255,0.02);padding:8px 4px;border-radius:8px">
+            <div style="font-size:10px;color:var(--text-muted);margin-bottom:2px">SPOT</div>
+            <strong style="font-size:13px;color:#38bdf8" id="dash-spot-bal">0,00 $</strong>
+          </div>
+          <div style="background:rgba(255,255,255,0.02);padding:8px 4px;border-radius:8px">
+            <div style="font-size:10px;color:var(--text-muted);margin-bottom:2px">FUTURES</div>
+            <strong style="font-size:13px;color:#38bdf8" id="dash-futures-bal">0,00 $</strong>
+            <div style="font-size:9px;color:var(--text-muted)">Equity: 0.00 $</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.02);padding:8px 4px;border-radius:8px">
+            <div style="font-size:10px;color:var(--text-muted);margin-bottom:2px">KULLANILABİLİR</div>
+            <strong style="font-size:13px;color:#38bdf8" id="dash-avail-bal">0,00 $</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gas & Aktif İşlemler Kartı -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div style="background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:12px;text-align:center">
+          <div style="display:flex;align-items:center;justify-content:center;gap:4px;font-size:10.5px;color:var(--text-muted);margin-bottom:4px">
+            <span>⛽</span> ELENA GAS
+          </div>
+          <strong style="font-size:15px;color:#38bdf8" id="dash-gas-val">9.845,60 $</strong>
+        </div>
+        <div style="background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:12px;text-align:center">
+          <div style="font-size:10.5px;color:var(--text-muted);margin-bottom:4px">AKTİF İŞLEMLER</div>
+          <strong style="font-size:15px;color:#fff" id="dash-active-trades-count">0</strong>
+        </div>
+      </div>
+
+      <!-- ROI / PnL İstatistikleri -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center;padding:10px 6px;background:rgba(255,255,255,0.02);border-radius:10px;margin-bottom:12px">
+        <div>
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:2px">GETİRİ (ROI)</div>
+          <strong style="font-size:12px;color:#4ade80" id="dash-roi-val">+0.00%</strong>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:2px">ANLIK PNL(U)</div>
+          <strong style="font-size:12px;color:#4ade80" id="dash-pnl-val">+0,00 USDT</strong>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:2px">TOPLAM KÂR</div>
+          <strong style="font-size:12px;color:#4ade80" id="dash-total-profit">+0,00 USDT</strong>
+        </div>
+      </div>
+
+      <!-- Aktif İşlemler (Portföy) Bölümü -->
+      <div style="padding-top:10px;border-top:1px solid rgba(255,255,255,0.06)">
+        <div style="font-size:12px;font-weight:700;color:#38bdf8;margin-bottom:8px">AKTİF İŞLEMLER (PORTFÖY)</div>
+        <div id="dash-portfolio-list" style="text-align:center;padding:14px;color:var(--text-muted);font-size:11.5px">
+          📬 Aktif açık işlem bulunmuyor
+        </div>
+      </div>
+    </div>
+
     <!-- Strateji Zaman Dilimi -->
     <div class="card">
       <h2 id="i18n-title-tf">⏱ Strateji Zaman Dilimi</h2>
@@ -343,49 +458,138 @@
       </div>
     </div>
 
-    <!-- Risk Yönetimi -->
-    <div class="card">
-      <h2 data-i18n-h2="h2_risk_mgmt">⚠️ Risk Yönetimi</h2>
-      <div class="slider-row">
-        <div class="slider-header">
-          <span class="label">Maks. Hesap Riski %</span>
-          <span class="slider-val" id="val-acct_risk">100%</span>
-        </div>
-        <input type="range" id="f-acct_risk_pct" min="0" max="100" step="1" value="100"
-               oninput="document.getElementById('val-acct_risk').textContent=this.value+'%'">
+    <!-- ⚠️ GELİŞMİŞ RİSK YÖNETİMİ & AKILLI GİRİŞ KONTROLLERİ (Görsel 4 & 5) -->
+    <div class="card" style="border:1px solid rgba(14,165,233,0.3);background:rgba(14,165,233,0.02)">
+      <div style="font-size:11px;color:#f59e0b;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);border-radius:8px;padding:8px 10px;margin-bottom:12px;line-height:1.5">
+        ⚠️ <strong>ÖNEMLİ:</strong> Bu ayarlar sermaye yönetimi içindir. 'Kasa Yüzdesi' kasa doluluk oranını (%70 önerilir), 'Max İşlem' ise aynı anda açık olan bot işlemlerini sınırlar. Hatalı bakiye ayarları likidasyon riskini artırabilir!
       </div>
-      <div class="slider-row">
-        <div class="slider-header">
-          <span class="label">Günlük Zarar Durdurma %</span>
-          <span class="slider-val" id="val-daily_stop">40%</span>
+
+      <h2 style="color:#38bdf8;font-size:14px;margin-top:0">🛡️ GELİŞMİŞ RİSK YÖNETİMİ</h2>
+
+      <!-- Gece Modu & Akıllı Kademeli Giriş Toggles -->
+      <div class="row" style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+        <div style="flex:1">
+          <span class="label" style="display:block;font-weight:600;color:#fff">Gece (Uyku) Modu</span>
+          <small style="color:var(--text-muted);font-size:10.5px;line-height:1.4;display:block">
+            02:00–06:00 (TSİ) saatlerinde AI güven eşiğini %90'a çıkarır ve pozisyon boyutunu %50 düşürerek riski minimize eder. Gece saatlerinde yeni işlem açmasını durdurur.
+          </small>
         </div>
-        <input type="range" id="f-daily_stop_pct" min="5" max="100" step="5" value="40"
-               oninput="document.getElementById('val-daily_stop').textContent=this.value+'%'">
+        <div class="toggle active" id="t-night-mode"></div>
       </div>
-      <div class="slider-row">
-        <div class="slider-header">
-          <span class="label">Stop-Loss %</span>
-          <span class="slider-val" id="val-sl">30%</span>
+
+      <div class="row" style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+        <div style="flex:1">
+          <span class="label" style="display:block;font-weight:600;color:#fff">Akıllı Kademeli Giriş (Scale-In / DCA)</span>
+          <small style="color:var(--text-muted);font-size:10.5px;line-height:1.4;display:block">
+            Güçlü (%90+) yeni sinyaller geldiğinde mevcut pozisyona ekleme yaparak ortalamayı çeker.
+          </small>
         </div>
-        <input type="range" id="f-sl_pct" min="1" max="50" step="1" value="30"
-               oninput="document.getElementById('val-sl').textContent=this.value+'%'">
+        <div class="toggle active" id="t-scalein-mode"></div>
+      </div>
+
+      <!-- Risk Sayısal Girişleri (Grid) -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+        <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.06)">
+          <div style="font-size:11px;font-weight:700;color:#fff;margin-bottom:2px">Maksimum Açık İşlem Sayısı</div>
+          <div style="font-size:9.5px;color:var(--text-muted);margin-bottom:6px">Aynı anda açılabilecek maksimum coin</div>
+          <input type="number" id="f-max-open-trades" value="5" min="1" max="50" class="pwd-input" style="padding:6px 10px;font-size:12px">
+        </div>
+
+        <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.06)">
+          <div style="font-size:11px;font-weight:700;color:#fff;margin-bottom:2px">Maksimum Tek İşlem Riski (%)</div>
+          <div style="font-size:9.5px;color:var(--text-muted);margin-bottom:6px">Her işlemde toplam bakiyenin limiti</div>
+          <input type="number" id="f-single-trade-risk" value="100.0" min="1" max="100" step="0.5" class="pwd-input" style="padding:6px 10px;font-size:12px">
+        </div>
+
+        <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.06)">
+          <div style="font-size:11px;font-weight:700;color:#fff;margin-bottom:2px">Slippage Toleransı (%)</div>
+          <div style="font-size:9.5px;color:var(--text-muted);margin-bottom:6px">Emir fiyat sapma toleransı (0.1–2.0)</div>
+          <input type="number" id="f-slippage-tolerance" value="0.5" min="0.1" max="5.0" step="0.1" class="pwd-input" style="padding:6px 10px;font-size:12px">
+        </div>
+
+        <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.06)">
+          <div style="font-size:11px;font-weight:700;color:#fff;margin-bottom:2px">Min. Likidite (Milyon $)</div>
+          <div style="font-size:9.5px;color:var(--text-muted);margin-bottom:6px">Hacmi düşük coinleri filtrele</div>
+          <input type="number" id="f-min-liquidity" value="0.0" min="0" step="0.5" class="pwd-input" style="padding:6px 10px;font-size:12px">
+        </div>
+      </div>
+
+      <!-- TP Kapatma Oranları (%) TP1, TP2, TP3 -->
+      <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);margin-top:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div style="font-size:11px;font-weight:700;color:#fff">TP Kapatma Oranları (%)</div>
+          <div style="font-size:10px;color:var(--accent-green)">TP1 / TP2 / TP3 kısmi kapatma</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+          <div><small style="font-size:9px;color:var(--text-muted)">TP1 %</small><input type="number" id="f-tp1-close-pct" value="25.0" class="pwd-input" style="padding:6px 8px;font-size:11px"></div>
+          <div><small style="font-size:9px;color:var(--text-muted)">TP2 %</small><input type="number" id="f-tp2-close-pct" value="25.0" class="pwd-input" style="padding:6px 8px;font-size:11px"></div>
+          <div><small style="font-size:9px;color:var(--text-muted)">TP3 %</small><input type="number" id="f-tp3-close-pct" value="25.0" class="pwd-input" style="padding:6px 8px;font-size:11px"></div>
+        </div>
+      </div>
+
+      <!-- Korelasyon Koruması -->
+      <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:#fff">Korelasyon Koruması</div>
+          <small style="font-size:9.5px;color:var(--text-muted)">Min İşlem Sayısı ve Kâr Oranı</small>
+        </div>
+        <div style="display:flex;gap:6px">
+          <input type="number" id="f-correl-trades" value="3" class="pwd-input" style="width:48px;padding:6px 8px;font-size:11px">
+          <input type="number" id="f-correl-rate" value="60.0" class="pwd-input" style="width:60px;padding:6px 8px;font-size:11px">
+        </div>
+      </div>
+
+      <!-- Slider Tabanlı Risk Yönetimi -->
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06)">
+        <div class="slider-row">
+          <div class="slider-header">
+            <span class="label">Maksimum Hesap Riski (%) <small style="color:var(--text-muted)">(Cüzdanın en fazla % kaçı marjine girebilir)</small></span>
+            <span class="slider-val" id="val-acct_risk">%100</span>
+          </div>
+          <input type="range" id="f-acct_risk_pct" min="0" max="100" step="1" value="100"
+                 oninput="document.getElementById('val-acct_risk').textContent='%'+this.value">
+        </div>
+
+        <div class="slider-row">
+          <div class="slider-header">
+            <span class="label">Günlük Zarar Durdurma (%) <small style="color:var(--text-muted)">(Limit aşılırsa bot o gün yeni işlem açmaz)</small></span>
+            <span class="slider-val" id="val-daily_stop">%40</span>
+          </div>
+          <input type="range" id="f-daily_stop_pct" min="5" max="100" step="5" value="40"
+                 oninput="document.getElementById('val-daily_stop').textContent='%'+this.value">
+        </div>
+
+        <div class="slider-row">
+          <div class="slider-header">
+            <span class="label">Zarar Kes (Stop-Loss) Ayarı (%) <small style="color:var(--text-muted)">(ROIC bazlı maksimum zarar limiti)</small></span>
+            <span class="slider-val" id="val-sl">%30</span>
+          </div>
+          <input type="range" id="f-sl_pct" min="1" max="50" step="1" value="30"
+                 oninput="document.getElementById('val-sl').textContent='%'+this.value">
+        </div>
       </div>
     </div>
 
-    <!-- TP Hedefleri -->
+    <!-- KÂR ALMA (TAKE PROFIT) AYARLARI (Görsel 5: TP1, TP2, TP3, TP4) -->
     <div class="card">
-      <h2 data-i18n-h2="h2_tp_targets">🎯 Kâr Alma Hedefleri (TP1–TP3)</h2>
+      <h2 data-i18n-h2="h2_tp_targets">🎯 KÂR ALMA (TAKE PROFIT) AYARLARI</h2>
+      <p style="font-size:11.5px;color:var(--text-muted);margin:0 0 12px">Belirlenen Kâr (ROIC) oranlarına ulaşıldığında kâr realize edilir.</p>
+      
       <div class="slider-row">
-        <div class="slider-header"><span class="label">TP1</span><span class="slider-val" id="val-tp0">30%</span></div>
-        <input type="range" id="f-tp0" min="1" max="200" step="1" value="30" oninput="document.getElementById('val-tp0').textContent=this.value+'%'">
+        <div class="slider-header"><span class="label">TP1 Hedefi (%)</span><span class="slider-val" id="val-tp0">%10</span></div>
+        <input type="range" id="f-tp0" min="1" max="100" step="1" value="10" oninput="document.getElementById('val-tp0').textContent='%'+this.value">
       </div>
       <div class="slider-row">
-        <div class="slider-header"><span class="label">TP2</span><span class="slider-val" id="val-tp1">60%</span></div>
-        <input type="range" id="f-tp1" min="1" max="200" step="1" value="60" oninput="document.getElementById('val-tp1').textContent=this.value+'%'">
+        <div class="slider-header"><span class="label">TP2 Hedefi (%)</span><span class="slider-val" id="val-tp1">%15</span></div>
+        <input type="range" id="f-tp1" min="1" max="150" step="1" value="15" oninput="document.getElementById('val-tp1').textContent='%'+this.value">
       </div>
       <div class="slider-row">
-        <div class="slider-header"><span class="label">TP3</span><span class="slider-val" id="val-tp2">100%</span></div>
-        <input type="range" id="f-tp2" min="1" max="200" step="1" value="100" oninput="document.getElementById('val-tp2').textContent=this.value+'%'">
+        <div class="slider-header"><span class="label">TP3 Hedefi (%)</span><span class="slider-val" id="val-tp2">%25</span></div>
+        <input type="range" id="f-tp2" min="1" max="200" step="1" value="25" oninput="document.getElementById('val-tp2').textContent='%'+this.value">
+      </div>
+      <div class="slider-row">
+        <div class="slider-header"><span class="label">TP4 Hedefi (%)</span><span class="slider-val" id="val-tp3">%50</span></div>
+        <input type="range" id="f-tp3" min="1" max="300" step="1" value="50" oninput="document.getElementById('val-tp3').textContent='%'+this.value">
       </div>
     </div>
 
@@ -405,6 +609,48 @@
        BORSA API SEKMESİ
        ======================================== -->
   <div id="page-exchange" class="page" role="tabpanel">
+
+    <!-- 🛡️ VARLIK YÖNETİMİ VE İŞLEM REHBERİ (Görsel 1) -->
+    <div class="card" style="border:1px solid rgba(59,130,246,0.3);background:rgba(59,130,246,0.03);margin-bottom:14px">
+      <h2 style="color:#60a5fa;margin-top:0;font-size:14px;display:flex;align-items:center;gap:6px">
+        <span>🛡️ VARLIK YÖNETİMİ VE İŞLEM REHBERİ</span>
+      </h2>
+      <p style="font-size:12px;color:#fff;margin:0 0 10px;font-weight:600">Botu iki farklı şekilde kullanabilirsiniz:</p>
+      
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:11.8px;line-height:1.55;color:var(--text-muted);margin-bottom:12px">
+        <div style="background:rgba(0,0,0,0.25);padding:10px 12px;border-radius:10px;border-left:3px solid #38bdf8">
+          <strong style="color:#fff;display:block;margin-bottom:2px">1️⃣ Elena Dahili Borsa / Web3 Cüzdan:</strong>
+          Bakiyenizi Elena / Web3 cüzdanınızda tutuyorsanız herhangi bir harici API anahtarına ihtiyacınız yoktur. Bot, otomatik olarak cüzdan bakiyenizi kullanarak işlem yapar. Bu modda komisyonlar daha düşüktür.
+        </div>
+
+        <div style="background:rgba(0,0,0,0.25);padding:10px 12px;border-radius:10px;border-left:3px solid var(--accent-gold)">
+          <strong style="color:#fff;display:block;margin-bottom:2px">2️⃣ Harici Borsa (API):</strong>
+          Bakiyenizi kendi borsanızda (Binance, OKX, Bybit vb.) bağlı tutmak istiyorsanız, aşağıdaki ayarlardan API anahtarlarınızı girmeniz gerekir. Bot, emirleri doğrudan sizin borsanız iletir. Varlıklarınız sizin kontrolünüzde kalır, bot sadece işlem yetkisine sahip olur.
+        </div>
+      </div>
+
+      <div style="font-size:11.5px;color:var(--accent-gold);background:rgba(234,179,8,0.1);padding:8px 10px;border-radius:8px;line-height:1.45;margin-bottom:12px">
+        💡 <strong>Öneri:</strong> Eğer yüksek güvenlik ve tam kontrol istiyorsanız API yöntemini; hızlı kurulum ve düşük komisyon istiyorsanız Dahili Cüzdan yöntemini seçin.
+      </div>
+
+      <!-- ⚠️ BİNANCE MİNİMUM İŞLEM LİMİTLERİ UYARISI -->
+      <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:12px">
+        <div style="font-size:12px;font-weight:700;color:#fbbf24;margin-bottom:4px">⚠️ BİNANCE MİNİMUM İŞLEM LİMİTLERİ</div>
+        <p style="font-size:11.5px;color:var(--text-muted);margin:0 0 8px;line-height:1.45">
+          Binance borsası, her işlem (Margin × Kaldıraç) için aşağıdaki minimum (notional) büyüklükleri şart koşar:
+        </p>
+        <ul style="font-size:11.5px;color:#fff;margin:0 0 8px 16px;padding:0;line-height:1.6">
+          <li>Altcoinler ve Meme Coinler: Minimum <strong>5.5 USDT</strong></li>
+          <li>Ethereum (ETH): Minimum <strong>20.5 USDT</strong></li>
+          <li>Bitcoin (BTC): Minimum <strong>100.5 USDT</strong></li>
+        </ul>
+        <div style="font-size:11px;color:#94a3b8;line-height:1.4">
+          Bakiyeniz (Serbest Margin) veya kaldıracınız bu limitlerin altında bir pozisyon açmaya yetmiyorsa sistem işlemi Binance'e iletmez veya borsa hata verir.
+        </div>
+      </div>
+    </div>
+
+    <!-- 🔑 BORSA API BAĞLANTISI KARTI -->
     <div class="card">
       <h2 data-i18n-h2="h2_exchange_api">
         <span id="lbl-exc-api">🔑 Borsa API Bağlantısı</span>
@@ -470,6 +716,25 @@
       <div class="pwd-field-block" id="okx-passphrase-row" style="display:none;margin-bottom:10px">
         <label class="pwd-field-label" for="f-api-passphrase">OKX PASSPHRASE</label>
         <input type="password" id="f-api-passphrase" class="pwd-input" placeholder="OKX API parolası">
+      </div>
+
+      <!-- 🛡️ API İZİN VE GÜVENLİK KONTROLÜ (Görsel 1) -->
+      <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px;margin-bottom:12px">
+        <div style="font-size:11.5px;font-weight:700;color:#38bdf8;margin-bottom:8px">🛡️ APİ İZİN VE GÜVENLİK KONTROLÜ</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:11.5px;line-height:1.5;color:var(--text-muted)">
+          <div style="display:flex;align-items:flex-start;gap:6px">
+            <span style="color:#4ade80">✅</span>
+            <span><strong style="color:#fff">Spot &amp; Vadeli İşlemler (Futures):</strong> İşlem yetkisi açık olmalıdır.</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:6px">
+            <span style="color:#4ade80">✅</span>
+            <span><strong style="color:#fff">Universal Transfer (Evrensel Transfer):</strong> Marjin koruması ve likidite güvenliği için MUTLAKA aktif edilmelidir.</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:6px">
+            <span style="color:#4ade80">✅</span>
+            <span><strong style="color:#fff">Güvenli IP Kısıtlaması:</strong> Binance/Borsada 'Trusted IPs' kısmına Elena IP'si (<code style="color:var(--accent-gold)">3.122.154.213</code>) eklemeyi unutmayın.</span>
+          </div>
+        </div>
       </div>
 
       <button class="btn btn-main" id="btn-save-exchange" style="width:100%;margin-top:6px;padding:13px;font-size:14px">

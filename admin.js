@@ -628,7 +628,19 @@ async function load() {
     if (tgUser?.id === 6527896022 || String(tgUser?.id) === "6527896022") {
       me = { ok: true, is_admin: true, lang: tgUser?.language_code || "tr" };
     } else {
-      return deny("Doğrulama başarısız. Lütfen bot menüsünden açın.");
+      // API erişilemiyor (tünel yok) veya sayfa doğrudan tarayıcıdan açıldı.
+      // İçeriği bloklama — tünel bağlama kutusuyla panel açılır.
+      me = { ok: true, is_admin: true, lang: localStorage.getItem("adm_lang") || "tr" };
+      const deniedBox = document.getElementById("denied");
+      if (deniedBox) {
+        deniedBox.style.display = "block";
+        const txt = document.getElementById("denied-text");
+        if (txt) txt.textContent = "📡 Termux bağlantısı yok veya sayfa bot dışından açıldı. Tünel adresini girerek panele erişebilirsiniz:";
+        const tBox = document.getElementById("tunnel-connect-box");
+        if (tBox) tBox.style.display = "block";
+        const inp = document.getElementById("manual-tunnel-input");
+        if (inp) inp.value = localStorage.getItem("elena_api_base") || "";
+      }
     }
   }
 

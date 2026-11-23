@@ -816,28 +816,34 @@ async function _updateProfileBalance() {
   try {
     const r = await api('/api/wallet/balance');
     if (r && r.ok) {
-      // Try USDT token first
-      const usdt = (r.tokens || []).find(t =>
-        (t.symbol || '').toUpperCase() === 'USDT' ||
-        (t.name   || '').toLowerCase().includes('tether')
-      );
-      let val = '—';
-      if (usdt && parseFloat(usdt.balance || 0) > 0) {
-        val = parseFloat(usdt.balance).toFixed(2);
-      } else if (r.usdt_total != null && parseFloat(r.usdt_total) > 0) {
-        val = parseFloat(r.usdt_total).toFixed(2);
-      } else if (r.native != null) {
-        // Show native balance with coin symbol if no USDT
-        const unit = r.unit || 'TRX';
-        val = parseFloat(r.native).toFixed(4) + ' ' + unit;
+      // YALNIZCA USDT / STABLECOIN BAKİYESİ (Native coin TRX/ETH/BNB ASLA GÖSTERİLMEZ!)
+      let stableSum = 0;
+      let foundStable = false;
+
+      (r.tokens || []).forEach(t => {
+        const sym = (t.symbol || '').toUpperCase();
+        if (sym === 'USDT' || sym === 'USDC' || sym === 'BUSD' || sym === 'DAI' || sym === 'USDD') {
+          const b = parseFloat(t.balance || 0);
+          if (!isNaN(b) && b > 0) {
+            stableSum += b;
+            foundStable = true;
+          }
+        }
+      });
+
+      if (!foundStable && r.usdt_total != null && parseFloat(r.usdt_total) > 0) {
+        stableSum = parseFloat(r.usdt_total);
+        foundStable = true;
       }
+
+      const val = stableSum > 0 ? (stableSum.toFixed(2) + ' USDT') : '0.00 USDT';
       balVal.textContent = val;
-      if (bWrap && val !== '—') bWrap.style.display = 'flex';
+      if (bWrap) bWrap.style.display = 'flex';
     } else {
-      balVal.textContent = '—';
+      balVal.textContent = '0.00 USDT';
     }
   } catch (e) {
-    balVal.textContent = '—';
+    balVal.textContent = '0.00 USDT';
   }
 }
 
@@ -1393,10 +1399,32 @@ function applyLanguage(lang) {
   if ($("#lbl-sec-pwd")) $("#lbl-sec-pwd").textContent = curLangKey === "ru" ? "🔐 Пароль безопасности и Доп. ключ" : (curLangKey === "tr" ? "🔐 Güvenlik Parolası & Ek Şifre" : "🔐 Security Password & Passphrase");
   if ($("#lbl-exc-api")) $("#lbl-exc-api").textContent = curLangKey === "ru" ? "🔑 Подключение биржевого API" : (curLangKey === "tr" ? "🔑 Borsa API Bağlantısı" : "🔑 Exchange API Connection");
 
+  // 🌍 Sayfadaki Diğer Statik ve Dinamik Alanların Tam Çoklu Dil Uyarlaması
+
+  // Butonlar ve Başlıklar
+  if ($("#btn-save-exchange")) $("#btn-save-exchange").textContent = isTr ? "💾 Borsa Bilgilerini Kaydet" : (isRu ? "💾 Сохранить API биржи" : "💾 Save Exchange API Keys");
+  if ($("#btn-save-web3-api")) $("#btn-save-web3-api").textContent = isTr ? "💾 Web3 API Bilgilerini Kaydet" : (isRu ? "💾 Сохранить Web3 API" : "💾 Save Web3 API Details");
+  if ($("#btn-disconnect-wallet")) $("#btn-disconnect-wallet").textContent = isTr ? "❌ Cüzdan Bağlantısını Kes" : (isRu ? "❌ Отключить кошелек" : "❌ Disconnect Wallet");
+  if ($("#btn-save-wallet-pwd")) $("#btn-save-wallet-pwd").textContent = isTr ? "💾 Şifreleri Güvenle Kaydet" : (isRu ? "💾 Надежно сохранить пароли" : "💾 Save Passwords Securely");
+
+  // Pano ve Sinyaller sekmeleri butonları
+  if ($("#btn-refresh-dashboard")) $("#btn-refresh-dashboard").textContent = isTr ? "🔄 Panoyu Yenile" : (isRu ? "🔄 Обновить панель" : "🔄 Refresh Dashboard");
+  if ($("#btn-refresh-signals")) $("#btn-refresh-signals").textContent = isTr ? "🔄 Sinyalleri Yenile" : (isRu ? "🔄 Обновить сигналы" : "🔄 Refresh Signals");
+
+  // Ayarlar sekmesi butonları
+  if ($("#btn-save-all-settings")) $("#btn-save-all-settings").textContent = isTr ? "💾 Tüm Ayarları Kaydet" : (isRu ? "💾 Сохранить все настройки" : "💾 Save All Settings");
+
   // Dil değiştiğinde Canlı Piyasa Okuma analizini de anında yeni dille güncelle
   if (window.runMarketInspection) {
     window.runMarketInspection();
   }
+
+  // Sinyaller açıksa yeni dille tekrar çiz
+  if (allSignalsData && allSignalsData.length) {
+    const curFilter = document.querySelector("#page-signals .chip.active")?.dataset?.filter || "all";
+    renderSignalsList(curFilter);
+  }
+
 localStorage.setItem("elena_lang", lang);
 }
 
@@ -2595,20 +2623,35 @@ function renderSignalsList(filter = "all") {
       else if (s.reason === "sl" || s.r_result < 0) reasonBadge = "<span style='color:var(--accent-red);font-size:10px'>🛑 Stop Tetiklendi</span>";
     }
 
-    // Fiyat ve Hedefler Izgarası (Giriş, TP1, TP2, TP3, SL, Net R)
-    var tp2Val = s.tp2 || (s.entry ? (isLong ? (s.entry * 1.035).toFixed(4) : (s.entry * 0.965).toFixed(4)) : "—");
-    var tp3Val = s.tp3 || (s.entry ? (isLong ? (s.entry * 1.07).toFixed(4) : (s.entry * 0.93).toFixed(4)) : "—");
-    var slVal  = s.sl  || (s.entry ? (isLong ? (s.entry * 0.985).toFixed(4) : (s.entry * 1.015).toFixed(4)) : "—");
+    // Fiyat ve Hedefler Izgarası (Giriş, TP1, TP2, TP3, SL, Güç Skoru)
+    function cleanNum(v) {
+      if (v == null || v === '' || v === '—') return '—';
+      const n = parseFloat(v);
+      if (isNaN(n)) return String(v);
+      if (n >= 1000) return n.toFixed(2);
+      if (n >= 1) return n.toFixed(4);
+      if (n >= 0.001) return n.toFixed(5);
+      return n.toFixed(6);
+    }
+
+    var entryFormatted = cleanNum(s.entry);
+    var tp1Formatted   = cleanNum(s.tp1 || exitText);
+    var tp2Val = s.tp2 || (s.entry ? (isLong ? (s.entry * 1.035) : (s.entry * 0.965)) : null);
+    var tp3Val = s.tp3 || (s.entry ? (isLong ? (s.entry * 1.07)  : (s.entry * 0.93))  : null);
+    var slVal  = s.sl  || (s.entry ? (isLong ? (s.entry * 0.985) : (s.entry * 1.015)) : null);
+    var tp2Formatted = cleanNum(tp2Val);
+    var tp3Formatted = cleanNum(tp3Val);
+    var slFormatted  = cleanNum(slVal);
     var pwrVal = s.power_score ? s.power_score.toFixed(1) : (s.r_result > 1 ? "9.2" : "8.4");
 
     var prices = document.createElement("div");
-    prices.style.cssText = "display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:11.5px;margin-bottom:10px;background:rgba(0,0,0,0.3);border-radius:10px;padding:10px 12px;border:1px solid rgba(255,255,255,0.06)";
-    prices.innerHTML = "<div><div style='color:var(--text-muted);font-size:9.5px;margin-bottom:2px'>GİRİŞ</div><strong style='color:#fff'>" + (s.entry||"—") + "</strong></div>"
-      + "<div><div style='color:var(--accent-red);font-size:9.5px;margin-bottom:2px'>STOP (SL)</div><strong style='color:#ff7878'>" + slVal + "</strong></div>"
-      + "<div><div style='color:var(--accent-gold);font-size:9.5px;margin-bottom:2px'>GÜÇ SKORU</div><strong style='color:var(--accent-gold)'>⭐ " + pwrVal + "/10</strong></div>"
-      + "<div><div style='color:var(--accent-green);font-size:9.5px;margin-bottom:2px'>HEDEF 1 (TP1)</div><strong style='color:var(--accent-green)'>" + (s.tp1 || exitText) + "</strong></div>"
-      + "<div><div style='color:var(--accent-green);font-size:9.5px;margin-bottom:2px'>HEDEF 2 (TP2)</div><strong style='color:#4ade80'>" + tp2Val + "</strong></div>"
-      + "<div><div style='color:var(--accent-green);font-size:9.5px;margin-bottom:2px'>HEDEF 3 (TP3)</div><strong style='color:#86efac'>" + tp3Val + "</strong></div>";
+    prices.style.cssText = "display:grid;grid-template-columns:repeat(auto-fit, minmax(88px, 1fr));gap:6px;font-size:11px;margin-bottom:10px;background:rgba(0,0,0,0.3);border-radius:10px;padding:8px 10px;border:1px solid rgba(255,255,255,0.06);overflow:hidden";
+    prices.innerHTML = "<div style='overflow:hidden'><div style='color:var(--text-muted);font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px'>GİRİŞ</div><strong style='color:#fff;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11.5px'>" + entryFormatted + "</strong></div>"
+      + "<div style='overflow:hidden'><div style='color:var(--accent-red);font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px'>STOP (SL)</div><strong style='color:#ff7878;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11.5px'>" + slFormatted + "</strong></div>"
+      + "<div style='overflow:hidden'><div style='color:var(--accent-gold);font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px'>GÜÇ SKORU</div><strong style='color:var(--accent-gold);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11.5px'>⭐ " + pwrVal + "/10</strong></div>"
+      + "<div style='overflow:hidden'><div style='color:var(--accent-green);font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px'>HEDEF 1 (TP1)</div><strong style='color:var(--accent-green);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11.5px'>" + tp1Formatted + "</strong></div>"
+      + "<div style='overflow:hidden'><div style='color:var(--accent-green);font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px'>HEDEF 2 (TP2)</div><strong style='color:#4ade80;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11.5px'>" + tp2Formatted + "</strong></div>"
+      + "<div style='overflow:hidden'><div style='color:var(--accent-green);font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px'>HEDEF 3 (TP3)</div><strong style='color:#86efac;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11.5px'>" + tp3Formatted + "</strong></div>";
     card.appendChild(prices);
 
     // Canlı Grafiği Aç butonu ve Hızlı İşlem Çubuğu

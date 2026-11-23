@@ -72,6 +72,16 @@
 
 <!-- ================= ADMIN İÇERİK ================= -->
 <div id="content">
+  <!-- CANLI SENKRONİZASYON DURUM BARI -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;margin-bottom:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px">
+    <div style="display:flex;align-items:center;gap:6px">
+      <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#00e676;box-shadow:0 0 6px #00e676"></span>
+      <span style="font-size:11px;color:#00e676;font-weight:700">CANLI VERİ AKIŞI</span>
+      <span style="font-size:10px;color:var(--text-muted)">(Otomatik 5s)</span>
+    </div>
+    <div id="adm-last-sync" style="font-size:11px;color:#a5d6ff;font-family:monospace">--:--:--</div>
+  </div>
+
 
   <!-- TABS -->
   <nav class="tabs" role="tablist" aria-label="Yönetim sekmeleri">
@@ -244,6 +254,6 @@
 </div>
 
 <div id="toast-container" aria-live="polite"></div>
-<script type="module" src="admin.js?v=56.3"></script>
+<script type="module" src="admin.js?v=v58"></script>
 </body>
 </html>

@@ -2802,7 +2802,14 @@ function renderSignalsList(filter = "all") {
 
     var prices = document.createElement("div");
     prices.style.cssText = "display:grid;grid-template-columns:repeat(auto-fit, minmax(88px, 1fr));gap:6px;font-size:11px;margin-bottom:10px;background:rgba(0,0,0,0.3);border-radius:10px;padding:8px 10px;border:1px solid rgba(255,255,255,0.06);overflow:hidden";
+    var curPriceFormatted = cleanNum(s.current_price || s.entry);
+    var pnlVal = (s.pnl_pct != null) ? s.pnl_pct : 0;
+    var pnlSign = pnlVal > 0 ? "+" : "";
+    var pnlColor = pnlVal >= 0 ? "var(--accent-green)" : "var(--accent-red)";
+
     prices.innerHTML = "<div style='overflow:hidden'><div style='color:var(--text-muted);font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px'>GİRİŞ</div><strong style='color:#fff;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11.5px'>" + entryFormatted + "</strong></div>"
+      + "<div style='overflow:hidden'><div style='color:#38bdf8;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;display:flex;align-items:center;gap:3px'>MEVCUT <span style=\'width:5px;height:5px;border-radius:50%;background:#00e676;display:inline-block\'></span></div><strong style='color:#fff;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11.5px'>" + curPriceFormatted + "</strong></div>"
+      + "<div style='overflow:hidden'><div style='color:var(--text-muted);font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px'>CANLI K/Z</div><strong style='color:" + pnlColor + ";display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11.5px'>" + pnlSign + pnlVal + "%</strong></div>"
       + "<div style='overflow:hidden'><div style='color:var(--accent-red);font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px'>STOP (SL)</div><strong style='color:#ff7878;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11.5px'>" + slFormatted + "</strong></div>"
       + "<div style='overflow:hidden'><div style='color:var(--accent-gold);font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px'>GÜÇ SKORU</div><strong style='color:var(--accent-gold);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11.5px'>⭐ " + pwrVal + "/10</strong></div>"
       + "<div style='overflow:hidden'><div style='color:var(--accent-green);font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px'>HEDEF 1 (TP1)</div><strong style='color:var(--accent-green);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11.5px'>" + tp1Formatted + "</strong></div>"
@@ -3768,13 +3775,11 @@ document.getElementById("btn-save-web3-api")?.addEventListener("click", async ()
     return;
   }
   try {
-    const res = await api("/api/exchange/save", {
-      exchange: "web3_" + provider,
+    const res = await api("/api/web3/save", {
+      provider: provider,
       api_key: apiKey,
       api_secret: apiSecret,
-      passphrase: network,
-      mode: "web3",
-      margin_mode: "cross"
+      network: network
     });
     if (res.ok) {
       toast("Web3 API bilgileri başarıyla kaydedildi ✅", "success");
@@ -3819,7 +3824,16 @@ window.openSignalSnapshot = function(sigId) {
     : `<span style="color:var(--accent-gold);font-weight:700">AÇIK POZİSYON ⏳</span>`;
 
   if (body) {
+    const chartEndpoint = (getApiBase() ? getApiBase().replace(/\/+$/, '') : '') + `/api/signal/chart/${sig.id}`;
     body.innerHTML = `
+      <!-- 📈 SİNYAL MUM GRAFİĞİ (TP/SL/GİRİŞ SEVİYELERİ İLE) -->
+      <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden;margin-bottom:12px;position:relative;text-align:center">
+        <img src="${chartEndpoint}" style="width:100%;height:auto;display:block;min-height:180px;object-fit:contain;background:#0f172a" alt="Sinyal Grafiği" onerror="this.style.display='none'" />
+        <div style="padding:6px 10px;background:rgba(0,0,0,0.4);font-size:10px;color:var(--text-muted);display:flex;justify-content:space-between">
+          <span>🎯 TP1-TP3 &amp; SL Seviyeli Canlı Grafik</span>
+          <span style="color:#38bdf8">Binance ${sig.market.toUpperCase()}</span>
+        </div>
+      </div>
       <div style="background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px;margin-bottom:12px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
           <span style="font-size:12px;color:var(--text-muted)">İşlem Modu:</span>
@@ -3930,3 +3944,48 @@ document.querySelectorAll(".sig-class-btn").forEach(btn => {
     applyCombinedSignalsFilter();
   });
 });
+
+
+// ========================================================
+// MİNİ APP OTOMATİK VERİ VE BAKİYE YENİLEME DÖNGÜSÜ
+// ========================================================
+let globalAppLiveSyncTimer = null;
+
+// 1. Profil Yanındaki Bakiye Göstergesi Otomatik Yenileme (12 saniyede bir)
+setInterval(async () => {
+  if (typeof _updateProfileBalance === "function") {
+    await _updateProfileBalance();
+  }
+}, 12000);
+
+// Bakiye çipine tıklandığında anında yenileme
+document.getElementById("upc-balance-wrap")?.addEventListener("click", async () => {
+  const balVal = document.getElementById("upc-balance-val");
+  if (balVal) balVal.textContent = "⏳...";
+  if (typeof _updateProfileBalance === "function") {
+    await _updateProfileBalance();
+  }
+  toast("Bakiye güncellendi 🔄", "info");
+});
+
+// 2. Aktif Sekme Canlı Veri Yenileyici (6 saniyede bir)
+function startAppLiveSync() {
+  if (globalAppLiveSyncTimer) clearInterval(globalAppLiveSyncTimer);
+  globalAppLiveSyncTimer = setInterval(async () => {
+    try {
+      const activeTabEl = document.querySelector(".tab-page.active") || document.querySelector("section.page.active");
+      const tabId = activeTabEl?.id;
+      if (tabId === "tab-dashboard") {
+        await loadDashboard();
+      } else if (tabId === "tab-signals") {
+        const r = await api("/api/signals/all");
+        if (r && r.ok && r.signals) {
+          allSignalsData = r.signals;
+          renderSignalsList(currentSigFilter || "all");
+        }
+      }
+    } catch (e) {}
+  }, 6000);
+}
+
+setTimeout(startAppLiveSync, 2000);

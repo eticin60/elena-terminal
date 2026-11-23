@@ -811,18 +811,28 @@ function renderUserProfileCard(meObj, walletObj) {
 
 async function _updateProfileBalance() {
   const balVal = document.getElementById('upc-balance-val');
+  const bWrap  = document.getElementById('upc-balance-wrap');
   if (!balVal) return;
   try {
     const r = await api('/api/wallet/balance');
     if (r && r.ok) {
-      // Find USDT token
+      // Try USDT token first
       const usdt = (r.tokens || []).find(t =>
-        t.symbol === 'USDT' || t.symbol === 'USDT' || (t.name||'').toLowerCase().includes('tether')
+        (t.symbol || '').toUpperCase() === 'USDT' ||
+        (t.name   || '').toLowerCase().includes('tether')
       );
-      const val = usdt
-        ? parseFloat(usdt.balance || 0).toFixed(2)
-        : (r.usdt_total != null ? parseFloat(r.usdt_total).toFixed(2) : '0.00');
+      let val = '—';
+      if (usdt && parseFloat(usdt.balance || 0) > 0) {
+        val = parseFloat(usdt.balance).toFixed(2);
+      } else if (r.usdt_total != null && parseFloat(r.usdt_total) > 0) {
+        val = parseFloat(r.usdt_total).toFixed(2);
+      } else if (r.native != null) {
+        // Show native balance with coin symbol if no USDT
+        const unit = r.unit || 'TRX';
+        val = parseFloat(r.native).toFixed(4) + ' ' + unit;
+      }
       balVal.textContent = val;
+      if (bWrap && val !== '—') bWrap.style.display = 'flex';
     } else {
       balVal.textContent = '—';
     }
@@ -1715,6 +1725,22 @@ async function loadBalance() {
       <strong style="color:var(--accent-gold)">${balance.toFixed(4)} ${unit}</strong>`;
     chainSection.appendChild(row);
   });
+
+  // Update profile bar balance with EVM USDT if any tokens found
+  try {
+    const _evmUsdt = document.getElementById('upc-balance-val');
+    if (_evmUsdt) {
+      const _r2 = await api('/api/wallet/balance');
+      if (_r2 && _r2.ok && _r2.tokens && _r2.tokens.length) {
+        const _utok = _r2.tokens.find(t => (t.symbol||'').toUpperCase()==='USDT' || (t.name||'').toLowerCase().includes('tether'));
+        if (_utok && parseFloat(_utok.balance||0) > 0) {
+          _evmUsdt.textContent = parseFloat(_utok.balance).toFixed(2);
+          const _bw = document.getElementById('upc-balance-wrap');
+          if (_bw) _bw.style.display = 'flex';
+        }
+      }
+    }
+  } catch(_) {}
 
   if (!anyBalance) {
     const empty = document.createElement("div");

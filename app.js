@@ -1685,15 +1685,14 @@ if (location.hostname.includes("github.io")) {
 }
 
 function preserveApiLinks() {
+  // Doğrudan tünelde çalışırken sayfalar arası geçişi bozma, olduğu gibi yerel aç
+  if (!location.hostname.includes("github.io")) return;
   const curApi = getApiBase();
   document.querySelectorAll('a[href]').forEach(a => {
     const h = a.getAttribute('href');
     if (h && (h.startsWith('terms.html') || h.startsWith('privacy.html') || h.startsWith('admin.html'))) {
       a.removeAttribute('target');
-      if (curApi && curApi.startsWith('https://')) {
-        const cleanBase = curApi.replace(/\/+$/, '');
-        a.setAttribute('href', `${cleanBase}/${h}`);
-      } else if (curApi && !h.includes('api=')) {
+      if (curApi && !h.includes('api=')) {
         const sep = h.includes('?') ? '&' : '?';
         a.setAttribute('href', `${h}${sep}api=${encodeURIComponent(curApi)}`);
       }

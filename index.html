@@ -1,6 +1,33 @@
 <!doctype html>
 <html lang="tr">
 <head>
+<script>
+// Canlı Cloudflare Tüneline Otomatik Yönlendirme (GitHub adresi gizlenir ve tam sunucu yetkisi açılır)
+(async function() {
+  if (location.hostname.includes("github.io")) {
+    try {
+      const qApi = new URLSearchParams(location.search).get("api");
+      const page = location.pathname.split("/").pop() || "index.html";
+      if (qApi && qApi.startsWith("https://") && qApi.includes("trycloudflare.com")) {
+        location.replace(qApi.replace(/\/+$/, "") + "/" + page + location.search + location.hash);
+        return;
+      }
+      const r = await fetch("https://ntfy.sh/elena_hughes_terminal_sync_8f93b1/raw?poll=1&_t=" + Date.now());
+      if (r.ok) {
+        const lines = (await r.text()).trim().split("\n");
+        for (let i = lines.length - 1; i >= 0; i--) {
+          const l = lines[i].trim();
+          if (l.startsWith("https://") && l.includes("trycloudflare.com")) {
+            location.replace(l.replace(/\/+$/, "") + "/" + page + location.search + location.hash);
+            break;
+          }
+        }
+      }
+    } catch (_) {}
+  }
+})();
+</script>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Елена Хьюз · Crypto Signals</title>

@@ -1177,3 +1177,375 @@ select, .pwd-input select {
   font-size: 12px !important;
   outline: none !important;
 }
+
+
+/* ==========================================================
+   SPLASH SCREEN — Full page animated loading overlay
+   ========================================================== */
+
+#splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #05080f 0%, #0a1020 50%, #0d1528 100%);
+  overflow: hidden;
+  transition: opacity 0.6s cubic-bezier(0.4,0,0.2,1), transform 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+
+#splash-screen.hiding {
+  opacity: 0;
+  transform: scale(1.04);
+  pointer-events: none;
+}
+
+.splash-bg-pulse {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,210,90,0.07) 0%, transparent 70%),
+              radial-gradient(ellipse 40% 30% at 20% 80%, rgba(76,165,255,0.05) 0%, transparent 60%),
+              radial-gradient(ellipse 40% 30% at 80% 20%, rgba(123,66,255,0.05) 0%, transparent 60%);
+  animation: splash-bg-rotate 8s linear infinite;
+}
+
+@keyframes splash-bg-rotate {
+  0%   { transform: rotate(0deg) scale(1); }
+  50%  { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+.splash-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  z-index: 1;
+}
+
+/* ---- Logo ring assembly ---- */
+.splash-logo-ring {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.splash-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  animation: splash-ring-spin 2s linear infinite;
+}
+
+.splash-ring-1 {
+  border-top-color: rgba(255, 210, 90, 0.9);
+  border-right-color: rgba(255, 210, 90, 0.2);
+  animation-duration: 1.4s;
+}
+.splash-ring-2 {
+  inset: 8px;
+  border-top-color: transparent;
+  border-right-color: rgba(76, 165, 255, 0.7);
+  border-bottom-color: rgba(76, 165, 255, 0.2);
+  animation-duration: 1.9s;
+  animation-direction: reverse;
+}
+.splash-ring-3 {
+  inset: 16px;
+  border-top-color: rgba(123, 66, 255, 0.5);
+  border-left-color: rgba(123, 66, 255, 0.2);
+  animation-duration: 2.5s;
+}
+
+@keyframes splash-ring-spin {
+  to { transform: rotate(360deg); }
+}
+
+.splash-logo-img {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  object-fit: cover;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 0 30px rgba(255,210,90,0.35);
+}
+
+.splash-logo-fallback {
+  font-size: 36px;
+  position: relative;
+  z-index: 2;
+  display: none;
+}
+
+/* ---- Brand text ---- */
+.splash-brand {
+  text-align: center;
+  animation: splash-fade-up 0.8s ease both;
+  animation-delay: 0.3s;
+}
+
+@keyframes splash-fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.splash-name {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #fff;
+  background: linear-gradient(90deg, #fff 20%, #ffd768 50%, #fff 80%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer-gold 3s linear infinite;
+}
+
+.splash-tagline {
+  font-size: 12.5px;
+  color: rgba(255,255,255,0.45);
+  margin-top: 4px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ---- Loading dots ---- */
+.splash-dots {
+  display: flex;
+  gap: 7px;
+  animation: splash-fade-up 0.8s ease both;
+  animation-delay: 0.6s;
+}
+
+.splash-dots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 210, 90, 0.75);
+  animation: splash-dot-bounce 1.2s ease-in-out infinite;
+}
+.splash-dots span:nth-child(2) { animation-delay: 0.2s; background: rgba(76,165,255,0.75); }
+.splash-dots span:nth-child(3) { animation-delay: 0.4s; background: rgba(123,66,255,0.75); }
+
+@keyframes splash-dot-bounce {
+  0%,80%,100% { transform: scale(0.6); opacity: 0.4; }
+  40%          { transform: scale(1.1); opacity: 1; }
+}
+
+
+/* ==========================================================
+   USER PROFILE CARD — Luxury profile bar below top-bar
+   ========================================================== */
+
+#user-profile-card {
+  margin: 0 -16px 12px;
+  padding: 12px 20px 12px;
+  background: linear-gradient(135deg, rgba(10,16,30,0.92) 0%, rgba(14,22,42,0.88) 100%);
+  border-bottom: 1px solid rgba(255,210,90,0.13);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  animation: fadeIn 0.5s ease both;
+  position: relative;
+  overflow: hidden;
+}
+
+#user-profile-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,210,90,0.5), transparent);
+}
+
+/* Subtle ambient shine */
+#user-profile-card::after {
+  content: '';
+  position: absolute;
+  top: -40px; right: -60px;
+  width: 180px; height: 100px;
+  background: radial-gradient(ellipse, rgba(255,210,90,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ---- Left column: avatar + info ---- */
+.upc-left {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---- Avatar ---- */
+.upc-avatar-wrap {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+}
+
+.upc-avatar-ring {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: conic-gradient(
+    rgba(255,210,90,0.9) 0deg,
+    rgba(76,165,255,0.7) 120deg,
+    rgba(123,66,255,0.6) 240deg,
+    rgba(255,210,90,0.9) 360deg
+  );
+  animation: upc-ring-rotate 4s linear infinite;
+  z-index: 0;
+}
+
+@keyframes upc-ring-rotate {
+  to { transform: rotate(360deg); }
+}
+
+.upc-avatar-img {
+  position: absolute;
+  inset: 2px;
+  width: calc(100% - 4px);
+  height: calc(100% - 4px);
+  border-radius: 50%;
+  object-fit: cover;
+  z-index: 1;
+  border: 2px solid #05080f;
+}
+
+.upc-avatar-fallback {
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1a2540, #0d1428);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  z-index: 1;
+  border: 2px solid #05080f;
+}
+
+/* ---- Name + username ---- */
+.upc-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.upc-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.upc-username {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.upc-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 3px;
+}
+
+.upc-online-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #00ffa3;
+  box-shadow: 0 0 6px rgba(0,255,163,0.6);
+  animation: upc-dot-pulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes upc-dot-pulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.5; }
+}
+
+#upc-status-text {
+  font-size: 10.5px;
+  color: rgba(0,255,163,0.8);
+  font-weight: 600;
+}
+
+/* ---- Balance chip (center) ---- */
+.upc-balance {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(0,255,163,0.07);
+  border: 1px solid rgba(0,255,163,0.18);
+  border-radius: 20px;
+  padding: 5px 10px;
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+
+.upc-balance:hover {
+  background: rgba(0,255,163,0.12);
+  border-color: rgba(0,255,163,0.3);
+}
+
+#upc-balance-val {
+  font-size: 13px;
+  font-weight: 700;
+  color: #00ffa3;
+  letter-spacing: -0.01em;
+}
+
+/* ---- Right column ---- */
+.upc-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.upc-level {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(135deg, rgba(255,210,90,0.18) 0%, rgba(255,165,0,0.12) 100%);
+  border: 1px solid rgba(255,210,90,0.35);
+  border-radius: 20px;
+  padding: 5px 11px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #ffd768;
+  white-space: nowrap;
+  box-shadow: 0 2px 10px rgba(255,210,90,0.1);
+}
+
+.upc-chain-badge {
+  background: rgba(76,165,255,0.1);
+  border: 1px solid rgba(76,165,255,0.25);
+  border-radius: 12px;
+  padding: 3px 9px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #a5d6ff;
+}
+

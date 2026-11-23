@@ -717,6 +717,126 @@ try {
 } catch (_) {}
 const initData = tg?.initData || "";
 
+// ================================================================
+//  SPLASH SCREEN CONTROLLER
+// ================================================================
+(function() {
+  const splash = document.getElementById('splash-screen');
+  if (!splash) return;
+
+  // Always show splash, then fade out
+  function hideSplash() {
+    splash.classList.add('hiding');
+    setTimeout(() => { splash.style.display = 'none'; }, 700);
+  }
+
+  // Auto-hide after 2.5 seconds MAX (even if main() hasn't loaded)
+  window._splashHideTimer = setTimeout(hideSplash, 2500);
+  window.hideSplash = hideSplash;
+})();
+
+
+// ================================================================
+//  TELEGRAM USER PROFILE CARD — Photo, Name, Level, Balance
+// ================================================================
+function renderUserProfileCard(meObj, walletObj) {
+  const card = document.getElementById('user-profile-card');
+  if (!card) return;
+
+  const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user || {};
+
+  // --- Avatar ---
+  const photoEl = document.getElementById('upc-photo');
+  const fallbackEl = document.getElementById('upc-avatar-fallback');
+  const photoUrl = tgUser.photo_url || null;
+
+  if (photoUrl && photoEl) {
+    photoEl.src = photoUrl;
+    photoEl.style.display = 'block';
+    if (fallbackEl) fallbackEl.style.display = 'none';
+  } else {
+    if (photoEl) photoEl.style.display = 'none';
+    if (fallbackEl) fallbackEl.style.display = 'flex';
+  }
+
+  // --- Name ---
+  const firstName = tgUser.first_name || meObj?.first_name || '';
+  const lastName  = tgUser.last_name  || meObj?.last_name  || '';
+  const username  = tgUser.username   || meObj?.username   || '';
+  const fullName  = [firstName, lastName].filter(Boolean).join(' ') || 'Trader';
+  const nameEl = document.getElementById('upc-name');
+  const unameEl = document.getElementById('upc-username');
+  if (nameEl)  nameEl.textContent  = fullName;
+  if (unameEl) unameEl.textContent = username ? '@' + username : '';
+
+  // --- Status text (language-aware) ---
+  const isRu = (currentLang === 'ru' || currentLang === 'uk');
+  const isTr = currentLang === 'tr';
+  const statusEl = document.getElementById('upc-status-text');
+  if (statusEl) {
+    statusEl.textContent = isRu ? 'В сети' : (isTr ? 'Çevrimiçi' : 'Online');
+  }
+
+  // --- Level badge ---
+  const levelEl = document.getElementById('upc-level-text');
+  if (levelEl) {
+    levelEl.textContent = isRu ? '1. Уровень' : (isTr ? '1. Seviye' : 'Level 1');
+  }
+
+  // --- Balance pill (from wallet if connected) ---
+  const balWrap = document.getElementById('upc-balance-wrap');
+  const balVal  = document.getElementById('upc-balance-val');
+  if (walletObj && walletObj.connected && balWrap && balVal) {
+    // Show chain
+    const chainBadge = document.getElementById('upc-chain-badge');
+    const chainName  = document.getElementById('upc-chain-name');
+    const chainLabels = {
+      'tron': 'TRON', 'eip155:1': 'ETH', 'eip155:56': 'BNB',
+      'eip155:137': 'POL', 'eip155:42161': 'ARB', 'eip155:10': 'OPT'
+    };
+    if (chainBadge) chainBadge.style.display = 'flex';
+    if (chainName)  chainName.textContent = chainLabels[walletObj.chain] || walletObj.chain || '—';
+    // Balance: show placeholder, will be updated by loadBalance()
+    balVal.textContent = '...';
+    balWrap.style.display = 'flex';
+    // Try to load balance from API
+    _updateProfileBalance();
+  } else {
+    if (balWrap) balWrap.style.display = 'none';
+  }
+
+  // --- Show card ---
+  card.style.display = 'flex';
+}
+
+async function _updateProfileBalance() {
+  const balVal = document.getElementById('upc-balance-val');
+  if (!balVal) return;
+  try {
+    const r = await api('/api/wallet/balance');
+    if (r && r.ok) {
+      // Find USDT token
+      const usdt = (r.tokens || []).find(t =>
+        t.symbol === 'USDT' || t.symbol === 'USDT' || (t.name||'').toLowerCase().includes('tether')
+      );
+      const val = usdt
+        ? parseFloat(usdt.balance || 0).toFixed(2)
+        : (r.usdt_total != null ? parseFloat(r.usdt_total).toFixed(2) : '0.00');
+      balVal.textContent = val;
+    } else {
+      balVal.textContent = '—';
+    }
+  } catch (e) {
+    balVal.textContent = '—';
+  }
+}
+
+// Expose globally so loadWallet() can call it after connecting
+window.renderUserProfileCard = renderUserProfileCard;
+window._updateProfileBalance  = _updateProfileBalance;
+
+
+
 // ========================================================
 // 8 DİL TAM ÇEVİRİ TABLOSU (I18N)
 // ========================================================
@@ -1455,6 +1575,11 @@ async function loadWallet() {
     WALLET = r;
     document.getElementById("landing-view").style.display = "none";
     document.getElementById("app-view").style.display   = "block";
+
+    // ── Render user profile card in top bar ──
+    if (window.renderUserProfileCard) {
+      window.renderUserProfileCard(typeof ME !== 'undefined' ? ME : null, r);
+    }
     // Zincir adını göster
     const chainLabels = {
       "tron": "TRON", "eip155:1": "Ethereum", "eip155:56": "BNB Chain",
@@ -1470,6 +1595,8 @@ async function loadWallet() {
     WALLET = null;
     document.getElementById("landing-view").style.display = "block";
     document.getElementById("app-view").style.display   = "none";
+    const _upc = document.getElementById("user-profile-card");
+    if (_upc) _upc.style.display = "none";
   }
   updateEnabledState();
 }
@@ -1505,6 +1632,14 @@ async function loadBalance() {
         list.innerHTML = "";
         if (r.tokens && r.tokens.length) {
           r.tokens.forEach(t => _appendToken(list, t));
+          // Update profile balance bar with USDT total
+          const _usdtTok = r.tokens.find(t => (t.symbol||'').toUpperCase() === 'USDT' || (t.name||'').toLowerCase().includes('tether'));
+          const _usdtBal = document.getElementById('upc-balance-val');
+          if (_usdtBal && _usdtTok) {
+            _usdtBal.textContent = parseFloat(_usdtTok.balance || 0).toFixed(2);
+            const _bWrap = document.getElementById('upc-balance-wrap');
+            if (_bWrap) _bWrap.style.display = 'flex';
+          }
         } else {
           list.innerHTML = `<div style="color:var(--text-muted);font-size:12px;padding:6px 0">TRC20 token bulunamadı</div>`;
         }
@@ -2083,6 +2218,12 @@ async function main() {
   const activeLang = botLang || localStorage.getItem("elena_lang") || tgLang || "tr";
   applyLanguage(activeLang);
   checkLegalAgreement(activeLang);
+
+  // ── Splash: hide after app is ready ──
+  if (window.hideSplash) {
+    clearTimeout(window._splashHideTimer);
+    window.hideSplash();
+  }
 
   // Yönetici ise Landing, Menü ve Ayarlar butonlarını göster
   if (ME.is_admin) {

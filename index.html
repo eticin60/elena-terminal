@@ -5,12 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Елена Хьюз · Crypto Signals</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="stylesheet" href="style.css?v=46">
+<link rel="stylesheet" href="style.css?v=47">
 </head>
 <body>
 
-<!-- ================= TOP BAR ================= -->
+<!-- ====================== SPLASH SCREEN ====================== -->
+<div id="splash-screen" aria-hidden="true">
+  <div class="splash-bg-pulse"></div>
+  <div class="splash-center">
+    <div class="splash-logo-ring">
+      <div class="splash-ring splash-ring-1"></div>
+      <div class="splash-ring splash-ring-2"></div>
+      <div class="splash-ring splash-ring-3"></div>
+      <img src="assets/brand/logo.png" class="splash-logo-img" alt="Elena Hughes" onerror="this.style.display='none'">
+      <div class="splash-logo-fallback" id="splash-fallback">🇷🇺</div>
+    </div>
+    <div class="splash-brand">
+      <div class="splash-name">Елена Хьюз</div>
+      <div class="splash-tagline" id="splash-tagline">Crypto Signals Terminal</div>
+    </div>
+    <div class="splash-dots">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</div>
+<!-- ============================================================ -->
+
+
+<!-- ================= LUXURY PROFILE HEADER ================= -->
 <div class="top-bar" id="top-bar">
+
+  <!-- Left: Bot brand (small, discreet) -->
   <div class="top-brand">
     <div class="top-flag-badge" id="top-flag">🇷🇺</div>
     <div>
@@ -18,11 +43,56 @@
       <div class="top-subtitle" id="i18n-top-sub">Crypto Signals</div>
     </div>
   </div>
-  <button class="lang-dropdown-btn" id="btn-lang-toggle" aria-label="Dil seç">
-    <span>🌐</span>
-    <span id="current-lang-label">TR</span>
-  </button>
+
+  <!-- Right: lang + user profile pill -->
+  <div style="display:flex;align-items:center;gap:8px">
+    <button class="lang-dropdown-btn" id="btn-lang-toggle" aria-label="Dil seç">
+      <span>🌐</span>
+      <span id="current-lang-label">TR</span>
+    </button>
+  </div>
 </div>
+
+<!-- ===== USER PROFILE CARD (shows after login) ===== -->
+<div id="user-profile-card" style="display:none">
+  <div class="upc-left">
+    <!-- Avatar with animated ring -->
+    <div class="upc-avatar-wrap" id="upc-avatar-wrap">
+      <div class="upc-avatar-ring"></div>
+      <img id="upc-photo" class="upc-avatar-img" src="" alt="" onerror="this.style.display='none';document.getElementById('upc-avatar-fallback').style.display='flex'">
+      <div class="upc-avatar-fallback" id="upc-avatar-fallback">👤</div>
+    </div>
+    <!-- Name + username + status -->
+    <div class="upc-info">
+      <div class="upc-name" id="upc-name">—</div>
+      <div class="upc-username" id="upc-username"></div>
+      <div class="upc-status">
+        <span class="upc-online-dot"></span>
+        <span id="upc-status-text">Online</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Center: Wallet balance chip -->
+  <div class="upc-balance" id="upc-balance-wrap" style="display:none">
+    <img src="assets/coins/usdt.svg" width="16" height="16" style="border-radius:50%;flex-shrink:0" onerror="this.style.display='none'">
+    <span id="upc-balance-val">—</span>
+    <span style="color:rgba(255,255,255,0.45);font-size:11px">USDT</span>
+  </div>
+
+  <!-- Right: Level badge -->
+  <div class="upc-right">
+    <div class="upc-level" id="upc-level">
+      <span>⭐</span>
+      <span id="upc-level-text">1. Seviye</span>
+    </div>
+    <div class="upc-chain-badge" id="upc-chain-badge" style="display:none">
+      <span id="upc-chain-name">—</span>
+    </div>
+  </div>
+</div>
+<!-- ============================================================ -->
+
 
 <!-- ========================================
      GİRİŞ EKRANI (Liquid Glass Landing Hero)
@@ -1354,6 +1424,6 @@
 <!-- ================= TOAST ================= -->
 <div id="toast-container" aria-live="polite"></div>
 
-<script type="module" src="app.js?v=46"></script>
+<script type="module" src="app.js?v=47"></script>
 </body>
 </html>

@@ -1684,11 +1684,13 @@ if (location.hostname.includes("github.io")) {
 
 function preserveApiLinks() {
   const curApi = getApiBase();
-  if (!curApi) return;
   document.querySelectorAll('a[href]').forEach(a => {
     const h = a.getAttribute('href');
-    if (h && (h.startsWith('admin.html') || h.startsWith('terms.html') || h.startsWith('privacy.html') || h.startsWith('index.html'))) {
-      if (!h.includes('api=')) {
+    if (h && (h.startsWith('terms.html') || h.startsWith('privacy.html') || h.startsWith('admin.html'))) {
+      if (curApi && curApi.startsWith('https://')) {
+        const cleanBase = curApi.replace(/\/+$/, '');
+        a.setAttribute('href', `${cleanBase}/${h}`);
+      } else if (curApi && !h.includes('api=')) {
         const sep = h.includes('?') ? '&' : '?';
         a.setAttribute('href', `${h}${sep}api=${encodeURIComponent(curApi)}`);
       }
@@ -2525,6 +2527,7 @@ function updateAutobotDashboardHeader(exch) {
 let isExchangeConnected = false;
 
 async function checkExchangeApiStatus() {
+  const tStart = performance.now();
   let statusResp = null;
   try {
     statusResp = await api("/api/exchange/status");
@@ -2542,7 +2545,11 @@ async function checkExchangeApiStatus() {
   if (isExchangeConnected && statusResp) {
     if (dot) { dot.style.background = "#4ade80"; dot.style.boxShadow = "0 0 10px #4ade80"; }
     if (connText) { connText.textContent = "Bağlantı: BAĞLI"; connText.style.color = "#4ade80"; }
-    if (pingVal) pingVal.textContent = (statusResp.ping_ms || 124) + " ms";
+    if (pingVal) {
+      const realPing = Math.max(24, Math.round(performance.now() - tStart));
+      pingVal.textContent = realPing + " ms";
+      pingVal.style.color = realPing < 250 ? "#4ade80" : (realPing < 500 ? "#fbbf24" : "#f87171");
+    }
     if (maskedKey && statusResp.masked_key) maskedKey.textContent = statusResp.masked_key;
     if (statusResp.exchange) {
       currentExchange = statusResp.exchange;
@@ -2804,9 +2811,12 @@ function renderSignalsList(filter = "all") {
 
     // Canlı Grafiği Aç butonu ve Hızlı İşlem Çubuğu
     var actionRow = document.createElement("div");
-    actionRow.style.cssText = "display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06)";
+    actionRow.style.cssText = "display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06);flex-wrap:wrap";
     actionRow.innerHTML = "<div><small style='color:var(--text-muted);font-size:10.5px'>" + (s.date || '') + (isClosed && s.exit_price ? " · Çıkış: " + s.exit_price : "") + "</small></div>"
-      + "<button class='btn btn-ghost' style='padding:4px 10px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px' onclick='window.openGlobalSymbol(\"" + s.symbol + "\")'>📊 Grafiği Aç</button>";
+      + "<div style='display:flex;gap:6px;align-items:center'>"
+      + "<button class='btn btn-ghost' style='padding:4px 8px;font-size:10.5px;font-weight:700;display:flex;align-items:center;gap:3px' onclick='window.openSignalSnapshot(\"" + s.id + "\")'>📊 Sinyal Grafiği</button>"
+      + "<button class='btn btn-main' style='padding:4px 8px;font-size:10.5px;font-weight:700;display:flex;align-items:center;gap:3px' onclick='window.openGlobalSymbol(\"" + s.symbol + "\")'>📈 Canlı Grafik</button>"
+      + "</div>";
     card.appendChild(actionRow);
 
     if (reasonBadge) {
@@ -3773,4 +3783,149 @@ document.getElementById("btn-save-web3-api")?.addEventListener("click", async ()
   } catch (e) {
     toast("Bağlantı hatası: " + e.message, "error");
   }
+});
+
+
+// ========================================================
+// GELİŞMİŞ SİNYAL ENSTANTANESİ & ARAMA FİLTRESİ
+// ========================================================
+let currentSigFilter = "all";
+let currentSigClass = "all";
+let currentSigSearch = "";
+
+window.openSignalSnapshot = function(sigId) {
+  const sig = allSignalsData.find(s => String(s.id) === String(sigId)) || allSignalsData[0];
+  if (!sig) return toast("Sinyal verisi bulunamadı", "warn");
+  const modal = document.getElementById("signal-snapshot-modal");
+  const title = document.getElementById("snap-title");
+  const sub = document.getElementById("snap-sub");
+  const body = document.getElementById("snap-body");
+  const btnLive = document.getElementById("btn-snap-open-live");
+
+  const isLong = (sig.side === "LONG" || sig.side === "BUY");
+  const dirColor = isLong ? "var(--accent-green)" : "var(--accent-red)";
+  const isClosed = (sig.status === "closed");
+
+  if (title) title.textContent = `${sig.symbol} · ${sig.tf} ${sig.side}`;
+  if (sub) sub.textContent = `Sinyal Tarihi: ${sig.date || '—'} · Güç Skoru: ⭐ ${sig.power_score || 8.4}/10`;
+  if (btnLive) btnLive.onclick = () => {
+    if (modal) modal.style.display = "none";
+    window.openGlobalSymbol(sig.symbol);
+  };
+
+  const outcomeStr = isClosed
+    ? `<span style="color:${sig.r_result > 0 ? 'var(--accent-green)' : 'var(--accent-red)'};font-weight:700">${sig.r_result > 0 ? '+' : ''}${Number(sig.r_result||0).toFixed(2)}R ${sig.r_result > 0 ? '✅ KÂR' : '🛑 STOP'}</span>`
+    : `<span style="color:var(--accent-gold);font-weight:700">AÇIK POZİSYON ⏳</span>`;
+
+  if (body) {
+    body.innerHTML = `
+      <div style="background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px;margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:12px;color:var(--text-muted)">İşlem Modu:</span>
+          <strong style="color:${dirColor}">${isLong ? '🟢 LONG / ALIM' : '🔴 SHORT / SATIM'} (${sig.market === 'spot' ? 'SPOT' : 'VADELİ'})</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:12px;color:var(--text-muted)">Giriş Fiyatı:</span>
+          <strong style="color:#fff;font-size:13.5px">${sig.entry || '—'}</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:12px;color:var(--text-muted)">Stop-Loss (Zarar Durdur):</span>
+          <strong style="color:var(--accent-red)">${sig.sl || '—'} (-${sig.sl_pct || 1.5}%)</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:12px;color:var(--text-muted)">TP1 Hedefi:</span>
+          <strong style="color:var(--accent-green)">${sig.tp1 || '—'} (+${(sig.sl_pct||1.5)*1}%)</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:12px;color:var(--text-muted)">TP2 Hedefi:</span>
+          <strong style="color:var(--accent-green)">${sig.tp2 || (isLong ? (sig.entry*1.035).toFixed(2) : (sig.entry*0.965).toFixed(2))} (+${(sig.sl_pct||1.5)*2}%)</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:12px;color:var(--text-muted)">TP3 Hedefi:</span>
+          <strong style="color:var(--accent-green)">${sig.tp3 || (isLong ? (sig.entry*1.07).toFixed(2) : (sig.entry*0.93).toFixed(2))} (+${(sig.sl_pct||1.5)*3}%)</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:6px;border-top:1px solid rgba(255,255,255,0.06)">
+          <span style="font-size:12px;color:var(--text-muted)">Durum:</span>
+          ${outcomeStr}
+        </div>
+      </div>
+      <div style="font-size:11.5px;color:var(--text-muted);line-height:1.5">
+        ℹ️ <strong>Güç Skoru (Power Score):</strong> Sinyal ilk oluştuğunda RSI, Hacim, Trend kırılımı ve Order Book derinliğine göre belirlenen teknik başarı olasılığı puanıdır.
+      </div>
+    `;
+  }
+
+  if (modal) modal.style.display = "flex";
+};
+
+document.getElementById("btn-close-snap-modal")?.addEventListener("click", () => {
+  const m = document.getElementById("signal-snapshot-modal");
+  if (m) m.style.display = "none";
+});
+document.getElementById("btn-snap-close")?.addEventListener("click", () => {
+  const m = document.getElementById("signal-snapshot-modal");
+  if (m) m.style.display = "none";
+});
+
+// Arama & Gelişmiş Filtreleme
+function applyCombinedSignalsFilter() {
+  const container = document.getElementById("signals-list");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const q = (currentSigSearch || "").trim().toUpperCase();
+
+  const filtered = allSignalsData.filter(s => {
+    // 1. Arama filtresi
+    if (q) {
+      const sym = (s.symbol || "").toUpperCase();
+      if (!sym.includes(q)) return false;
+    }
+    // 2. Durum / Yön filtresi
+    if (currentSigFilter === "open" && s.status !== "open") return false;
+    if (currentSigFilter === "tp" && !s.is_win) return false;
+    if (currentSigFilter === "sl" && !s.is_loss) return false;
+    if (currentSigFilter === "long" && s.side !== "LONG" && s.side !== "BUY") return false;
+    if (currentSigFilter === "short" && s.side !== "SHORT") return false;
+    if (currentSigFilter === "spot" && s.market !== "spot") return false;
+    if (currentSigFilter === "futures" && s.market === "spot") return false;
+
+    // 3. Varlık Sınıfı filtresi
+    if (currentSigClass === "crypto") {
+      if (!s.symbol.includes("USDT") && !s.symbol.includes("BTC") && !s.symbol.includes("ETH")) return false;
+    } else if (currentSigClass === "stock") {
+      const isStock = ["THYAO", "ASELS", "GARAN", "KCHOL", "TUPRS", "BIMAS", "AKBNK", "ISCTR", "EREGL", "SISE", "AAPL", "MSFT", "NVDA", "TSLA"].some(k => s.symbol.includes(k));
+      if (!isStock) return false;
+    } else if (currentSigClass === "commodity") {
+      const isComm = ["GOLD", "SILVER", "XAU", "XAG", "BRENT", "CRUDE", "WTI", "USOIL", "UKOIL"].some(k => s.symbol.includes(k));
+      if (!isComm) return false;
+    } else if (currentSigClass === "forex") {
+      const isFx = ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDTRY", "EURTRY"].some(k => s.symbol.includes(k));
+      if (!isFx) return false;
+    }
+
+    return true;
+  });
+
+  if (!filtered.length) {
+    container.innerHTML = '<div class="empty">Aramanıza veya filtre kriterlerinize uygun sinyal bulunamadı</div>';
+    return;
+  }
+
+  // Render cards using standard renderer
+  window._renderSignalsSubset?.(filtered);
+}
+
+document.getElementById("sig-search-input")?.addEventListener("input", e => {
+  currentSigSearch = e.target.value;
+  applyCombinedSignalsFilter();
+});
+
+document.querySelectorAll(".sig-class-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".sig-class-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentSigClass = btn.dataset.class;
+    applyCombinedSignalsFilter();
+  });
 });

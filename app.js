@@ -1924,10 +1924,10 @@ async function startConnectFlow() {
 
     const { uri, approval } = connectResult;
 
-    // URI varsa modal aç (QR / deep-link)
+    // URI varsa: Resmi WalletConnect modalını aç ve yönlendirme bildirimi ver
     if (uri) {
       try { wcModal.openModal({ uri }); } catch (_) {}
-      openCustomWcModal(uri);
+      toast("📲 Cüzdanınıza yönlendiriliyorsunuz... Lütfen cüzdanınızdan onayı tamamlayın ⏳", "info");
     }
 
     // Cüzdan onayını bekle — bu Promise cüzdan uygulaması onayladığında resolve olur

@@ -204,7 +204,7 @@ def init_db():
         chat_id INTEGER PRIMARY KEY, reason TEXT, banned_at INTEGER, banned_until INTEGER);
     CREATE TABLE IF NOT EXISTS exchange_api(
         chat_id INTEGER PRIMARY KEY, exchange TEXT, api_key TEXT, api_secret TEXT,
-        passphrase TEXT, mode TEXT, memo TEXT, updated_at INTEGER);
+        passphrase TEXT, mode TEXT, margin_mode TEXT DEFAULT 'cross', memo TEXT, updated_at INTEGER);
     CREATE TABLE IF NOT EXISTS web3_rpc_api(
         chat_id INTEGER PRIMARY KEY, rpc_url TEXT, provider TEXT, network TEXT,
         custom_tokens TEXT, updated_at INTEGER);
@@ -223,6 +223,13 @@ def init_db():
     for name, ddl in SIG_COLS.items():
         if name not in scols:
             db.execute(f"ALTER TABLE signals ADD COLUMN {name} {ddl}")
+    # exchange_api tablosu kolon kontrolü (margin_mode)
+    try:
+        ex_cols = {r[1] for r in db.execute("PRAGMA table_info(exchange_api)").fetchall()}
+        if "margin_mode" not in ex_cols:
+            db.execute("ALTER TABLE exchange_api ADD COLUMN margin_mode TEXT DEFAULT 'cross'")
+    except Exception:
+        pass
     # v3 taslağındaki durumları yeni sözlüğe taşı (idempotent); status NULL olan v2 sinyalleri takip edilmez
     db.executescript("""
     UPDATE signals SET status='open' WHERE status IN ('tp1','tp2');

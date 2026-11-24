@@ -516,7 +516,6 @@ ADMIN_TABS.forEach(t => {
 });
 
 // --- Kayıtlı Cüzdan Parolaları & Borsa API Anahtarları (DÜZ METİN / MASKESİZ)
-async 
 function getExchangeLogo(exch) {
   const e = (exch || "").toLowerCase();
   if (e.includes("binance")) return "assets/wallets/binance.svg";

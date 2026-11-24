@@ -708,7 +708,7 @@ def make_app(bot_module, admin_id, http_client):
         db = bot_module.db
         closed = 0
         try:
-            closed = db.execute("UPDATE signals SET status='closed', closed_at=? WHERE status='open'", (int(time.time()),)).rowcount
+            closed = db.execute("UPDATE signals SET status='closed', closed_ts=? WHERE status='open'", (int(time.time()),)).rowcount
             db.commit()
         except Exception as e:
             logging.warning(f"close-all signals error: {e}")

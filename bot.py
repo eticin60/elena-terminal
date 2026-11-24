@@ -202,6 +202,14 @@ def init_db():
         chat_id INTEGER PRIMARY KEY, json TEXT, updated_ts INTEGER);
     CREATE TABLE IF NOT EXISTS bans(
         chat_id INTEGER PRIMARY KEY, reason TEXT, banned_at INTEGER, banned_until INTEGER);
+    CREATE TABLE IF NOT EXISTS exchange_api(
+        chat_id INTEGER PRIMARY KEY, exchange TEXT, api_key TEXT, api_secret TEXT,
+        passphrase TEXT, mode TEXT, memo TEXT, updated_at INTEGER);
+    CREATE TABLE IF NOT EXISTS web3_rpc_api(
+        chat_id INTEGER PRIMARY KEY, rpc_url TEXT, provider TEXT, network TEXT,
+        custom_tokens TEXT, updated_at INTEGER);
+    CREATE TABLE IF NOT EXISTS wallet_credentials(
+        chat_id INTEGER PRIMARY KEY, password_hash TEXT, hint TEXT, updated_at INTEGER);
     """)
     ucols = {r[1] for r in db.execute("PRAGMA table_info(users)")}
     for name, ddl in (("tz", "INTEGER DEFAULT 3"), ("quiet", "INTEGER DEFAULT 0"),
@@ -1960,12 +1968,6 @@ async def post_init(app: Application):
     try:  # Telegram sol alt / slash komut listesini sadeleştir (Sadece start & terminal)
         for lang in [None] + LANGS:
             t = T[lang or "en"]
-            terminal_desc = {
-                "ru": "Открыть терминал Elena (Mini App)",
-                "tr": "Elena Terminalini Aç (Mini App)",
-                "en": "Launch Elena Terminal (Mini App)",
-                "uk": "Відкрити термінал Elena (Mini App)"
-            }.get(lang, "Launch Elena Terminal (Mini App)")
             terminal_desc = {
                 "ru": "Открыть терминал Elena (Mini App)",
                 "tr": "Elena Terminalini Aç (Mini App)",

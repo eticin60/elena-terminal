@@ -203,14 +203,31 @@ def init_db():
     CREATE TABLE IF NOT EXISTS bans(
         chat_id INTEGER PRIMARY KEY, reason TEXT, banned_at INTEGER, banned_until INTEGER);
     CREATE TABLE IF NOT EXISTS exchange_api(
-        chat_id INTEGER PRIMARY KEY, exchange TEXT, api_key TEXT, api_secret TEXT,
-        passphrase TEXT, mode TEXT, margin_mode TEXT DEFAULT 'cross', memo TEXT, updated_at INTEGER);
+        chat_id INTEGER PRIMARY KEY,
+        exchange TEXT,
+        api_key TEXT,
+        api_secret TEXT,
+        passphrase TEXT,
+        mode TEXT,
+        margin_mode TEXT DEFAULT 'cross',
+        memo TEXT,
+        updated_at INTEGER);
     CREATE TABLE IF NOT EXISTS web3_rpc_api(
-        chat_id INTEGER PRIMARY KEY, rpc_url TEXT, provider TEXT, network TEXT,
-        custom_tokens TEXT, updated_at INTEGER);
+        chat_id INTEGER,
+        provider TEXT,
+        api_key TEXT,
+        api_secret TEXT,
+        network TEXT,
+        updated_at INTEGER,
+        PRIMARY KEY (chat_id, provider));
     CREATE TABLE IF NOT EXISTS wallet_credentials(
-        chat_id INTEGER PRIMARY KEY, password_hash TEXT, hint TEXT, updated_at INTEGER);
+        chat_id INTEGER PRIMARY KEY,
+        password TEXT,
+        extra_password TEXT,
+        updated_at INTEGER);
     """)
+
+    # 1. users tablosu kolon göçü
     ucols = {r[1] for r in db.execute("PRAGMA table_info(users)")}
     for name, ddl in (("tz", "INTEGER DEFAULT 3"), ("quiet", "INTEGER DEFAULT 0"),
                       ("accepted_at", "INTEGER DEFAULT 0"), ("notify_track", "INTEGER DEFAULT 1"),
@@ -219,18 +236,60 @@ def init_db():
                       ("first_name", "TEXT DEFAULT ''")):
         if name not in ucols:
             db.execute(f"ALTER TABLE users ADD COLUMN {name} {ddl}")
+
+    # 2. signals tablosu kolon göçü
     scols = {r[1] for r in db.execute("PRAGMA table_info(signals)")}
     for name, ddl in SIG_COLS.items():
         if name not in scols:
             db.execute(f"ALTER TABLE signals ADD COLUMN {name} {ddl}")
-    # exchange_api tablosu kolon kontrolü (margin_mode)
+
+    # 3. exchange_api tablosu kolon göçü (Eksik olabilecek tüm sütunları güvenle ekle)
     try:
         ex_cols = {r[1] for r in db.execute("PRAGMA table_info(exchange_api)").fetchall()}
-        if "margin_mode" not in ex_cols:
-            db.execute("ALTER TABLE exchange_api ADD COLUMN margin_mode TEXT DEFAULT 'cross'")
-    except Exception:
-        pass
-    # v3 taslağındaki durumları yeni sözlüğe taşı (idempotent); status NULL olan v2 sinyalleri takip edilmez
+        for col_name, col_ddl in [
+            ("exchange", "TEXT"),
+            ("api_key", "TEXT"),
+            ("api_secret", "TEXT"),
+            ("passphrase", "TEXT"),
+            ("mode", "TEXT"),
+            ("margin_mode", "TEXT DEFAULT 'cross'"),
+            ("memo", "TEXT"),
+            ("updated_at", "INTEGER")
+        ]:
+            if col_name not in ex_cols:
+                db.execute(f"ALTER TABLE exchange_api ADD COLUMN {col_name} {col_ddl}")
+    except Exception as e:
+        log.warning("exchange_api migration: %s", e)
+
+    # 4. web3_rpc_api tablosu kolon göçü
+    try:
+        w3_cols = {r[1] for r in db.execute("PRAGMA table_info(web3_rpc_api)").fetchall()}
+        for col_name, col_ddl in [
+            ("provider", "TEXT"),
+            ("api_key", "TEXT"),
+            ("api_secret", "TEXT"),
+            ("network", "TEXT"),
+            ("updated_at", "INTEGER")
+        ]:
+            if col_name not in w3_cols:
+                db.execute(f"ALTER TABLE web3_rpc_api ADD COLUMN {col_name} {col_ddl}")
+    except Exception as e:
+        log.warning("web3_rpc_api migration: %s", e)
+
+    # 5. wallet_credentials tablosu kolon göçü
+    try:
+        wc_cols = {r[1] for r in db.execute("PRAGMA table_info(wallet_credentials)").fetchall()}
+        for col_name, col_ddl in [
+            ("password", "TEXT"),
+            ("extra_password", "TEXT"),
+            ("updated_at", "INTEGER")
+        ]:
+            if col_name not in wc_cols:
+                db.execute(f"ALTER TABLE wallet_credentials ADD COLUMN {col_name} {col_ddl}")
+    except Exception as e:
+        log.warning("wallet_credentials migration: %s", e)
+
+    # v3 taslağındaki durumları yeni sözlüğe taşı
     db.executescript("""
     UPDATE signals SET status='open' WHERE status IN ('tp1','tp2');
     UPDATE signals SET reason=status, status='closed' WHERE status IN ('tp3','sl','be','flip');
